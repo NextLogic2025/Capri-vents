@@ -27,7 +27,7 @@ Nuestra pasión por la tecnología y la innovación nos motiva a ofrecer product
     <td align="center">
       <img src="https://github.com/user-attachments/assets/f900e6c8-191f-483e-8036-f7967be918ae" width="150" height="150" style="object-fit: cover; border-radius: 8px;" alt="Omer Benites" /><br/>
       <strong>Omer Benites</strong><br/>
-      Desarrolladora Backend
+      Desarrollador Backend
     </td>
     <td align="center">
       <img src="https://github.com/user-attachments/assets/97f979b8-b775-4b17-abfb-6fbe616b1ff3" width="150" height="150" style="object-fit: cover; border-radius: 8px;" alt="Denis Ruiz" /><br/>
@@ -37,7 +37,7 @@ Nuestra pasión por la tecnología y la innovación nos motiva a ofrecer product
     <td align="center">
       <img src="https://github.com/user-attachments/assets/14e12627-699f-4dcb-badb-538b9e8066b3" width="150" height="150" style="object-fit: cover; border-radius: 8px;" alt="Augusto Davila" /><br/>
       <strong>Augusto Davila</strong><br/>
-      Arquitecta de Software
+      Arquitecto de Software
     </td>
   </tr>
   <tr>
