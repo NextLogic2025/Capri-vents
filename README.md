@@ -13,12 +13,52 @@ En NextLogic, somos una empresa de desarrollo de software dedicada a crear soluc
 
 Nuestra pasión por la tecnología y la innovación nos motiva a ofrecer productos de alta calidad, combinando creatividad, estrategia y un enfoque centrado en las necesidades del cliente. En NextLogic, pensamos en el futuro, programamos el presente.
 
-| Misión | Visión |
-|----------|-----------|
-| Desarrollar soluciones tecnológicas innovadoras que impulsen la transformación digital, optimizando procesos y mejorando la experiencia del usuario. | Ser líderes en el desarrollo de software a nivel regional, reconocidos por nuestra creatividad, calidad y compromiso con el futuro tecnológico. |
+| **Misión** | **Visión** |
+|--------------|---------------|
+| Desarrollar soluciones tecnológicas innovadoras que impulsen la transformación digital, optimizando procesos, mejorando la experiencia del usuario y generando valor sostenible para nuestros clientes. Nos comprometemos con la excelencia, la ética profesional y el crecimiento continuo de nuestro equipo humano. | Ser líderes en el desarrollo de software a nivel regional, reconocidos por nuestra creatividad, calidad, responsabilidad social y compromiso con el futuro tecnológico. Aspiramos a transformar industrias mediante soluciones inteligentes, escalables y centradas en las personas. |
+
 
 <div align="center">
 
-<table> <tr> <td align="center"> <img width="150" alt="Ana Torres" src="https://github.com/user-attachments/assets/ana-torres.jpg" /><br/> <strong>Omer Benites</strong><br/> Desarrolladora Backend </td> <td align="center"> <img width="150" alt="Luis Pérez" src="https://github.com/user-attachments/assets/luis-perez.jpg" /><br/> <strong>Denis Ruiz</strong><br/> Desarrollador Frontend </td> <td align="center"> <img width="150" alt="Carla Gómez" src="https://github.com/user-attachments/assets/carla-gomez.jpg" /><br/> <strong>Augusto Davila</strong><br/> Arquitecta de Software </td> </tr> <tr> <td align="center"> <img width="150" alt="Diego Ruiz" src="https://github.com/user-attachments/assets/diego-ruiz.jpg" /><br/> <strong>Pablo Criollo</strong><br/> Ingeniero de Seguridad </td> <td align="center"> <img width="150" alt="Sofía León" src="https://github.com/user-attachments/assets/sofia-leon.jpg" /><br/> <strong>Luis León</strong><br/> Especialista en Bases de Datos </td> <td align="center"> <img width="150" alt="Javier Mora" src="https://github.com/user-attachments/assets/javier-mora.jpg" /><br/> <strong>Lenin Cuenca</strong><br/> Diseñador UX/UI </td> </tr> </table>
+<h2 align="center">Equipo de Desarrollo</h2>
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/f900e6c8-191f-483e-8036-f7967be918ae" width="150" height="150" style="object-fit: cover; border-radius: 8px;" alt="Omer Benites" /><br/>
+      <strong>Omer Benites</strong><br/>
+      Desarrolladora Backend
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/97f979b8-b775-4b17-abfb-6fbe616b1ff3" width="150" height="150" style="object-fit: cover; border-radius: 8px;" alt="Denis Ruiz" /><br/>
+      <strong>Denis Ruiz</strong><br/>
+      Desarrollador Frontend
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/14e12627-699f-4dcb-badb-538b9e8066b3" width="150" height="150" style="object-fit: cover; border-radius: 8px;" alt="Augusto Davila" /><br/>
+      <strong>Augusto Davila</strong><br/>
+      Arquitecta de Software
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/b773eaf6-e56b-49dd-9fb3-9a2c47ba7229" width="150" height="150" style="object-fit: cover; border-radius: 8px;" alt="Pablo Criollo" /><br/>
+      <strong>Pablo Criollo</strong><br/>
+      Ingeniero de Seguridad
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/ce215da9-aa6c-4c98-bacb-67dfe70d0109" width="150" height="150" style="object-fit: cover; border-radius: 8px;" alt="Luis León" /><br/>
+      <strong>Luis León</strong><br/>
+      Especialista en Bases de Datos
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/30e5aed0-cb2a-48fb-ab45-48fa24ededaa" width="150" height="150" style="object-fit: cover; border-radius: 8px;" alt="Lenin Cuenca" /><br/>
+      <strong>Lenin Cuenca</strong><br/>
+      Diseñador UX/UI
+    </td>
+  </tr>
+</table>
+
 
 </div>
+
