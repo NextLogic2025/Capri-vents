@@ -60,7 +60,7 @@ Nuestra pasión por la tecnología y la innovación nos motiva a ofrecer product
 </table>
 </div>
 
-# Reto: Aplicación de ventas en linea - Cafrilosa
+# Proyecto: Aplicación de ventas en linea - Cafrilosa
 
 
 ## Descripción del reto
@@ -72,7 +72,7 @@ Cafrilosa enfrenta dificultades en la gestión de sus ventas debido a procesos m
 Además, la ausencia de un canal digital limita el alcance comercial y la visibilidad de los productos, afectando la eficiencia y la competitividad en el mercado.
 
 ## Solución propuesta
-La solución consiste en implementar una aplicación de ventas en línea integral, que automatice la gestión de pedidos, clientes, inventarios y promociones.
+La solución consiste en implementar una aplicación web y móvil de ventas en línea integral, que automatice la gestión de pedidos, clientes, inventarios y promociones.
 Esta herramienta permitirá a Cafrilosa centralizar sus operaciones comerciales, mejorar la trazabilidad de los procesos y ofrecer a sus clientes una experiencia ágil, segura y personalizada, fortaleciendo su presencia en el entorno digital.
 
 ## Objetivos
