@@ -64,7 +64,13 @@ Nuestra pasión por la tecnología y la innovación nos motiva a ofrecer product
 
 
 ## Descripción del reto
+El reto consiste en desarrollar una aplicación de ventas en línea para Cafrilosa, que permita gestionar de forma eficiente los pedidos, clientes, inventarios y promociones de sus productos de embutidos.
+El sistema busca optimizar los procesos comerciales y operativos, mejorando la atención al cliente y fortaleciendo la transformación digital de la empresa.
 
 ## Problemática
+Cafrilosa enfrenta dificultades en la gestión de sus ventas debido a procesos manuales y dispersos, lo que genera demoras en la atención de pedidos, errores en el control de inventario y falta de seguimiento a los clientes.
+Además, la ausencia de un canal digital limita el alcance comercial y la visibilidad de los productos, afectando la eficiencia y la competitividad en el mercado.
 
 ## Solución propuesta
+La solución consiste en implementar una aplicación de ventas en línea integral, que automatice la gestión de pedidos, clientes, inventarios y promociones.
+Esta herramienta permitirá a Cafrilosa centralizar sus operaciones comerciales, mejorar la trazabilidad de los procesos y ofrecer a sus clientes una experiencia ágil, segura y personalizada, fortaleciendo su presencia en el entorno digital.
