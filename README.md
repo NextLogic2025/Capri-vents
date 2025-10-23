@@ -75,7 +75,7 @@ Además, la ausencia de un canal digital limita el alcance comercial y la visibi
 La solución consiste en implementar una aplicación de ventas en línea integral, que automatice la gestión de pedidos, clientes, inventarios y promociones.
 Esta herramienta permitirá a Cafrilosa centralizar sus operaciones comerciales, mejorar la trazabilidad de los procesos y ofrecer a sus clientes una experiencia ágil, segura y personalizada, fortaleciendo su presencia en el entorno digital.
 
-## Solución propuesta
+## Objetivos
 
 
 1. **Optimizar la gestión de ventas** mediante una plataforma digital que integre pedidos, clientes, inventarios y promociones en un solo sistema.  
