@@ -1,11 +1,10 @@
-<p align="right">
-  <!-- Reemplaza la URL por el logo oficial de Cafrilosa en tu repo -->
-  <img src="https://raw.githubusercontent.com/tu-org/tu-repo/main/assets/logo-cafrilosa.png" alt="Logo Cafrilosa" width="140">
+<img width="339" height="190" alt="image" src="https://github.com/user-attachments/assets/c388d752-7cb4-4a42-acec-9b96efb07b9b" /><p align="left">
 </p>
 
 # Mapa de Capacidades — Plataforma **Cafrilosa**
-![alt text](<Capa 1.png>)
-![alt text](Capa.png)
+<img width="2374" height="917" alt="Capa 1" src="https://github.com/user-attachments/assets/9479b299-de57-4d3b-94f7-53481f444d74" />
+<img width="2374" height="917" alt="Capa" src="https://github.com/user-attachments/assets/b4bacc5c-a08a-46f7-b3ed-c672ba28d0da" />
+
 ---
 
 ## 📌 Tabla de contenido
@@ -24,8 +23,7 @@
   - [9. Distribución y Logística](#9-distribución-y-logística)
 - [Flujos clave — Vista del Cliente](#flujos-clave--vista-del-cliente)
 - [KPIs sugeridos](#kpis-sugeridos)
-- [Glosario](#glosario)
-- [Notas](#notas)
+
 
 ---
 
@@ -150,16 +148,3 @@ Un **Mapa de Capacidades** organiza, en lenguaje de negocio, **lo que el sistema
 - **Marketing:** CTR, CAC, ROI.
 
 ---
-
-## Glosario
-- **POD:** *Proof of Delivery* (prueba de entrega).  
-- **EOQ:** *Economic Order Quantity* (cantidad económica de pedido).  
-- **OTIF:** Entrega a tiempo y completa.  
-- **Cobertura:** días que el stock actual satisface la demanda.
-
----
-
-## Notas
-- **Imágenes en UI:** usar únicamente material gráfico de **Cafrilosa**.  
-- Actualiza las URLs del **logo** y del **mapa** a tu repositorio.  
-- Este README documenta el mapa funcional para guiar prototipos en Figma y el backlog del proyecto.
