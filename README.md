@@ -83,3 +83,18 @@ Esta herramienta permitirá a Cafrilosa centralizar sus operaciones comerciales,
 3. **Fortalecer el control operativo y comercial**, reduciendo errores en los procesos de venta y asegurando la trazabilidad de cada pedido desde su registro hasta la entrega.  
 4. **Impulsar la transformación digital de Cafrilosa**, modernizando sus procesos internos y aumentando su competitividad en el mercado de embutidos.  
 
+## Figma
+
+<table align="center">
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/f813572a-0161-4e29-9bd7-fe68d38a0183" alt="Vista Admin" width="300"/>
+      <br/><strong>Vista Admin</strong>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/44deb597-bc4d-48b9-aa2d-fd6af657b4fe" alt="Vista Cliente" width="300"/>
+      <br/><strong>Vista Cliente</strong>
+    </td>
+  </tr>
+</table>
+
