@@ -35,10 +35,12 @@ Un **Mapa de Capacidades** organiza, en lenguaje de negocio, **lo que el sistema
 ---
 
 ## Mapa de Capacidades (Imagen)
-<img width="2374" height="917" alt="Capa 1" src="https://github.com/user-attachments/assets/9479b299-de57-4d3b-94f7-53481f444d74" />
-<img width="2374" height="917" alt="Capa" src="https://github.com/user-attachments/assets/b4bacc5c-a08a-46f7-b3ed-c672ba28d0da" />
+![alt text](Capa.jpg)
+
 
 ---
+
+
 
 ## Módulos y Subcapacidades
 
