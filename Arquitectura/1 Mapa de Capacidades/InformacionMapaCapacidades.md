@@ -41,59 +41,151 @@ Un **Mapa de Capacidades** organiza, en lenguaje de negocio, **lo que el sistema
 ---
 
 
+# Mapa de Capacidades del Sistema  
+**ERP Comercial - Arquitectura por Capas (3 Niveles)**
 
-## Módulos y Subcapacidades
+> **Nivel 1:** Módulo  
+> **Nivel 2:** Subproceso  
+> **Nivel 3:** Tarea específica (acción atómica)
 
-### 1. Gestión de Clientes
-- **Registro de clientes:** alta, datos de contacto/fiscales.  
-- **Actualización de datos:** edición, cambio de responsable, historial.  
-- **Verificación/validación:** integridad (correo/teléfono), duplicados.  
-- **Categorización y segmentación:** tipo, condiciones comerciales, preferencias.  
-- **Estados:** activación, suspensión, reactivación.
+---
 
-### 2. Administración de Datos
-- **Gobierno de datos maestros:** clientes, productos, catálogos.  
-- **Calidad y consistencia:** normalización, limpieza, reglas de validación.  
-- **Auditoría y trazabilidad:** quién/qué/cuándo.
+## 1. Gestión de Clientes
 
-### 3. Incorporación de Nuevos Productos
-- **Alta de producto:** nombre, categoría, atributos, características.  
-- **Datos comerciales:** precios, impuestos, unidades, empaques.  
-- **Aprobación/publicación:** revisión y disponibilidad en catálogo.
+### 1.1 Registrar Clientes
+| Tarea | Descripción |
+|------|-------------|
+| Recopilar información básica | Ingresar nombre, contacto, dirección, canal |
+| Registrar datos maestros del cliente | Crear registro único en sistema central |
+| Verificar datos fiscales y referencias comerciales | Validar RUT/CUIT, historial crediticio |
+| Asignar código interno de cliente y canal / responsable | Generar ID único + vincular a vendedor |
 
-### 4. Gestión de Productos
-- **Ficha de producto:** descripciones, **imágenes (solo Cafrilosa)**, etiquetas.  
-- **Precios y promociones:** vigencias, reglas y excepciones.  
-- **Estados:** activo/inactivo, descontinuación, sustituciones.
+### 1.2 Actualización de Datos
+| Tarea | Descripción |
+|------|-------------|
+| Actualización de información de cliente | Editar campos modificables |
+| Controlar historial de información | Mantener log de versiones anteriores |
+| Validación de actualizaciones con áreas contable y logística | Aprobación cruzada antes de guardar |
+| Registro de cambios en historial del cliente | Auditoría automática con timestamp |
 
-### 5. Gestión de Inventarios (Stock)
-- **Movimientos:** ingresos, salidas, transferencias.  
-- **Ajustes y auditorías:** conteos cíclicos, mermas, diferencias.  
-- **Lotes/caducidades/ubicaciones:** lote/fecha, estanterías.  
-- **Alertas/umbrales:** mínimos, máximos, rotación, obsolescencia.
+---
 
-### 6. Reabastecimiento Sostenible
-- **Puntos de reorden / EOQ:** cantidades y frecuencia óptima.  
-- **Pronóstico y planeación:** demanda, estacionalidad, cobertura.  
-- **Proveedores:** evaluación, pedidos programados, confirmaciones.  
-- **Disponibilidad en cadena:** plazos y nivel de servicio.
+## 2. Gestión de Productos
 
-### 7. Marketing (Campañas)
-- **Planeación:** objetivos, segmentación, canales, presupuesto.  
-- **Ejecución y seguimiento:** lanzamientos, monitoreo, ajustes.  
-- **Cierre y métricas:** desempeño por canal, ROI, lecciones aprendidas.
+### 2.1 Incorporación de Nuevos Productos
+| Tarea | Descripción |
+|------|-------------|
+| Registrar productos | Alta en catálogo maestro |
+| Ingresar datos: Tipo | Clasificar (perecedero, seco, etc.) |
+| Ingresar datos: Nombre | Nombre comercial y técnico |
+| Ingresar datos: Características | Peso, volumen, conservación |
+| Asignar códigos de producto | SKU, EAN, interno |
+| Verificar disponibilidad inicial | Confirmar stock físico vs. sistema |
 
-### 8. Ventas (Proceso y Post-venta)
-- **Proceso de venta:** búsqueda/selección, validación de stock, cotización, descuentos, pedido.  
-- **Pagos y comprobantes:** registro/validación y emisión de comprobantes.  
-- **Post-venta:** confirmaciones, devoluciones, garantías, satisfacción.
+### 2.2 Actualización y Mantenimiento
+| Tarea | Descripción |
+|------|-------------|
+| Actualizar información de productos | Modificar cualquier campo |
+| Revisar precios y disponibilidad | Ajuste masivo o individual |
+| Modificar descripciones e imágenes según retroalimentación | Actualización desde marketing/ventas |
+| Sincronizar cambios | Push a app móvil, web, POS |
+| Retirar productos obsoletos | Marcar como inactivo |
+| Identificar productos con baja rotación | Reporte automático < 3 ventas/mes |
+| Notificar a producción para detener elaboración | Email/Slack automático |
+| Eliminar del catálogo de la app y archivar datos históricos | Soft-delete + backup |
 
-### 9. Distribución y Logística
-- **Planificación de rutas:** zonas, secuencias, ventanas de entrega.  
-- **Preparación y despacho:** picking/packing, documentación, carga.  
-- **Ejecución y seguimiento:** tracking, **POD** (prueba de entrega), incidencias.  
-- **Control de condiciones:** temperatura/seguridad cuando aplique.
+---
 
+## 3. Gestión de Inventarios
+
+### 3.1 Monitoreo de Stock
+| Tarea | Descripción |
+|------|-------------|
+| Registrar entradas y salidas de stock | Por recepción, venta, ajuste |
+| Actualizar inventario al completar lotes | Cierre de producción |
+| Deducir unidades vendidas o enviadas diariamente | Job nocturno automático |
+| Generar reportes semanales para revisión | PDF/Excel por email |
+| Ajustar alertas de reabastecimiento | Umbral dinámico por rotación |
+
+### 3.2 Reabastecimiento Sostenible
+| Tarea | Descripción |
+|------|-------------|
+| Generar órdenes de reabastecimiento | Automático o manual |
+| Identificar niveles bajos | Stock < punto de pedido |
+| Confirmar disponibilidad | Con proveedor o producción |
+| Actualizar inventario al reabastecer | Recepción física + sistema |
+| Optimizar rotación de inventario | FIFO, FEFO, ABC |
+| Clasificar productos por fecha de caducidad | Alertas por lote |
+| Desechar productos expirados | Registro de merma |
+
+---
+
+## 4. Marketing
+
+### 4.1 Planificación de Campañas
+| Tarea | Descripción |
+|------|-------------|
+| Definir audiencias objetivo | Filtros: zona, compras, preferencias |
+| Segmentar clientes por preferencias | Tags: vegano, sin gluten, etc. |
+| Recopilar feedback | Encuestas post-compra |
+| Priorizar grupos | Scoring por LTV |
+| Crear contenido promocional | Plantillas reutilizables |
+| Redactar descripciones | Copy optimizado |
+| Fotos de productos | Galería por SKU |
+| Programar publicaciones | Calendario integrado |
+
+### 4.2 Ejecución de Campañas
+| Tarea | Descripción |
+|------|-------------|
+| Lanzar campañas | Activación programada |
+| Enviar notificación | Push, email, SMS |
+| Lanzar campaña | Disparo masivo |
+| Medir tasa de apertura | Reporte en tiempo real |
+
+---
+
+## 5. Ventas
+
+### 5.1 Proceso de Venta
+| Tarea | Descripción |
+|------|-------------|
+| Recepcionar y validar pedidos | App/web/POS |
+| Realizar pedido | Confirmación inmediata |
+| Verificar stock en almacén | Bloqueo temporal de unidades |
+| Generar orden de picking en almacén | Lista impresa o digital |
+| Procesar pagos seguros | Integración Stripe/Mercado Pago |
+| Pasarela de pago | Redirección segura |
+| Validar transacción | Callback + webhook |
+| Emitir comprobante | PDF fiscal automático |
+
+### 5.2 Gestión Post-Venta
+| Tarea | Descripción |
+|------|-------------|
+| Confirmar y preparar pedidos para envío | Estado: "Listo para picking" |
+| Recibir lista de picking | Desde almacén |
+| Empacar y etiquetar con QR de rastreo | Código único por pedido |
+| Escanear salida y actualizar estado | "En tránsito" |
+
+---
+
+## 6. Distribución y Logística
+
+### 6.1 Planificación de Rutas
+| Tarea | Descripción |
+|------|-------------|
+| Asignar rutas óptimas por zona | Algoritmo Google Maps/OR-Tools |
+| Recibir direcciones de pedidos | Desde ventas |
+| Generar rutas diarias para flota propia y terceros | PDF + app móvil |
+| Coordinar embalaje con cadena de frío | Alertas de temperatura |
+| Seleccionar caja | Según volumen/peso |
+| Registrar temperatura | Sensor IoT o manual |
+
+### 6.2 Ejecución y Seguimiento
+| Tarea | Descripción |
+|------|-------------|
+| Rastrear envíos | GPS en tiempo real |
+| Escanear QR al cargar y entregar | App conductor |
+| Registrar prueba de entrega | Foto + firma digital |
 ---
 
 ## Flujos clave — Vista del Cliente
