@@ -28,7 +28,7 @@ Un diagrama de casos de uso (UML) muestra qué hace el sistema desde la perspect
 
 ## 1) Módulo Gestión de Clientes
 
-![Gestión de Clientes](./imgs/gestion_clientes.png)
+<img width="900" height="700" alt="image" src="https://github.com/user-attachments/assets/f3ebdfa1-03da-47ea-806f-8083cd432efd" />
 
 ### Propósito
 Registrar clientes nuevos y mantener su información actualizada, garantizando trazabilidad y validaciones fiscales/contables.
@@ -80,7 +80,7 @@ Submódulos Registrar Clientes y Actualización de Datos.
 
 ## 2) Módulo Gestión de Productos
 
-![Gestión de Productos](./imgs/gestion_productos.png)
+<img width="900" height="700" alt="image" src="https://github.com/user-attachments/assets/ea117eab-7df8-49bc-93dc-7b1047db300a" />
 
 ### Propósito
 Administrar alta, mantenimiento y baja de productos, sincronizando con almacén.
@@ -133,7 +133,7 @@ Administrar alta, mantenimiento y baja de productos, sincronizando con almacén.
 
 ## 3) Módulo Gestión de Inventarios
 
-![Gestión de Inventarios](./imgs/gestion_inventarios.png)
+<img width="900" height="700" alt="image" src="https://github.com/user-attachments/assets/988782da-660b-4e42-8e47-5a99b57dca8b" />
 
 ### Propósito
 Control continuo de stock y reabastecimiento con criterios de sustentabilidad y caducidad.
@@ -183,7 +183,7 @@ Control continuo de stock y reabastecimiento con criterios de sustentabilidad y 
 
 ## 4) Módulo Gestión de Marketing
 
-![Gestión de Marketing](./imgs/gestion_marketing.png)
+<img width="900" height="700" alt="image" src="https://github.com/user-attachments/assets/179c7728-ad84-463f-9921-3dc5fb3c638e" />
 
 ### Propósito
 Planificar y ejecutar campañas basadas en audiencias y catálogo actualizado.
@@ -230,7 +230,7 @@ Planificar y ejecutar campañas basadas en audiencias y catálogo actualizado.
 
 ## 5) Módulo Gestión de Ventas
 
-![Gestión de Ventas](./imgs/gestion_ventas.png)
+<img width="900" height="700" alt="image" src="https://github.com/user-attachments/assets/09a87479-8ced-4518-8064-0d1d316f90b4" />
 
 ### Propósito
 Procesar pedidos y pagos de forma segura y preparar los envíos.
@@ -278,7 +278,7 @@ Procesar pedidos y pagos de forma segura y preparar los envíos.
 
 ## 6) Módulo Gestión de Distribución y Logística
 
-![Gestión de Distribución y Logística](./imgs/gestion_logistica.png)
+<img width="900" height="700" alt="image" src="https://github.com/user-attachments/assets/481cbf1f-5058-4915-b09d-8d51b1048ece" />
 
 ### Propósito
 Planificar rutas, asegurar cadena de frío y dar trazabilidad a la entrega.
