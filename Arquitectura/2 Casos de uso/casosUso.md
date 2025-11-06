@@ -1,10 +1,10 @@
 <p align="right">
-  <img src="https://i.postimg.cc/13qQdqZs/utpllogo.png" alt="Logo UTPL" width="150"/>
+  <img src="https://i.postimg.cc/13qQdqZs/utpllogo.png" alt="Logo UTPL" width="150"/>
 </p>
 
 # Módulos y descripciones de Casos de Uso del sistema
 
-Este .md resume y documenta los seis diagramas de casos de uso del sistema. Incluye: propósito del módulo, límite del sistema, actores, y la descripción de los casos de uso con sus relaciones `<<include>>` y `<<extend>>`.
+Este documento resume y documenta los seis diagramas de casos de uso actualizados del sistema. Incluye: propósito del módulo, límite del sistema, actores, y la descripción de los casos de uso con sus relaciones <<include>>.
 
 ---
 
@@ -16,302 +16,158 @@ Un diagrama de casos de uso (UML) muestra qué hace el sistema desde la perspect
 
 ## Elementos básicos
 
-* **Actor**: rol externo que interactúa con el sistema (persona o sistema).
-* **Caso de uso**: funcionalidad que el sistema ofrece al actor.
-* **Relaciones**:
-    * **Asociación**: actor ↔ caso de uso.
-    * **`<<include>>`**: un caso de uso reutiliza a otro obligatorio.
-    * **`<<extend>>`**: comportamiento opcional/condicional que amplía a otro.
-    * **Generalización**: herencia entre actores o casos.
+* *Actor*: rol externo que interactúa con el sistema (persona o sistema).
+* *Caso de uso*: funcionalidad que el sistema ofrece al actor.
+* *Relaciones*:
+    * *Asociación*: actor ↔ caso de uso (línea sólida).
+    * **<<include>>**: un caso de uso principal requiere la ejecución de otro obligatorio (línea discontinua con flecha).
 
 ---
 
-## 1) Módulo Gestión de Clientes
+## 1) Módulo Gestión Cliente
 
-<img width="900" height="700" alt="image" src="https://github.com/user-attachments/assets/f3ebdfa1-03da-47ea-806f-8083cd432efd" />
+<img width="1231" height="1734" alt="image" src="https://github.com/user-attachments/assets/1f0621b9-2006-488c-93ea-d2ec996f1f1c" />
+
 
 ### Propósito
-Registrar clientes nuevos y mantener su información actualizada, garantizando trazabilidad y validaciones fiscales/contables.
-
-### Límite del sistema
-Submódulos Registrar Clientes y Actualización de Datos.
+Gestionar el ciclo de vida del cliente, desde la identificación de oportunidades y prospección, hasta su registro formal, clasificación y fidelización continua.
 
 ### Actores
-* Cliente
-* SRI (sistema externo para validaciones fiscales)
-* Carfilosa (área/sistema interno)
-* Personal y Contadora (para validaciones de actualización)
+* Personal, Supervisor de Ventas, Analista Comercial, Vendedor, Marketing
+* Cafrilosa (sistema/ente externo), SRI (ente fiscal externo), Cliente
 
-### Submódulo: Registrar Clientes
+### Submódulos y Casos de Uso
 
-**Casos de uso y relaciones**
-* **Recopilar información básica**
-    * `<<include>>` Verificar datos fiscales y referencias comerciales (SRI)
-    * `<<include>>` Registrar datos maestros del cliente (Carfilosa)
-    * `<<include>>` Asignar código interno de cliente y canal correspondiente (Carfilosa)
-
-**Descripción corta**
-
-| *Caso de uso* | *Actores* | *Flujo normal (resumen)* |
-| :--- | :--- | :--- |
-| **Recopilar información básica** | Cliente | Capturar datos personales/empresa y canal. |
-| **Verificar datos fiscales y referencias comerciales** | SRI | Consultar RUC/identificador y referencias; devolver estado. |
-| **Registrar datos maestros del cliente** | Carfilosa | Persistir datos validados y parámetros comerciales. |
-| **Asignar código interno de cliente y canal correspondiente** | Carfilosa | Generar código único y asociar canal (retail, mayorista, etc.). |
-
-### Submódulo: Actualización de Datos
-
-**Caso principal**
-* **Actualizar Información de Cliente**
-    * `<<include>>` Controlar Historial de información (Carfilosa)
-    * `<<include>>` Registro de cambios en historial de cliente
-    * `<<include>>` Validación de actualizaciones con área contable y logística (Personal/Contadora)
-
-**Descripción corta**
-
-| *Caso de uso* | *Actores* | *Flujo normal (resumen)* |
-| :--- | :--- | :--- |
-| **Actualizar Información de Cliente** | Cliente, Personal | Cliente solicita cambio; Personal valida; se actualiza y registra trazabilidad. |
-| **Controlar Historial de información** | Carfilosa | Consultar y auditar cambios. |
-| **Registro de cambios en historial de cliente** | — | Guardar quién, qué y cuándo. |
-| **Validación de actualizaciones con área contable y logística** | Personal, Contadora | Aprobar/observar cambios que afecten crédito, impuestos o entregas. |
+| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (<<include>>) |
+| :--- | :--- | :--- | :--- |
+| *Prospectar Clientes* | *Identificar nuevos clientes potenciales* | Personal, Sup. Ventas, Analista, Cafrilosa | • Analizar el mercado local y la competencia.<br>• Recibir referencias de clientes actuales. |
+| | *Evaluar viabilidad comercial* | Personal, Sup. Ventas, Analista | • Revisar capacidad de pago.<br>• Validar requisitos legales o sanitarios. |
+| *Registrar y Clasificar* | *Ingresar Datos del Cliente* | Cliente, Personal, Sup. Ventas, Analista | • Verificar validez fiscal (SRI).<br>• Ingresar datos (razón social, dirección, etc.). |
+| | *Clasificar cliente según perfil comercial* | Personal, Sup. Ventas, Analista, Cafrilosa | • Asignar canal de venta (mayorista, minorista).<br>• Categorizar según tamaño y frecuencia. |
+| *Fidelizar Clientes* | *Mantener comunicación continua* | Personal, Sup. Ventas, Vendedor, Mkt, Cliente | • Enviar información sobre promociones.<br>• Realizar seguimiento postventa. |
+| | *Implementar programas de beneficios* | Personal, Sup. Ventas, Vendedor, Marketing | • Aplicar bonificaciones por volumen.<br>• Otorgar descuentos por antigüedad. |
 
 ---
 
-## 2) Módulo Gestión de Productos
+## 2) Módulo Gestión de Pedidos
 
-<img width="900" height="700" alt="image" src="https://github.com/user-attachments/assets/ea117eab-7df8-49bc-93dc-7b1047db300a" />
+<img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/fe8bd66b-e587-4ffb-8829-27154243dded" />
+
 
 ### Propósito
-Administrar alta, mantenimiento y baja de productos, sincronizando con almacén.
+Controlar la toma de pedidos por diversos canales, coordinar su preparación con logística y realizar el seguimiento hasta el cierre administrativo.
 
 ### Actores
-* Personal, Gerente de Almacén, Marketing
-* Almacén (sistema/área externo al módulo)
+* Personal, Supervisor de Ventas, Gerente de Almacén
+* Logística, Cliente, Almacén, Repartidor
 
-### A) Incorporación de Nuevos Productos
+### Submódulos y Casos de Uso
 
-**Caso principal: Registrar productos**
-* `<<include>>` Ingresar datos
-* `<<include>>` Asignar Códigos de Productos
-* `<<include>>` Verificar disponibilidad inicial (Almacén)
-
-| *Caso de uso* | *Actores* | *Resumen* |
-| :--- | :--- | :--- |
-| **Registrar productos** | Personal | Alta de ítems con atributos comerciales y logísticos. |
-| **Ingresar datos** | — | Nombre, categoría, unidad, presentación, precios base. |
-| **Asignar Códigos de Productos** | — | SKU/código interno y códigos de barra. |
-| **Verificar disponibilidad inicial** | Almacén | Confirmar stock inicial o fecha de disponibilidad. |
-
-### B) Actualizar información de productos
-
-**Casos:**
-* Revisar precios y disponibilidad
-* Modificar descripciones o imágenes según retroalimentación
-* `<<include>>` Sincronizar cambios (Almacén)
-
-| *Caso de uso* | *Actores* | *Resumen* |
-| :--- | :--- | :--- |
-| **Revisar precios y disponibilidad** | Personal, Gerente de Almacén | Ajuste por lista de precios/stock. |
-| **Modificar descripciones o imágenes según retroalimentación** | Marketing, Personal | Mejoras de catálogo y SEO. |
-| **Sincronizar cambios** | Almacén | Propagar cambios a inventario/ventas. |
-
-### C) Retirar productos obsoletos
-
-**Casos:**
-* Identificar productos con baja rotación
-    * `<<include>>` Notificar a producción para detener elaboración
-    * `<<include>>` Eliminar del catálogo de la app y archivar datos históricos (Almacén)
-
-| *Caso de uso* | *Actores* | *Resumen* |
-| :--- | :--- | :--- |
-| **Identificar productos con baja rotación** | Personal, Gerente de Almacén | KPI de rotación y margen. |
-| **Notificar a producción para detener elaboración** | — | Aviso formal y fecha de corte. |
-| **Eliminar del catálogo de la app y archivar datos históricos** | Almacén | Ocultar/retirar y conservar histórico. |
+| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (<<include>>) |
+| :--- | :--- | :--- | :--- |
+| *Recibir Pedido* | *Tomar pedido durante visita o por canal digital* | Personal, Sup. Ventas, Gte. Almacén, Personal (recepción) | • Registrar productos y cantidades en sistema.<br>• Confirmar fechas de entrega disponibles. |
+| | *Validar condiciones comerciales* | Personal, Sup. Ventas, Gte. Almacén, Logística, Cliente | • Verificar precios vigentes y descuentos.<br>• Confirmar crédito disponible. |
+| *Coordinar Pedido* | *Enviar pedido a planta o almacén* | Cliente*, Almacén, Repartidor | • Priorizar pedidos según zona/urgencia.<br>• Validar disponibilidad de stock o capacidad. |
+| | *Confirmar fecha y modo de entrega* | Personal, Sup. Ventas, Gte. Almacén, Almacén, Repartidor, Cliente | • Programar reparto según ruta.<br>• Confirmar al cliente la fecha estimada. |
+| *Controlar Pedido* | *Realizar seguimiento del estado del pedido* | Personal, Sup. Ventas, Gte. Almacén, Almacén | • Verificar preparación, empaque y despacho.<br>• Informar retrasos o cambios al cliente. |
+| | *Ejecutar cierre administrativo del pedido* | Personal, Sup. Ventas, Gte. Almacén, Cliente | • Confirmar facturación y despacho finalizado.<br>• Registrar cierre del pedido en ERP/CRM. |
+(Nota: En el diagrama, "Cliente" inicia "Enviar pedido a planta", lo cual puede representar pedidos de autogestión).
 
 ---
 
-## 3) Módulo Gestión de Inventarios
+## 3) Módulo Gestión de Entregas
 
-<img width="900" height="700" alt="image" src="https://github.com/user-attachments/assets/988782da-660b-4e42-8e47-5a99b57dca8b" />
+<img width="1254" height="1664" alt="image" src="https://github.com/user-attachments/assets/f474002d-f23f-4585-91f0-0607098edc59" />
+
 
 ### Propósito
-Control continuo de stock y reabastecimiento con criterios de sustentabilidad y caducidad.
+Asegurar la correcta preparación, embalaje, transporte y entrega final de los productos, gestionando cualquier incidencia en el proceso.
 
 ### Actores
-* Personal, Gerente de Almacén, Almacén (sistema)
+* Personal, Supervisor de Ventas, Repartidor
+* Almacén, Cliente
 
-### A) Monitoreo de Stock
+### Submódulos y Casos de Uso
 
-**Caso principal: Registrar entradas y salidas de stock**
-* `<<include>>` Actualizar inventario al completar lotes
-* `<<include>>` Detectar unidades vendidas o enviadas diariamente
-* `<<include>>` Generar reportes semanales para revisión
-* `<<extend>>` Ajustar alertas de reabastecimiento
-
-| *Caso de uso* | *Actores* | *Resumen* |
-| :--- | :--- | :--- |
-| **Registrar entradas y salidas de stock** | Personal | Movimientos por compras, producción, ventas, devoluciones. |
-| **Actualizar inventario al completar lotes** | — | Cierre de lote → alta en stock disponible. |
-| **Detectar unidades vendidas o enviadas diariamente** | Almacén | Integración con ventas/despacho. |
-| **Generar reportes semanales para revisión** | Gerente de Almacén | KPIs, quiebres, mermas. |
-| **Ajustar alertas de reabastecimiento (extend)** | Gerente de Almacén | Ajuste de puntos de pedido y stocks de seguridad. |
-
-### B) Reabastecimiento Sostenible
-
-**Caso principal: Reabastecimiento Sostenible**
-* `<<include>>` Identificar niveles bajos
-* `<<include>>` Confirmar disponibilidad
-* `<<include>>` Actualizar inventario al reabastecer
-* `<<extend>>` Clasificar productos por fecha de caducidad
-* `<<extend>>` Desechar productos expirados
-
-**Caso relacionado:**
-* Optimizar rotación de inventario (`<<extend>>` del flujo de reabastecimiento)
-
-| *Caso de uso* | *Actores* | *Resumen* |
-| :--- | :--- | :--- |
-| **Reabastecimiento Sostenible** | Personal, Gerente | Ordenar según demanda y capacidad. |
-| **Identificar niveles bajos** | — | Puntos de reposición por SKU. |
-| **Confirmar disponibilidad** | Almacén | Validar proveedores/lotes. |
-| **Actualizar inventario al reabastecer** | — | Entradas y ajustes de reservas. |
-| **Clasificar por fecha de caducidad (extend)** | — | FEFO/rotación. |
-| **Desechar productos expirados (extend)** | — | Bajas con trazabilidad. |
-| **Optimizar rotación de inventario (extend)** | Gerente | Parametrizar políticas de rotación. |
+| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (<<include>>) |
+| :--- | :--- | :--- | :--- |
+| *Preparar Pedido* | *Verificar producto y lote* | Personal, Sup. Ventas, Repartidor, Almacén | • Confirmar frescura y fecha de vencimiento.<br>• Comprobar temperatura/condición. |
+| | *Embalar y documentar* | Personal, Sup. Ventas, Repartidor | • Generar guías de despacho.<br>• Etiquetar bultos por cliente o zona. |
+| *Distribuir y Entregar* | *Cargar y transportar productos* | Personal, Sup. Ventas, Repartidor, Personal (logística) | • Asignar vehículo y chofer según ruta.<br>• Respetar cadena de frío durante reparto. |
+| | *Confirmar entrega al cliente* | Personal, Sup. Ventas, Repartidor, Cliente | • Obtener firma o confirmación de recepción.<br>• Registrar observaciones o rechazos. |
+| *Gestionar Incidencias* | *Reportar problemas de entrega* | Personal, Sup. Ventas, Repartidor, Cliente | • Clasificar incidente.<br>• Registrar evidencia y datos en el sistema. |
+| | *Coordinar solución* | Personal, Sup. Ventas, Repartidor | • Generar nota de crédito o programar reposición.<br>• Escalar casos recurrentes a supervisión. |
 
 ---
 
-## 4) Módulo Gestión de Marketing
+## 4) Módulo Gestión de Cobros y Créditos
 
-<img width="900" height="700" alt="image" src="https://github.com/user-attachments/assets/179c7728-ad84-463f-9921-3dc5fb3c638e" />
+<img width="1282" height="1664" alt="image" src="https://github.com/user-attachments/assets/0ee6519f-8f07-46a2-9616-d12417bdceb0" />
+
 
 ### Propósito
-Planificar y ejecutar campañas basadas en audiencias y catálogo actualizado.
+Administrar la cartera de clientes, ejecutar la cobranza de manera efectiva y evaluar el otorgamiento de créditos comerciales.
 
 ### Actores
-* Personal, Gerente de Almacén, Marketing, Cliente
-* Campaña (plataforma/sistema de campañas)
+* Personal, Supervisor de Ventas, Vendedor
+* Gerente de Ventas, Logística, Cliente
 
-### A) Planificación de Campañas
+### Submódulos y Casos de Uso
 
-**Casos:**
-* **Definir audiencias objetivo**
-    * `<<include>>` Segmentar clientes por preferencias
-    * `<<include>>` Recopilar feedback
-    * `<<include>>` Priorizar grupos
-* **Crear contenido promocional**
-    * `<<include>>` Redactar descripciones
-    * `<<include>>` Fotos de productos
-    * `<<include>>` Programar publicaciones
-
-| *Caso de uso* | *Actores* | *Resumen* |
-| :--- | :--- | :--- |
-| **Definir audiencias objetivo** | Personal | Segmentar por preferencias, historial y canales. |
-| **Recopilar feedback** | Campaña | Importar reseñas/encuestas. |
-| **Priorizar grupos** | — | Seleccionar targets de alto impacto. |
-| **Crear contenido promocional** | Marketing, Personal | Piezas, copys, creatividades. |
-| **Redactar descripciones / Fotos de productos / Programar publicaciones** | Campaña | Preparar y calendarizar. |
-
-### B) Ejecución de Campañas
-
-**Caso principal: Lanzar Campañas**
-* `<<include>>` Enviar notificación
-* `<<include>>` Ejecutar Campaña
-* `<<include>>` Medir tasa de apertura
-
-| *Caso de uso* | *Actores* | *Resumen* |
-| :--- | :--- | :--- |
-| **Lanzar Campañas** | Marketing, Personal | Activar envíos por canal (email, push, redes). |
-| **Enviar notificación** | Campaña, Cliente | Disparos por segmento. |
-| **Ejecutar Campaña** | Campaña | Orquestación y seguimiento. |
-| **Medir tasa de apertura** | Campaña | Métricas de apertura/clic/conversión. |
+| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (<<include>>) |
+| :--- | :--- | :--- | :--- |
+| *Controlar Cuentas por Cobrar* | *Monitorear facturas pendientes* | Personal, Sup. Ventas, Personal (admin) | • Identificar facturas vencidas por rango.<br>• Evaluar riesgo de incobrabilidad. |
+| | *Clasificar clientes por estado de pago* | Personal, Sup. Ventas, Gte. Ventas | • Etiquetar cliente (Puntual, Atrasado, Moroso).<br>• Notificar estado al Ejecutivo de Cuentas. |
+| *Ejecutar Cobros* | *Coordinar rutas de cobranza* | Personal, Sup. Ventas, Vendedor, Logística | • Asignar cobros a vendedores por zona.<br>• Priorizar visitas por antigüedad de deuda. |
+| | *Registrar pagos recibidos* | Personal, Sup. Ventas, Vendedor, Cliente | • Validar montos, medio de pago y fecha.<br>• Emitir recibo oficial y actualizar cuenta. |
+| *Gestionar Créditos* | *Evaluar solicitud de crédito* | Supervisor de Ventas | • Verificar historial y capacidad de pago.<br>• Definir límite y plazo autorizado. |
+| | *Controlar cumplimiento de condiciones* | Supervisor de Ventas | • Revisar periodicidad de pagos.<br>• Actualizar límites según comportamiento. |
 
 ---
 
-## 5) Módulo Gestión de Ventas
+## 5) Módulo Postventa y Servicio al Cliente
 
-<img width="900" height="700" alt="image" src="https://github.com/user-attachments/assets/09a87479-8ced-4518-8064-0d1d316f90b4" />
+<img width="1098" height="1664" alt="image" src="https://github.com/user-attachments/assets/cfdb8065-ca52-42fa-a5c6-a623f4ef990c" />
+
 
 ### Propósito
-Procesar pedidos y pagos de forma segura y preparar los envíos.
+Atender reclamos de manera eficiente, medir la satisfacción del cliente y ejecutar acciones de fidelización continua.
 
 ### Actores
-* Cliente, Personal, Gerente de Almacén
-* Almacén (sistema), Pasarela de Pago
+* Supervisor de Ventas
+* Vendedor, Cliente
 
-### A) Proceso Ventas
+### Submódulos y Casos de Uso
 
-**Casos:**
-* **Recepcionar y Validar Pedidos**
-    * `<<include>>` Realizar Pedido
-    * `<<include>>` Verificar stock en almacén (Almacén)
-    * `<<include>>` Generar orden de picking en almacén (Almacén)
-* **Procesar Pagos Seguros**
-    * `<<include>>` Validar Transacción (Pasarela de Pago)
-    * `<<include>>` Emitir Comprobante
-
-| *Caso de uso* | *Actores* | *Resumen* |
-| :--- | :--- | :--- |
-| **Recepcionar y Validar Pedidos** | Cliente, Almacén | Capturar pedido; validar disponibilidad; emitir orden de picking. |
-| **Realizar Pedido** | Cliente | Selección y confirmación de carrito. |
-| **Verificar stock en almacén** | Almacén | Disponibilidad y reservas. |
-| **Generar orden de picking en almacén** | Almacén | Lista de preparación por ubicación. |
-| **Procesar Pagos Seguros** | Pasarela de Pago | Cobro, antifraude y conciliación. |
-| **Validar Transacción** | Pasarela de Pago | Autorización/declinación. |
-| **Emitir Comprobante** | — | Factura/recibo electrónico. |
-
-### B) Gestión Post-Ventas
-
-**Caso principal: Confirmar y preparar pedidos para envío**
-* `<<include>>` Recibir lista de picking
-* `<<include>>` Escanear salida y se actualiza estado
-* `<<include>>` Empacar y etiquetar con QR de rastreo (Almacén)
-
-| *Caso de uso* | *Actores* | *Resumen* |
-| :--- | :--- | :--- |
-| **Confirmar y preparar pedidos para envío** | Personal, Gerente | Verificar pago/picking; preparar despacho. |
-| **Recibir lista de picking** | Almacén | Tareas de preparación. |
-| **Escanear salida y se actualiza estado** | Almacén | Trazabilidad de despacho. |
-| **Empacar y etiquetar con QR de rastreo** | Almacén | Etiquetas y guía de envío. |
+| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (<<include>>) |
+| :--- | :--- | :--- | :--- |
+| *Atender Reclamos* | *Recibir reclamo por producto o servicio* | Sup. Ventas, Vendedor | • Identificar pedido y motivo del reclamo.<br>• Documentar evidencia del problema. |
+| | *Resolver reclamo* | Sup. Ventas | • Aprobar o rechazar devolución.<br>• Coordinar reposición o emitir nota de crédito. |
+| *Dar Seguimiento a la Satisfacción* | *Aplicar encuestas o llamadas* | Sup. Ventas, Cliente | • Programar envíos/llamadas en CRM.<br>• Recopilar respuestas (NPS/CSAT) y comentarios. |
+| | *Analizar resultados y retroalimentar* | Sup. Ventas | • Consolidar métricas y detectar causas raíz.<br>• Comunicar hallazgos y proponer correctivos. |
+| *Fidelizar de Forma Continua* | *Implementar programas de retención* | Sup. Ventas, Cliente | • Definir criterios de elegibilidad.<br>• Asignar beneficios y notificar al cliente. |
+| | *Ofertar beneficios y promociones* | Sup. Ventas | • Aplicar descuentos o beneficios por volumen.<br>• Lanzar promociones periódicas y medir performance. |
 
 ---
 
-## 6) Módulo Gestión de Distribución y Logística
+## 6) Módulo Control y Análisis Comercial
 
-<img width="900" height="700" alt="image" src="https://github.com/user-attachments/assets/481cbf1f-5058-4915-b09d-8d51b1048ece" />
+<img width="1104" height="1664" alt="image" src="https://github.com/user-attachments/assets/d9a798a2-2f17-4ae8-bf59-e94a4a7b93b1" />
 
 ### Propósito
-Planificar rutas, asegurar cadena de frío y dar trazabilidad a la entrega.
+Proveer herramientas para la medición del desempeño de ventas, análisis de mercado y toma de decisiones estratégicas gerenciales.
 
 ### Actores
-* Personal, Supervisor de Logística, Coordinador de Almacén/Distribución, Director/Repartidor
-* Carfilosa (sistema/área)
+* Supervisor de Ventas
+* Gerente
 
-### A) Planificación de Rutas
+### Submódulos y Casos de Uso
 
-**Casos:**
-* **Asignar rutas óptimas por zona**
-    * `<<include>>` Asignar rutas
-    * `<<include>>` Generar rutas diarias para flota propia y terceros (Carfilosa)
-* **Coordinar embalaje con cadena de frío**
-    * `<<include>>` Seleccionar caja
-    * `<<include>>` Registrar temperatura (Carfilosa)
-
-| *Caso de uso* | *Actores* | *Resumen* |
-| :--- | :--- | :--- |
-| **Asignar rutas óptimas por zona** | Personal, Supervisor | Optimización por zona, ventanas y capacidad. |
-| **Generar rutas diarias para flota propia y terceros** | Carfilosa | Integración con proveedores de transporte. |
-| **Coordinar embalaje con cadena de frío** | Personal, Coordinador | Selección de insumos, validación de cadena de frío. |
-| **Seleccionar caja / Registrar temperatura** | Carfilosa | Registro antes de salida y durante tránsito. |
-
-### B) Ejecución y Seguimiento
-
-**Caso principal: Ejecución y Seguimiento**
-* `<<include>>` Escanear QR al cargar y entregar
-* `<<include>>` Registrar prueba de entrega
-
-| *Caso de uso* | *Actores* | *Resumen* |
-| :--- | :--- | :--- |
-| **Ejecución y Seguimiento** | Personal, Director/Repartidor, Carfilosa | Monitoreo del viaje y eventos. |
-| **Escanear QR al cargar y entregar** | — | Confirmar carga y entrega en puntos de control. |
-| **Registrar prueba de entrega** | — | Firma/foto/geo-posición como evidencia. |
+| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (<<include>>) |
+| :--- | :--- | :--- | :--- |
+| *Medir Desempeño Comercial* | *Evaluar cumplimiento de metas* | Sup. Ventas, Gerente | • Comparar ventas reales vs. objetivos.<br>• Medir rentabilidad por canal o producto. |
+| | *Monitorear actividad de ventas* | Sup. Ventas, Gerente | • Seguimiento de visitas y pedidos por vendedor.<br>• Controlar frecuencia de cobro y detectar desvíos. |
+| *Analizar Mercado y Promociones* | *Identificar tendencias de consumo* | Sup. Ventas, Gerente | • Evaluar demanda de nuevos productos.<br>• Monitorear movimientos de competencia. |
+| | *Analizar eficiencia de promociones* | Sup. Ventas, Gerente | • Medir impacto en ventas.<br>• Ajustar estrategias comerciales. |
+| *Reportar y Decidir Gerencialmente* | *Elaborar informes de resultados* | Sup. Ventas, Gerente | • Generar reporte de ventas por zona/canal.<br>• Analizar clientes inactivos y proponer reactivación. |
+| | *Tomar decisiones estratégicas* | Sup. Ventas, Gerente | • Redefinir metas o políticas de precio.<br>• Planificar nuevas campañas y asignar responsables. |
