@@ -88,7 +88,7 @@ Esta herramienta permitirá a Cafrilosa centralizar sus operaciones comerciales,
 <table align="center">
   <tr>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/f813572a-0161-4e29-9bd7-fe68d38a0183" alt="Vista Admin" width="300"/>
+      <img src="https://github.com/user-attachments/assets/44a719ca-66f4-43c5-91ad-a5dd03a87631" alt="Vista Admin" width="300"/>
       <br/><strong>Vista Admin</strong>
     </td>
     <td align="center">
