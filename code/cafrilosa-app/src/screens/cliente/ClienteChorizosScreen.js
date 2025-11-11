@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { SafeAreaView, ScrollView, View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import ProductListItem from "../../components/ui/ProductListItem";
 
@@ -10,14 +11,14 @@ const products = [
   {
     id: "cho-1",
     category: "Chorizos",
-    name: "Chorizo Parrillero Clasico 500g",
+    name: "Chorizo Parrillero Clásico 500g",
     price: 10.99,
     image: productImage,
     stock: "40/60",
     weight: "500g",
     rating: 4.7,
     reviewsCount: 90,
-    description: "Chorizo clasico para parrilla con mezcla equilibrada de especias.",
+    description: "Chorizo clásico para parrilla con mezcla equilibrada de especias.",
     characteristics: ["Textura jugosa", "Ideal para asados"],
   },
   {
@@ -30,7 +31,7 @@ const products = [
     weight: "400g",
     rating: 4.5,
     reviewsCount: 70,
-    description: "Picante criollo con aji seleccionado.",
+    description: "Picante criollo con ají seleccionado.",
     characteristics: ["Picor medio", "Sin conservantes"],
   },
   {
@@ -43,21 +44,21 @@ const products = [
     weight: "600g",
     rating: 4.8,
     reviewsCount: 110,
-    description: "Version premium con alto contenido carnico.",
+    description: "Versión premium con alto contenido cárnico.",
     characteristics: ["80% carne", "Ahumado suave"],
   },
   {
     id: "cho-4",
     category: "Chorizos",
-    name: "Chorizo EspaNol Ahumado 450g",
+    name: "Chorizo Español Ahumado 450g",
     price: 12.4,
     image: productImage,
     stock: "28/40",
     weight: "450g",
     rating: 4.4,
     reviewsCount: 60,
-    description: "Chorizo estilo espaNol curado con pimenton de la Vera.",
-    characteristics: ["Toque ahumado", "Tradicion espaNola"],
+    description: "Chorizo estilo español curado con pimentón de la Vera.",
+    characteristics: ["Toque ahumado", "Tradición española"],
   },
   {
     id: "cho-5",
@@ -70,7 +71,7 @@ const products = [
     rating: 4.3,
     reviewsCount: 55,
     description: "Receta tradicional criolla, ideal para sartenes.",
-    characteristics: ["Preparacion rapida", "Sabor casero"],
+    characteristics: ["Preparación rápida", "Sabor casero"],
   },
   {
     id: "cho-6",
@@ -95,20 +96,20 @@ const products = [
     weight: "420g",
     rating: 4.2,
     reviewsCount: 47,
-    description: "Opcion mas ligera con 70% carne de pavo.",
-    characteristics: ["Bajo en grasa", "Proteina magra"],
+    description: "Opción más ligera con 70% carne de pavo.",
+    characteristics: ["Bajo en grasa", "Proteína magra"],
   },
   {
     id: "cho-8",
     category: "Chorizos",
-    name: "Chorizo JalapeNo Gourmet 380g",
+    name: "Chorizo Jalapeño Gourmet 380g",
     price: 12.9,
     image: productImage,
     stock: "24/35",
     weight: "380g",
     rating: 4.4,
     reviewsCount: 52,
-    description: "Chorizo gourmet con jalapeNo fresco.",
+    description: "Chorizo gourmet con jalapeño fresco.",
     characteristics: ["Picante balanceado", "Ideal para tacos"],
   },
   {
@@ -135,13 +136,14 @@ const products = [
     rating: 4.1,
     reviewsCount: 32,
     description: "Alternativa vegetal especiada para parrillas mixtas.",
-    characteristics: ["100% vegetal", "Fuente de proteina"],
+    characteristics: ["100% vegetal", "Fuente de proteína"],
   },
 ];
 
 const ClienteChorizosScreen = ({ navigation }) => {
   const [search, setSearch] = useState("");
   const [quantities, setQuantities] = useState({});
+  const insets = useSafeAreaInsets();
 
   const filteredProducts = useMemo(() => {
     if (!search.trim()) return products;
@@ -171,7 +173,10 @@ const ClienteChorizosScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 12 }]}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.headerRow}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Ionicons name="chevron-back" size={22} color="#111827" />
@@ -225,7 +230,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 12,
     marginBottom: 16,
   },
   backButton: {

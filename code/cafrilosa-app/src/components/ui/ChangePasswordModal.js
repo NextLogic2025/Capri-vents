@@ -24,42 +24,42 @@ const ChangePasswordModal = ({ visible, onClose, onPasswordChanged }) => {
       return;
     }
     if (newPassword.length < 6) {
-      setError("La nueva contrasena debe tener al menos 6 caracteres");
+      setError("La nueva contraseña debe tener al menos 6 caracteres");
       return;
     }
     if (newPassword !== confirmPassword) {
-      setError("Las contrasenas no coinciden");
+      setError("Las contraseñas no coinciden");
       return;
     }
     setError("");
-    // TODO: conectar con backend aqui para validar contrasena actual y guardar la nueva contrasena
+    // TODO: conectar con backend aqui para validar contraseña actual y guardar la nueva contraseña
     if (onPasswordChanged) {
       onPasswordChanged();
     }
-    Alert.alert("Contrasena actualizada", "Cambio realizado exitosamente (simulado)");
+    Alert.alert("Contraseña actualizada", "Cambio realizado exitosamente (simulado)");
     onClose();
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade">
+    <Modal visible={visible} transparent animationType="fade" statusBarTranslucent>
       <View style={styles.overlay}>
         <View style={styles.card}>
-          <Text style={styles.title}>Cambiar contrasena</Text>
+          <Text style={styles.title}>Cambiar contraseña</Text>
           <PasswordInputField
-            label="Contrasena actual"
-            placeholder="Ingresa tu contrasena"
+            label="Contraseña actual"
+            placeholder="Ingresa tu contraseña"
             value={currentPassword}
             onChangeText={setCurrentPassword}
           />
           <PasswordInputField
-            label="Nueva contrasena"
+            label="Nueva contraseña"
             placeholder="Minimo 6 caracteres"
             value={newPassword}
             onChangeText={setNewPassword}
           />
           <PasswordInputField
-            label="Confirmar contrasena"
-            placeholder="Repite la nueva contrasena"
+            label="Confirmar contraseña"
+            placeholder="Repite la nueva contraseña"
             value={confirmPassword}
             onChangeText={setConfirmPassword}
           />

@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { SafeAreaView, ScrollView, View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import ProductListItem from "../../components/ui/ProductListItem";
 
@@ -10,7 +11,7 @@ const products = [
   {
     id: "jam-1",
     category: "Jamones",
-    name: "Jamon Serrano Reserva 500g",
+    name: "Jamón Serrano Reserva 500g",
     price: 16.5,
     oldPrice: 18.0,
     image: productImage,
@@ -18,52 +19,52 @@ const products = [
     weight: "500g",
     rating: 4.9,
     reviewsCount: 142,
-    description: "Jamon serrano curado lentamente para un sabor intenso y equilibrado.",
+    description: "Jamón serrano curado lentamente para un sabor intenso y equilibrado.",
     characteristics: ["Curado 18 meses", "Ideal para picadas"],
   },
   {
     id: "jam-2",
     category: "Jamones",
-    name: "Jamon Iberico Corte Fino 300g",
+    name: "Jamón Iberico Corte Fino 300g",
     price: 22.9,
     image: productImage,
     stock: "22/30",
     weight: "300g",
     rating: 4.8,
     reviewsCount: 120,
-    description: "Corte fino de jamon iberico con vetas de grasa que aportan suavidad.",
-    characteristics: ["Origen EspaNa", "Corte profesional"],
+    description: "Corte fino de jamón iberico con vetas de grasa que aportan suavidad.",
+    characteristics: ["Origen España", "Corte profesional"],
   },
   {
     id: "jam-3",
     category: "Jamones",
-    name: "Jamon Premium ANejo 450g",
+    name: "Jamón Premium Añejo 450g",
     price: 19.75,
     image: productImage,
     stock: "35/45",
     weight: "450g",
     rating: 4.7,
     reviewsCount: 85,
-    description: "Jamon aNejo con aroma ahumado y textura firme.",
+    description: "Jamón añejo con aroma ahumado y textura firme.",
     characteristics: ["Ahumado natural", "Conservacion refrigerada"],
   },
   {
     id: "jam-4",
     category: "Jamones",
-    name: "Jamon Glaseado Familiar 800g",
+    name: "Jamón Glaseado Familiar 800g",
     price: 24.1,
     image: productImage,
     stock: "18/25",
     weight: "800g",
     rating: 4.5,
     reviewsCount: 64,
-    description: "Jamon glaseado ideal para celebraciones familiares.",
+    description: "Jamón glaseado ideal para celebraciones familiares.",
     characteristics: ["Listo para hornear", "Sabor dulce"],
   },
   {
     id: "jam-5",
     category: "Jamones",
-    name: "Jamon Ahumado Artesanal 400g",
+    name: "Jamón Ahumado Artesanal 400g",
     price: 17.35,
     image: productImage,
     stock: "30/42",
@@ -76,20 +77,20 @@ const products = [
   {
     id: "jam-6",
     category: "Jamones",
-    name: "Jamon Cocido Natural 500g",
+    name: "Jamón Cocido Natural 500g",
     price: 13.9,
     image: productImage,
     stock: "48/60",
     weight: "500g",
     rating: 4.4,
     reviewsCount: 58,
-    description: "Jamon cocido clasico, bajo en sodio y listo para sandwiches.",
+    description: "Jamón cocido clásico, bajo en sodio y listo para sandwiches.",
     characteristics: ["Bajo en sodio", "Sin gluten"],
   },
   {
     id: "jam-7",
     category: "Jamones",
-    name: "Jamon de Pavo Light 350g",
+    name: "Jamón de Pavo Light 350g",
     price: 11.8,
     image: productImage,
     stock: "40/55",
@@ -102,20 +103,20 @@ const products = [
   {
     id: "jam-8",
     category: "Jamones",
-    name: "Jamon Serrano Loncheado 250g",
+    name: "Jamón Serrano Loncheado 250g",
     price: 10.75,
     image: productImage,
     stock: "45/65",
     weight: "250g",
     rating: 4.5,
     reviewsCount: 66,
-    description: "Lonchas finas de jamon serrano listas para servir.",
+    description: "Lonchas finas de jamón serrano listas para servir.",
     characteristics: ["Empaque al vacio", "Listo para tapas"],
   },
   {
     id: "jam-9",
     category: "Jamones",
-    name: "Jamon Prosciutto Italiano 300g",
+    name: "Jamón Prosciutto Italiano 300g",
     price: 21.45,
     image: productImage,
     stock: "26/35",
@@ -128,14 +129,14 @@ const products = [
   {
     id: "jam-10",
     category: "Jamones",
-    name: "Jamon Reserva Premium 1kg",
+    name: "Jamón Reserva Premium 1kg",
     price: 34.9,
     image: productImage,
     stock: "12/20",
     weight: "1kg",
     rating: 4.9,
     reviewsCount: 150,
-    description: "Pieza completa de jamon reserva para eventos especiales.",
+    description: "Pieza completa de jamón reserva para eventos especiales.",
     characteristics: ["Curado prolongado", "Rinde para 10 porciones"],
   },
 ];
@@ -143,6 +144,7 @@ const products = [
 const ClienteJamonesScreen = ({ navigation }) => {
   const [search, setSearch] = useState("");
   const [quantities, setQuantities] = useState({});
+  const insets = useSafeAreaInsets();
 
   const filteredProducts = useMemo(() => {
     if (!search.trim()) return products;
@@ -165,13 +167,16 @@ const ClienteJamonesScreen = ({ navigation }) => {
       Alert.alert("Selecciona una cantidad", "Agrega al menos 1 unidad para continuar");
       return;
     }
-    console.log("Agregar jamon al carrito:", product.name, "x", quantity, "Stock:", product.stock);
+    console.log("Agregar jamón al carrito:", product.name, "x", quantity, "Stock:", product.stock);
     // TODO: conectar con backend o estado global para agregar productos al carrito y actualizar stock.
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 12 }]}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.headerRow}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Ionicons name="chevron-back" size={22} color="#111827" />
@@ -225,7 +230,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 12,
     marginBottom: 16,
   },
   backButton: {

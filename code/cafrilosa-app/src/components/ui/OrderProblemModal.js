@@ -5,7 +5,7 @@ const problems = [
   {
     key: "bad_product",
     title: "Producto en Mal Estado",
-    description: "El producto llego daNado o sin refrigeracion adecuada",
+    description: "El producto llegó dañado o sin refrigeración adecuada",
   },
   {
     key: "wrong_quantity",
@@ -21,7 +21,7 @@ const problems = [
 
 const OrderProblemModal = ({ visible, onClose, onSelectProblem }) => {
   return (
-    <Modal visible={visible} animationType="fade" transparent>
+    <Modal visible={visible} animationType="fade" transparent statusBarTranslucent>
       <View style={styles.overlay}>
         <View style={styles.modalCard}>
           <Text style={styles.title}>?Que problema tuviste con tu pedido?</Text>
@@ -96,4 +96,3 @@ const styles = StyleSheet.create({
 });
 
 export default OrderProblemModal;
-

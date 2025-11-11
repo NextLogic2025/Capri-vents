@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from "react";
+﻿import React, { useMemo, useState } from "react";
 import { SafeAreaView, ScrollView, View, Text, StyleSheet, TouchableOpacity, Alert, Modal } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import CardFormModal from "../../components/ui/CardFormModal";
 import TransferHistoryItem from "../../components/ui/TransferHistoryItem";
@@ -61,19 +62,21 @@ const transferHistory = [
 const cafrilosaAccounts = [
   {
     id: "acc1",
-    bank: "Banco Nacion Argentina",
-    cbu: "0110599540000012345678",
-    alias: "CAFRILOSA.NACION",
-    type: "Cuenta corriente",
-    holder: "Cafrilosa S.A.",
+    bank: "Banco de Loja",
+    accountNumber: "01504001588012345678",
+    alias: "CAFRILOSA.LOJA",
+    type: "Cuenta corriente empresarial",
+    holder: "Inversiones Cafrilosa Cia. Ltda.",
+    swift: "BJLOECEQXXX",
   },
   {
     id: "acc2",
-    bank: "Banco Galicia",
-    cbu: "0070123400000005678912",
-    alias: "CAFRILOSA.GALICIA",
-    type: "Caja de ahorro",
-    holder: "Cafrilosa S.A.",
+    bank: "Banco Pichincha",
+    accountNumber: "22001000654321098765",
+    alias: "CAFRILOSA.PICH",
+    type: "Cuenta de ahorros empresarial",
+    holder: "Inversiones Cafrilosa Cia. Ltda.",
+    swift: "PICHECEQ",
   },
 ];
 
@@ -87,6 +90,7 @@ const ClienteMetodosPagoScreen = ({ navigation }) => {
 
   const [transferModalVisible, setTransferModalVisible] = useState(false);
   const [selectedTransfer, setSelectedTransfer] = useState(null);
+  const insets = useSafeAreaInsets();
 
   // TODO: conectar con backend aqui para gestionar metodos de pago (tarjetas, transferencias, cuentas bancarias)
 
@@ -209,9 +213,9 @@ const ClienteMetodosPagoScreen = ({ navigation }) => {
         <View key={account.id} style={styles.accountCard}>
           <Text style={styles.accountBank}>{account.bank}</Text>
           <View style={styles.accountRow}>
-            <Text style={styles.accountLabel}>CBU</Text>
+            <Text style={styles.accountLabel}>Cuenta / CCI</Text>
             <View style={styles.copyRow}>
-              <Text style={styles.accountValue}>{account.cbu}</Text>
+              <Text style={styles.accountValue}>{account.accountNumber}</Text>
               <Ionicons name="copy-outline" size={16} color="#E64A19" />
             </View>
           </View>
@@ -227,6 +231,12 @@ const ClienteMetodosPagoScreen = ({ navigation }) => {
             <Text style={styles.accountLabel}>Titular</Text>
             <Text style={styles.accountValue}>{account.holder}</Text>
           </View>
+          {account.swift ? (
+            <View style={styles.accountRow}>
+              <Text style={styles.accountLabel}>Swift / BIC</Text>
+              <Text style={styles.accountValue}>{account.swift}</Text>
+            </View>
+          ) : null}
         </View>
       ))}
       <View style={styles.infoBox}>
@@ -238,12 +248,15 @@ const ClienteMetodosPagoScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[styles.content, { paddingTop: insets.top + 12 }]}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Ionicons name="chevron-back" size={22} color="#111827" />
           </TouchableOpacity>
-          <Text style={styles.title}>Metodos de pago</Text>
+          <Text style={styles.title}>Métodos de pago</Text>
           <View style={styles.placeholder} />
         </View>
 
@@ -274,7 +287,7 @@ const ClienteMetodosPagoScreen = ({ navigation }) => {
 
       <TransferDetailModal visible={transferModalVisible} transfer={selectedTransfer} onClose={() => setTransferModalVisible(false)} />
 
-      <Modal visible={!!cardMenu} transparent animationType="fade">
+      <Modal visible={!!cardMenu} transparent animationType="fade" statusBarTranslucent>
         <View style={styles.menuOverlay}>
           <View style={styles.menuCard}>
             <TouchableOpacity style={styles.menuItem} onPress={() => setDefaultCard(cardMenu)}>
@@ -527,3 +540,4 @@ const styles = StyleSheet.create({
 });
 
 export default ClienteMetodosPagoScreen;
+

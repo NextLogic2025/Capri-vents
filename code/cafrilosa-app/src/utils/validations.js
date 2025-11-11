@@ -1,4 +1,4 @@
-﻿export const isValidEmail = (email = '') => {
+export const isValidEmail = (email = '') => {
   const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
   return emailRegex.test(String(email).trim());
 };

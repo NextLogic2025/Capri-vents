@@ -17,7 +17,7 @@ const OrderDetailModal = ({ visible, order, onClose, onProblemPress }) => {
   const { id, items, subtotal, shippingCost, total, address, estimatedDeliveryDate, paymentMethod, tracking } = order;
 
   return (
-    <Modal visible={visible} animationType="slide" transparent>
+    <Modal visible={visible} animationType="slide" transparent statusBarTranslucent>
       <View style={styles.overlay}>
         <View style={styles.modalCard}>
           <View style={styles.headerRow}>

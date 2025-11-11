@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { SafeAreaView, ScrollView, View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import ProductListItem from "../../components/ui/ProductListItem";
 
@@ -31,7 +32,7 @@ const products = [
     weight: "800g",
     rating: 4.6,
     reviewsCount: 88,
-    description: "Combo de jamon serrano e iberico listo para picadas.",
+    description: "Combo de jamón serrano e iberico listo para picadas.",
     characteristics: ["Incluye 2 tipos", "Empaque al vacio"],
   },
   {
@@ -44,7 +45,7 @@ const products = [
     weight: "600g",
     rating: 4.4,
     reviewsCount: 60,
-    description: "Kit para desayunos con salchichas y jamon cocido.",
+    description: "Kit para desayunos con salchichas y jamón cocido.",
     characteristics: ["Incluye salsa", "Listo para calentar"],
   },
   {
@@ -63,7 +64,7 @@ const products = [
   {
     id: "pro-5",
     category: "Promociones",
-    name: "Pack Fiesta Queso + Jamon 1kg",
+    name: "Pack Fiesta Queso + Jamón 1kg",
     price: 21.3,
     image: productImage,
     stock: "22/32",
@@ -128,14 +129,14 @@ const products = [
   {
     id: "pro-10",
     category: "Promociones",
-    name: "Combo Deluxe Jamon + Queso 1kg",
+    name: "Combo Deluxe Jamón + Queso 1kg",
     price: 29.5,
     image: productImage,
     stock: "14/22",
     weight: "1kg",
     rating: 4.8,
     reviewsCount: 88,
-    description: "Combo deluxe con jamones curados y quesos aNejos.",
+    description: "Combo deluxe con jamones curados y quesos añejos.",
     characteristics: ["Incluye tabla reutilizable", "Ideal para regalos"],
   },
 ];
@@ -143,6 +144,7 @@ const products = [
 const ClientePromocionesScreen = ({ navigation }) => {
   const [search, setSearch] = useState("");
   const [quantities, setQuantities] = useState({});
+  const insets = useSafeAreaInsets();
 
   const filteredProducts = useMemo(() => {
     if (!search.trim()) return products;
@@ -171,7 +173,10 @@ const ClientePromocionesScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 12 }]}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.headerRow}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Ionicons name="chevron-back" size={22} color="#111827" />
@@ -225,7 +230,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 12,
     marginBottom: 16,
   },
   backButton: {

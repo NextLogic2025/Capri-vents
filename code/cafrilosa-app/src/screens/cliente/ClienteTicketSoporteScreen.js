@@ -86,13 +86,13 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 24,
     paddingBottom: 40,
-    paddingTop: 24,
+    paddingTop: 40,
   },
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 12,
+    marginBottom: 16,
   },
   backButton: {
     width: 44,

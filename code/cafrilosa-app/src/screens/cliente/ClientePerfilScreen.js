@@ -1,5 +1,6 @@
 import React from "react";
 import { SafeAreaView, ScrollView, View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import ProfileOptionItem from "../../components/ui/ProfileOptionItem";
@@ -14,6 +15,7 @@ const userProfile = {
 // TODO: conectar con backend aqui para obtener informacion real del usuario (nombre, pedidos, puntos)
 
 const ClientePerfilScreen = ({ navigation }) => {
+  const insets = useSafeAreaInsets();
   const handleLogout = () => {
     navigation.reset({
       index: 0,
@@ -36,8 +38,8 @@ const ClientePerfilScreen = ({ navigation }) => {
       route: "ClienteDirecciones",
     },
     {
-      title: "Metodos de Pago",
-      subtitle: "2 metodos guardados",
+      title: "Métodos de Pago",
+      subtitle: "2 métodos guardados",
       icon: <MaterialCommunityIcons name="credit-card-outline" size={22} color="#E64A19" />,
       route: "ClienteMetodosPago",
     },
@@ -57,7 +59,10 @@ const ClientePerfilScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 12 }]}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.header}>
           <Text style={styles.title}>Perfil</Text>
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>

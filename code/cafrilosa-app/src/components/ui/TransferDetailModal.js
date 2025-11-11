@@ -15,7 +15,7 @@ const TransferDetailModal = ({ visible, transfer, onClose }) => {
   const statusColor = statusColors[transfer.status] || "#6B7280";
 
   return (
-    <Modal visible={visible} transparent animationType="slide">
+    <Modal visible={visible} transparent animationType="slide" statusBarTranslucent>
       <View style={styles.overlay}>
         <View style={styles.card}>
           <View style={styles.headerRow}>

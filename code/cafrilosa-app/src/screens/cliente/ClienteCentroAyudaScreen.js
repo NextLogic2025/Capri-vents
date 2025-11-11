@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { SafeAreaView, ScrollView, View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import SupportTicketItem from "../../components/ui/SupportTicketItem";
 
@@ -9,7 +10,7 @@ const tickets = [
     type: "Reclamo",
     priority: "Alta",
     title: "Producto en mal estado",
-    description: "Recibi un paquete de chorizo parrillero que llego con mal olor...",
+    description: "Recibí un paquete de chorizo parrillero que llegó con mal olor...",
     status: "En Proceso",
     createdAt: "24 de ene de 2025",
     repliesCount: 1,
@@ -19,17 +20,17 @@ const tickets = [
     type: "Consulta",
     priority: "Media",
     title: "Consulta sobre productos sin TACC",
-    description: "Tienen productos certificados sin TACC?",
+    description: "¿Tienen productos certificados sin TACC?",
     status: "Abierto",
     createdAt: "27 de ene de 2025",
     repliesCount: 2,
   },
   {
     id: "CASO-2025-003",
-    type: "Devolucion",
+    type: "Devolución",
     priority: "Alta",
-    title: "Solicitud de devolucion",
-    description: "Pedido incompleto, faltan 2 productos que solicite en mi orden...",
+    title: "Solicitud de devolución",
+    description: "Pedido incompleto, faltan 2 productos que solicité en mi orden...",
     status: "Resuelto",
     createdAt: "30 de ene de 2025",
     repliesCount: 3,
@@ -64,9 +65,14 @@ const ClienteCentroAyudaScreen = ({ navigation }) => {
     // TODO: conectar con backend o deep links aqui para abrir llamada, email o WhatsApp
   };
 
+  const insets = useSafeAreaInsets();
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[styles.content, { paddingTop: insets.top + 12 }]}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Ionicons name="chevron-back" size={22} color="#111827" />

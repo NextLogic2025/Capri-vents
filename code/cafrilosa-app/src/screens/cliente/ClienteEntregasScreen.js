@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { SafeAreaView, View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import DeliveryCurrentCard from "../../components/ui/DeliveryCurrentCard";
 import DeliveryHistoryItem from "../../components/ui/DeliveryHistoryItem";
@@ -42,7 +43,7 @@ const deliveryHistory = [
       },
       {
         id: "p2",
-        name: "Jamon Cocido Premium",
+        name: "Jamón Cocido Premium",
         quantity: 3,
         totalPrice: 56.25,
         image: require("../../assets/images/offer-jamon-cocido.png"),
@@ -98,15 +99,16 @@ const ClienteEntregasScreen = () => {
     return delivery.id.toLowerCase().includes(query) || delivery.orderCode.toLowerCase().includes(query);
   });
 
+  const insets = useSafeAreaInsets();
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 16 }]}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Entregas</Text>
-          <TouchableOpacity style={styles.notificationButton}>
-            <Ionicons name="notifications-outline" size={20} color="#111827" />
-            <View style={styles.notificationDot} />
-          </TouchableOpacity>
         </View>
 
         <View style={styles.searchBar}>
@@ -181,28 +183,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#111827",
   },
-  notificationButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "#FFFFFF",
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 3,
-  },
-  notificationDot: {
-    position: "absolute",
-    top: 10,
-    right: 12,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "#DC2626",
-  },
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
@@ -240,3 +220,4 @@ const styles = StyleSheet.create({
 });
 
 export default ClienteEntregasScreen;
+

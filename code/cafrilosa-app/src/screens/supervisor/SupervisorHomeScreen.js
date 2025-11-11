@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { SafeAreaView, View, Text, StyleSheet, Image } from "react-native";
 
 const logo = require("../../assets/images/logo-cafrilosa.png");

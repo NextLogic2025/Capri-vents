@@ -4,7 +4,7 @@ import PrimaryButton from "./PrimaryButton";
 
 const EditTextFieldModal = ({ visible, title, label, value, onChangeText, onCancel, onSave }) => {
   return (
-    <Modal visible={visible} transparent animationType="fade">
+    <Modal visible={visible} transparent animationType="fade" statusBarTranslucent>
       <View style={styles.overlay}>
         <View style={styles.card}>
           <Text style={styles.title}>{title}</Text>

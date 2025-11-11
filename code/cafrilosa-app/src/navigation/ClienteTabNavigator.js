@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -170,4 +170,5 @@ const styles = StyleSheet.create({
 });
 
 export default ClienteTabNavigator;
+
 

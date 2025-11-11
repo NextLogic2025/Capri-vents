@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { SafeAreaView, ScrollView, View, Text, StyleSheet } from "react-native";
 import AuthHeader from "../../components/ui/AuthHeader";
 import TextInputField from "../../components/ui/TextInputField";
@@ -12,12 +12,13 @@ const RegisterScreen = ({ navigation }) => {
   const { register } = useAuthMock();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
 
   const handleRegister = () => {
-    if (!fullName || !email || !password || !confirmPassword) {
+    if (!fullName || !email || !phone || !password || !confirmPassword) {
       // TODO: mostrar errores en texto rojo debajo de los campos si algo falla
       return;
     }
@@ -27,7 +28,7 @@ const RegisterScreen = ({ navigation }) => {
       return;
     }
 
-    register({ fullName, email, password });
+    register({ fullName, email, phone, password });
     // TODO: conectar con backend aquí para registrar usuario
     navigation.navigate("Login");
   };
@@ -54,6 +55,14 @@ const RegisterScreen = ({ navigation }) => {
             onChangeText={setEmail}
             keyboardType="email-address"
             iconName="email-outline"
+          />
+          <TextInputField
+            label="Teléfono"
+            placeholder="+593 99 999 9999"
+            value={phone}
+            onChangeText={setPhone}
+            keyboardType="phone-pad"
+            iconName="phone-outline"
           />
           <PasswordInputField
             label="Contraseña"

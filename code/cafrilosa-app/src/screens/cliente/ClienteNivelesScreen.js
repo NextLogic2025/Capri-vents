@@ -12,7 +12,7 @@ const currentLevel = {
 };
 
 const currentBenefits = [
-  "Envio express gratis",
+  "Envío express gratis",
   "10% de descuento en todas las compras",
   "Acceso anticipado a productos nuevos",
   "Regalos mensuales exclusivos",
@@ -55,7 +55,7 @@ const levels = [
     rangeText: "Nivel inicial hasta 500 puntos",
     discountText: "0% de descuento",
     benefits: [
-      "Envio estandar gratis en compras sobre $50",
+      "Envío estándar gratis en compras sobre $50",
       "Acceso a catalogo completo",
       "Notificaciones de productos nuevos",
     ],
@@ -70,11 +70,11 @@ const levels = [
     rangeText: "Desde 500 puntos hasta 1500 puntos",
     discountText: "5% de descuento",
     benefits: [
-      "Envio gratis en todas las compras",
+      "Envío gratis en todas las compras",
       "5% de descuento en compras",
       "Acceso a promociones exclusivas",
     ],
-    extraBenefitsText: "+1 beneficios mas",
+    extraBenefitsText: "+1 beneficios más",
     isCurrent: false,
     locked: false,
   },
@@ -85,11 +85,11 @@ const levels = [
     rangeText: "Desde 1500 puntos hasta 3000 puntos",
     discountText: "10% de descuento",
     benefits: [
-      "Envio express gratis",
+      "Envío express gratis",
       "10% de descuento en todas las compras",
       "Acceso anticipado a productos nuevos",
     ],
-    extraBenefitsText: "+3 beneficios mas",
+    extraBenefitsText: "+3 beneficios más",
     isCurrent: true,
     locked: false,
   },
@@ -104,7 +104,7 @@ const levels = [
       "15% de descuento permanente",
       "Gerente de cuenta dedicado",
     ],
-    extraBenefitsText: "+4 beneficios mas",
+    extraBenefitsText: "+4 beneficios más",
     isCurrent: false,
     locked: true,
   },
@@ -119,7 +119,7 @@ const levels = [
       "20% de descuento permanente",
       "Consultor gastronomico personal",
     ],
-    extraBenefitsText: "+5 beneficios mas",
+    extraBenefitsText: "+5 beneficios más",
     isCurrent: false,
     locked: true,
   },

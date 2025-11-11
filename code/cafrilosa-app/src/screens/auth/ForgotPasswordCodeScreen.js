@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { SafeAreaView, ScrollView, View, Text, TextInput, StyleSheet, TouchableOpacity } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import PrimaryButton from "../../components/ui/PrimaryButton";

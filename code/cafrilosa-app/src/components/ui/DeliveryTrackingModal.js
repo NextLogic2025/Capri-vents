@@ -12,7 +12,7 @@ const DeliveryTrackingModal = ({ visible, delivery, onClose, onViewDetails, onCa
   const { orderCode, progress = 0, etaText, driverName, driverInitials, driverPlate, address } = delivery;
 
   return (
-    <Modal visible={visible} transparent animationType="fade">
+    <Modal visible={visible} transparent animationType="fade" statusBarTranslucent>
       <View style={styles.overlay}>
         <View style={styles.container}>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>

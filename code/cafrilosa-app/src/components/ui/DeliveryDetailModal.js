@@ -29,7 +29,7 @@ const DeliveryDetailModal = ({ visible, delivery, onClose, onCallDriver }) => {
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide">
+    <Modal visible={visible} transparent animationType="slide" statusBarTranslucent>
       <View style={styles.overlay}>
         <View style={styles.container}>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>

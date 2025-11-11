@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
 
 const CheckboxField = ({ checked, onToggle, label, labelStyle, style }) => {

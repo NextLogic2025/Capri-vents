@@ -1,7 +1,9 @@
-import React from "react";
-import { SafeAreaView, ScrollView, View, Text, StyleSheet, TouchableOpacity, ImageBackground } from "react-native";
+﻿import React, { useCallback, useRef, useState } from "react";
+import { SafeAreaView, ScrollView, View, Text, StyleSheet, TouchableOpacity, ImageBackground, Modal } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useFocusEffect } from "@react-navigation/native";
 import CategoryCard from "../../components/ui/CategoryCard";
 import OfferProductCard from "../../components/ui/OfferProductCard";
 
@@ -33,7 +35,7 @@ const offers = [
   },
   {
     id: "offer2",
-    name: "Jamon Serrano",
+    name: "Jamón Serrano",
     discount: 13,
     rating: 4.8,
     price: 12.9,
@@ -42,7 +44,7 @@ const offers = [
     stock: "35/50",
     category: "Jamones",
     weight: "400g",
-    description: "Jamon serrano curado con sal marina.",
+    description: "Jamón serrano curado con sal marina.",
     characteristics: ["Curado 16 meses", "Sin gluten"],
   },
   {
@@ -56,7 +58,7 @@ const offers = [
     category: "Embutidos",
     weight: "300g",
     description: "Salchichas tipo Frankfurt ahumadas.",
-    characteristics: ["Sabor suave", "Apto para niNos"],
+    characteristics: ["Sabor suave", "Apto para niños"],
   },
   {
     id: "offer4",
@@ -74,9 +76,70 @@ const offers = [
   },
 ];
 
+const announcements = [
+  {
+    id: "ann-order-1",
+    type: "order",
+    title: "Pedido #3860 recibido",
+    description: "Confirmamos la recepción del pedido, estamos preparando tus productos.",
+    meta: "Hace 5 min",
+    isNew: true,
+    icon: "cart-outline",
+  },
+  {
+    id: "ann-order-2",
+    type: "order",
+    title: "Pedido #3792 en camino",
+    description: "Nuestro repartidor salió hacia tu dirección, seguimiento actualizado.",
+    meta: "Hoy, 09:45",
+    isNew: true,
+    icon: "bicycle-outline",
+  },
+  {
+    id: "ann-order-3",
+    type: "order",
+    title: "Pedido #3726 entregado",
+    description: "Gracias por comprar en Cafrilosa, esperamos tu calificación.",
+    meta: "Ayer",
+    isNew: false,
+    icon: "checkmark-circle-outline",
+  },
+  {
+    id: "ann-promo-1",
+    type: "promo",
+    title: "Promo de temporada",
+    description: "2x1 en Jamones Reserva durante este fin de semana.",
+    meta: "Válido hasta el domingo",
+    isNew: true,
+    icon: "pricetags-outline",
+  },
+  {
+    id: "ann-promo-2",
+    type: "promo",
+    title: "Nuevos combos parrilleros",
+    description: "Chorizos + embutidos premium con 20% OFF al comprar desde la app.",
+    meta: "Explora en Promociones",
+    isNew: false,
+    icon: "flame-outline",
+  },
+];
+
 const ClienteHomeScreen = ({ navigation, route }) => {
   const user = route?.params?.user;
   const firstName = user?.name?.split(" ")[0] || "Cliente";
+  const insets = useSafeAreaInsets();
+  const scrollRef = useRef(null);
+  const [announcementsVisible, setAnnouncementsVisible] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      requestAnimationFrame(() => {
+        scrollRef.current?.scrollTo({ y: 0, animated: false });
+      });
+    }, [])
+  );
+
+  const newAnnouncementsCount = announcements.filter((item) => item.isNew).length;
 
   const handleCategoryPress = (category) => {
     if (category.id === "embutidos") {
@@ -95,26 +158,34 @@ const ClienteHomeScreen = ({ navigation, route }) => {
     // TODO: conectar con backend o estado global para agregar ofertas al carrito y actualizar stock.
   };
 
+  const handleAnnouncementPress = (announcement) => {
+    setAnnouncementsVisible(false);
+    if (announcement.type === "promo") {
+      navigation.navigate("ClientePromociones");
+    } else {
+      navigation.navigate("ClientePedidos");
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView ref={scrollRef} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.headerWrapper}>
-          <LinearGradient colors={["#F65A3B", "#F6C453"]} style={styles.headerGradient}>
+          <LinearGradient colors={["#F65A3B", "#F6C453"]} style={[styles.headerGradient, { paddingTop: insets.top + 28 }]}>
             <View style={styles.headerRow}>
-              <View>
-                <Text style={styles.greetingText}>Hola, {firstName} ??</Text>
+              <View style={styles.greetingBlock}>
+                <Text style={styles.greetingText}>Hola, {firstName} 👋</Text>
                 <Text style={styles.welcomeText}>Bienvenido</Text>
-                <Text style={styles.storeText}>Supermercado El Ahorro</Text>
+                <Text style={styles.storeText}>Cafrilosa Online</Text>
               </View>
               <View style={styles.headerActions}>
-                <TouchableOpacity style={styles.roundIcon}>
-                  <Ionicons name="search" size={20} color="#E64A19" />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.roundIcon}>
-                  <Ionicons name="notifications-outline" size={20} color="#E64A19" />
-                  <View style={styles.badge}>
-                    <Text style={styles.badgeText}>1</Text>
-                  </View>
+                <TouchableOpacity style={styles.roundIcon} onPress={() => setAnnouncementsVisible(true)}>
+                  <Ionicons name="megaphone-outline" size={20} color="#B45309" />
+                  {newAnnouncementsCount > 0 && (
+                    <View style={[styles.badge, styles.announcementBadge]}>
+                      <Text style={styles.badgeText}>{newAnnouncementsCount}</Text>
+                    </View>
+                  )}
                 </TouchableOpacity>
               </View>
             </View>
@@ -129,11 +200,11 @@ const ClienteHomeScreen = ({ navigation, route }) => {
           >
             <View>
               <Text style={styles.levelText}>Tu nivel</Text>
-              <Text style={styles.levelTitle}>Cliente Gold ?</Text>
+              <Text style={styles.levelTitle}>Cliente Gold ⭐</Text>
               <Text style={styles.levelPoints}>1250 puntos acumulados</Text>
               <View style={styles.rewardCard}>
-                <Text style={styles.rewardLabel}>Proxima recompensa</Text>
-                <Text style={styles.rewardValue}>Cupon de $5 de descuento</Text>
+                <Text style={styles.rewardLabel}>Próxima recompensa</Text>
+                <Text style={styles.rewardValue}>Cupón de $5 de descuento</Text>
               </View>
             </View>
             <View style={styles.giftCircle}>
@@ -143,8 +214,8 @@ const ClienteHomeScreen = ({ navigation, route }) => {
         </View>
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Categorias</Text>
-          <TouchableOpacity onPress={() => console.log("Ver todas las categorias")}> 
+          <Text style={styles.sectionTitle}>Categorías</Text>
+          <TouchableOpacity onPress={() => console.log("Ver todas las categorías")}> 
             <Text style={styles.viewAll}>Ver todas</Text>
           </TouchableOpacity>
         </View>
@@ -158,10 +229,10 @@ const ClienteHomeScreen = ({ navigation, route }) => {
           <ImageBackground source={promoImage} style={styles.promoCard} imageStyle={styles.promoImage}>
             <View style={styles.promoOverlay} />
             <View style={styles.promoContent}>
-              <Text style={styles.promoTitle}>Promocion Especial</Text>
+              <Text style={styles.promoTitle}>Promoción Especial</Text>
               <Text style={styles.promoSubtitle}>20% OFF en Chorizos Premium</Text>
               <TouchableOpacity style={styles.promoButton}>
-                <Text style={styles.promoButtonText}>Ver mas</Text>
+                <Text style={styles.promoButtonText}>Ver más</Text>
               </TouchableOpacity>
             </View>
           </ImageBackground>
@@ -184,6 +255,37 @@ const ClienteHomeScreen = ({ navigation, route }) => {
           ))}
         </View>
       </ScrollView>
+      <Modal visible={announcementsVisible} transparent animationType="fade" statusBarTranslucent>
+        <View style={styles.announcementOverlay}>
+          <TouchableOpacity style={styles.announcementBackdrop} activeOpacity={1} onPress={() => setAnnouncementsVisible(false)} />
+          <View style={styles.announcementCard}>
+            <View style={styles.announcementHeader}>
+              <Text style={styles.announcementTitleModal}>Centro de anuncios</Text>
+              <TouchableOpacity onPress={() => setAnnouncementsVisible(false)}>
+                <Ionicons name="close" size={22} color="#111827" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {announcements.map((item) => (
+                <TouchableOpacity key={item.id} style={styles.announcementItem} onPress={() => handleAnnouncementPress(item)} activeOpacity={0.8}>
+                  <View style={[styles.announcementIcon, item.type === "promo" ? styles.announcementIconPromo : styles.announcementIconOrder]}>
+                    <Ionicons name={item.icon} size={18} color={item.type === "promo" ? "#B45309" : "#2563EB"} />
+                  </View>
+                  <View style={styles.announcementInfo}>
+                    <View style={styles.announcementRow}>
+                      <Text style={styles.announcementItemTitle}>{item.title}</Text>
+                      {item.isNew && <Text style={styles.announcementPill}>Nuevo</Text>}
+                    </View>
+                    <Text style={styles.announcementDescription}>{item.description}</Text>
+                    <Text style={styles.announcementMeta}>{item.meta}</Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -203,7 +305,6 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 32,
     borderBottomRightRadius: 32,
     paddingHorizontal: 24,
-    paddingTop: 32,
     paddingBottom: 90,
   },
   headerRow: {
@@ -211,10 +312,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-start",
   },
+  greetingBlock: {
+    flex: 1,
+  },
   greetingText: {
     color: "#FFEFE9",
     fontSize: 14,
-    marginBottom: 4,
+    marginBottom: 8,
   },
   welcomeText: {
     color: "#FFFFFF",
@@ -228,7 +332,7 @@ const styles = StyleSheet.create({
   },
   headerActions: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
   },
   roundIcon: {
     width: 42,
@@ -242,7 +346,7 @@ const styles = StyleSheet.create({
   },
   badge: {
     position: "absolute",
-    top: 6,
+    top: 4,
     right: 6,
     width: 16,
     height: 16,
@@ -255,6 +359,9 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 10,
     fontWeight: "700",
+  },
+  announcementBadge: {
+    backgroundColor: "#F59E0B",
   },
   membershipCard: {
     backgroundColor: "#E64A19",
@@ -379,7 +486,89 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
   },
+  announcementOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    justifyContent: "flex-end",
+  },
+  announcementBackdrop: {
+    flex: 1,
+  },
+  announcementCard: {
+    backgroundColor: "#FFFFFF",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingHorizontal: 24,
+    paddingTop: 20,
+    paddingBottom: 12,
+    maxHeight: "75%",
+  },
+  announcementHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+  announcementTitleModal: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#111827",
+  },
+  announcementItem: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F3F4F6",
+    gap: 12,
+  },
+  announcementIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  announcementIconOrder: {
+    backgroundColor: "#DBEAFE",
+  },
+  announcementIconPromo: {
+    backgroundColor: "#FEF3C7",
+  },
+  announcementInfo: {
+    flex: 1,
+  },
+  announcementRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 4,
+  },
+  announcementItemTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#111827",
+  },
+  announcementPill: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: "#92400E",
+    backgroundColor: "#FFEDD5",
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+  },
+  announcementDescription: {
+    color: "#4B5563",
+    fontSize: 13,
+    marginBottom: 4,
+  },
+  announcementMeta: {
+    color: "#9CA3AF",
+    fontSize: 12,
+  },
 });
 
 export default ClienteHomeScreen;
+
 

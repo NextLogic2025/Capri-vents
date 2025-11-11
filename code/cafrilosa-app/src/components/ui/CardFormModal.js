@@ -54,14 +54,14 @@ const CardFormModal = ({ visible, mode = "add", initialCard, onCancel, onSave })
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide">
+    <Modal visible={visible} transparent animationType="slide" statusBarTranslucent>
       <View style={styles.overlay}>
         <View style={styles.card}>
           <Text style={styles.title}>{mode === "add" ? "Agregar tarjeta" : "Editar tarjeta"}</Text>
           <View style={styles.typeRow}>{["Credito", "Debito"].map(renderTypeButton)}</View>
           <TextInput
             style={styles.input}
-            placeholder="Numero de tarjeta"
+            placeholder="Número de tarjeta"
             placeholderTextColor="#9CA3AF"
             keyboardType="number-pad"
             value={form.number}

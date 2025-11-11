@@ -1,6 +1,7 @@
-﻿import React from "react";
+import React from "react";
 import { View, Image, TouchableOpacity, StyleSheet, ImageBackground, Text } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const headerMeat = require("../../assets/images/login-header-meat.png");
 const logo = require("../../assets/images/logo-cafrilosa.png");
@@ -11,17 +12,19 @@ const AuthHeader = ({
   title = "Cafrilosa",
   subtitle = "Carnes & Embutidos desde 1965",
 }) => {
+  const insets = useSafeAreaInsets();
+
   return (
     <View style={styles.container}>
       <ImageBackground source={headerMeat} style={styles.headerImage} imageStyle={styles.headerImageStyle}>
         <View style={styles.overlay} />
       </ImageBackground>
+      {showBackButton ? (
+        <TouchableOpacity style={[styles.backButton, { top: insets.top + 16 }]} onPress={onBackPress}>
+          <MaterialCommunityIcons name="arrow-left" size={22} color="#111827" />
+        </TouchableOpacity>
+      ) : null}
       <View style={styles.cardWrapper}>
-        {showBackButton ? (
-          <TouchableOpacity style={styles.backButton} onPress={onBackPress}>
-            <MaterialCommunityIcons name="arrow-left" size={22} color="#111827" />
-          </TouchableOpacity>
-        ) : null}
         <View style={styles.logoCard}>
           <View style={styles.logoBadge}>
             <Image source={logo} style={styles.logoImage} resizeMode="contain" />
@@ -96,12 +99,12 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: "absolute",
-    top: -20,
-    left: "8%",
+    left: 20,
     width: 46,
     height: 46,
     borderRadius: 23,
     backgroundColor: "#FFFFFF",
+    zIndex: 4,
     elevation: 8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
@@ -113,3 +116,4 @@ const styles = StyleSheet.create({
 });
 
 export default AuthHeader;
+

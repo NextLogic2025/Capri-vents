@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { SafeAreaView, ScrollView, View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import ProductListItem from "../../components/ui/ProductListItem";
 
@@ -25,14 +26,14 @@ const products = [
   {
     id: "emb-2",
     category: "Embutidos",
-    name: "Chorizo EspaNol Tradicional 400g",
+    name: "Chorizo Español Tradicional 400g",
     price: 14.5,
     image: productImage,
     stock: "32/50",
     weight: "400g",
     rating: 4.6,
     reviewsCount: 98,
-    description: "Receta clasica espaNola con ahumado natural y especias mediterraneas.",
+    description: "Receta clasica española con ahumado natural y especias mediterraneas.",
     characteristics: ["Curado lentamente", "Toque ahumado"],
   },
   {
@@ -137,13 +138,14 @@ const products = [
     rating: 4.4,
     reviewsCount: 70,
     description: "Fuet catalan de textura firme y sabor suave.",
-    characteristics: ["Tradicion catalana", "Listo para picar"],
+    characteristics: ["Tradición catalana", "Listo para picar"],
   },
 ];
 
 const ClienteEmbutidosScreen = ({ navigation }) => {
   const [search, setSearch] = useState("");
   const [quantities, setQuantities] = useState({});
+  const insets = useSafeAreaInsets();
 
   const filteredProducts = useMemo(() => {
     if (!search.trim()) return products;
@@ -173,7 +175,10 @@ const ClienteEmbutidosScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 12 }]}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.headerRow}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Ionicons name="chevron-back" size={22} color="#111827" />
@@ -227,7 +232,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 12,
     marginBottom: 16,
   },
   backButton: {
@@ -280,4 +284,3 @@ const styles = StyleSheet.create({
 });
 
 export default ClienteEmbutidosScreen;
-

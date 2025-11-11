@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { SafeAreaView, ScrollView, View, Text, StyleSheet, TouchableOpacity, Modal, Alert } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import AddressCard from "../../components/ui/AddressCard";
 import AddressFormModal from "../../components/ui/AddressFormModal";
@@ -68,7 +69,7 @@ const ClienteDireccionesScreen = ({ navigation }) => {
 
   const handleDeleteAddress = () => {
     if (!menuAddress) return;
-    Alert.alert("Eliminar direccion", "Esta accion no se puede deshacer", [
+    Alert.alert("Eliminar dirección", "Esta accion no se puede deshacer", [
       { text: "Cancelar", style: "cancel" },
       {
         text: "Eliminar",
@@ -81,9 +82,14 @@ const ClienteDireccionesScreen = ({ navigation }) => {
     ]);
   };
 
+  const insets = useSafeAreaInsets();
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[styles.content, { paddingTop: insets.top + 12 }]}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Ionicons name="chevron-back" size={22} color="#111827" />
@@ -109,7 +115,7 @@ const ClienteDireccionesScreen = ({ navigation }) => {
         onSave={handleSaveAddress}
       />
 
-      <Modal visible={!!menuAddress} transparent animationType="fade">
+      <Modal visible={!!menuAddress} transparent animationType="fade" statusBarTranslucent>
         <View style={styles.menuOverlay}>
           <View style={styles.menuCard}>
             <TouchableOpacity style={styles.menuItem} onPress={() => openEdit(menuAddress)}>

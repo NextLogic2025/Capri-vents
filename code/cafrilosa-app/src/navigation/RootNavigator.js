@@ -7,7 +7,7 @@ import ForgotPasswordEmailScreen from "../screens/auth/ForgotPasswordEmailScreen
 import ForgotPasswordCodeScreen from "../screens/auth/ForgotPasswordCodeScreen";
 import ForgotPasswordResetScreen from "../screens/auth/ForgotPasswordResetScreen";
 import ClienteTabNavigator from "./ClienteTabNavigator";
-import VendedorHomeScreen from "../screens/vendedor/VendedorHomeScreen";
+import VendedorTabNavigator from "./VendedorTabNavigator";
 import SupervisorHomeScreen from "../screens/supervisor/SupervisorHomeScreen";
 
 const Stack = createNativeStackNavigator();
@@ -22,8 +22,13 @@ export default function RootNavigator() {
       <Stack.Screen name="ForgotPasswordCode" component={ForgotPasswordCodeScreen} />
       <Stack.Screen name="ForgotPasswordReset" component={ForgotPasswordResetScreen} />
       <Stack.Screen name="ClienteTabs" component={ClienteTabNavigator} />
-      <Stack.Screen name="VendedorHome" component={VendedorHomeScreen} />
+      <Stack.Screen
+        name="VendedorTabs"
+        component={VendedorTabNavigator}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen name="SupervisorHome" component={SupervisorHomeScreen} />
     </Stack.Navigator>
   );
 }
+

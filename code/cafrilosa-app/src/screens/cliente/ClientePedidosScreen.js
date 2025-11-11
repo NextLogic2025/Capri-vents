@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { SafeAreaView, ScrollView, View, Text, StyleSheet, TouchableOpacity, TextInput } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import OrderSummaryCard from "../../components/ui/OrderSummaryCard";
 import OrderHistoryItem from "../../components/ui/OrderHistoryItem";
@@ -24,7 +25,7 @@ const orders = [
       },
       {
         id: "item-2",
-        name: "Jamon Serrano Reserva",
+        name: "Jamón Serrano Reserva",
         quantity: 1,
         unitPrice: 24.9,
         image: placeholderImage,
@@ -94,15 +95,16 @@ const ClientePedidosScreen = ({ navigation }) => {
     setProblemModalVisible(true);
   };
 
+  const insets = useSafeAreaInsets();
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 16 }]}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.header}>
           <Text style={styles.title}>Pedidos</Text>
-          <View style={styles.notificationButton}>
-            <Ionicons name="notifications-outline" size={20} color="#111827" />
-            <View style={styles.notificationDot} />
-          </View>
         </View>
 
         <View style={styles.searchBar}>
@@ -172,29 +174,6 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "700",
     color: "#111827",
-  },
-  notificationButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "#FFFFFF",
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-  notificationDot: {
-    position: "absolute",
-    top: 10,
-    right: 12,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "#F43F5E",
   },
   searchBar: {
     flexDirection: "row",

@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { SafeAreaView, ScrollView, View, Text, StyleSheet, TouchableOpacity, TextInput } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import OrderHistoryItem from "../../components/ui/OrderHistoryItem";
 import OrderDetailModal from "../../components/ui/OrderDetailModal";
@@ -11,7 +12,7 @@ const orders = [
     status: "En Camino",
     items: [
       { id: "item-1", name: "Chorizo Parrillero Premium", quantity: 2, unitPrice: 12.99 },
-      { id: "item-2", name: "Jamon Serrano Reserva", quantity: 1, unitPrice: 24.9 },
+      { id: "item-2", name: "Jamón Serrano Reserva", quantity: 1, unitPrice: 24.9 },
     ],
     address: "Av. Principal 123, Guayaquil",
     estimatedDeliveryDate: "15/1/2024",
@@ -48,6 +49,7 @@ const ClientePerfilHistorialPedidosScreen = ({ navigation }) => {
   const [search, setSearch] = useState("");
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [detailVisible, setDetailVisible] = useState(false);
+  const insets = useSafeAreaInsets();
   // TODO: conectar con backend aqui para obtener el historial completo de pedidos
 
   const filteredOrders = useMemo(() => {
@@ -57,7 +59,10 @@ const ClientePerfilHistorialPedidosScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[styles.content, { paddingTop: insets.top + 12 }]}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Ionicons name="chevron-back" size={22} color="#111827" />

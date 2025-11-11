@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -57,7 +57,7 @@ const LoginScreen = ({ navigation }) => {
     } else if (user.role === "vendedor") {
       navigation.reset({
         index: 0,
-        routes: [{ name: "VendedorHome" }],
+        routes: [{ name: "VendedorTabs" }],
       });
     } else if (user.role === "supervisor") {
       navigation.reset({

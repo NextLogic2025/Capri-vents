@@ -23,7 +23,7 @@ const ChangeEmailModal = ({ visible, currentEmail, onClose, onEmailUpdated }) =>
 
   const handleSendCode = () => {
     if (!validateEmail(newEmail)) {
-      setError("Ingresa un correo valido");
+      setError("Ingresa un correo válido");
       return;
     }
     setError("");
@@ -33,7 +33,7 @@ const ChangeEmailModal = ({ visible, currentEmail, onClose, onEmailUpdated }) =>
 
   const handleConfirm = () => {
     if (code !== EMAIL_CODE) {
-      setError("Codigo incorrecto");
+      setError("Código incorrecto");
       return;
     }
     setError("");
@@ -45,7 +45,7 @@ const ChangeEmailModal = ({ visible, currentEmail, onClose, onEmailUpdated }) =>
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade">
+    <Modal visible={visible} transparent animationType="fade" statusBarTranslucent>
       <View style={styles.overlay}>
         <View style={styles.card}>
           <Text style={styles.title}>Cambiar correo electronico</Text>
@@ -64,7 +64,7 @@ const ChangeEmailModal = ({ visible, currentEmail, onClose, onEmailUpdated }) =>
                 keyboardType="email-address"
               />
               {error ? <Text style={styles.error}>{error}</Text> : null}
-              <PrimaryButton title="Enviar codigo" onPress={handleSendCode} />
+              <PrimaryButton title="Enviar código" onPress={handleSendCode} />
               <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
                 <Text style={styles.cancelText}>Cancelar</Text>
               </TouchableOpacity>
@@ -77,7 +77,7 @@ const ChangeEmailModal = ({ visible, currentEmail, onClose, onEmailUpdated }) =>
               </Text>
               <TextInput
                 style={[styles.input, styles.codeInput]}
-                placeholder="Codigo"
+                placeholder="Código"
                 placeholderTextColor="#9CA3AF"
                 value={code}
                 onChangeText={setCode}

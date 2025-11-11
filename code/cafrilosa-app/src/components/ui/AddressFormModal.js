@@ -49,10 +49,10 @@ const AddressFormModal = ({ visible, mode = "add", initialAddress, onCancel, onS
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide">
+    <Modal visible={visible} transparent animationType="slide" statusBarTranslucent>
       <View style={styles.overlay}>
         <View style={styles.card}>
-          <Text style={styles.title}>{mode === "add" ? "Agregar direccion" : "Editar direccion"}</Text>
+          <Text style={styles.title}>{mode === "add" ? "Agregar dirección" : "Editar dirección"}</Text>
           <View style={styles.typeRow}>
             {typeOptions.map((option) => {
               const selected = form.type === option.value;
@@ -70,7 +70,7 @@ const AddressFormModal = ({ visible, mode = "add", initialAddress, onCancel, onS
           <ScrollView showsVerticalScrollIndicator={false}>
             <TextInput
               style={styles.input}
-              placeholder="Nombre de la direccion *"
+              placeholder="Nombre de la dirección *"
               placeholderTextColor="#9CA3AF"
               value={form.name}
               onChangeText={(text) => handleChange("name", text)}
@@ -85,7 +85,7 @@ const AddressFormModal = ({ visible, mode = "add", initialAddress, onCancel, onS
             <View style={styles.row}>
               <TextInput
                 style={[styles.input, styles.rowInput]}
-                placeholder="Numero"
+                placeholder="Número"
                 placeholderTextColor="#9CA3AF"
                 value={form.number}
                 onChangeText={(text) => handleChange("number", text)}
@@ -121,7 +121,7 @@ const AddressFormModal = ({ visible, mode = "add", initialAddress, onCancel, onS
             />
             <TextInput
               style={styles.input}
-              placeholder="Codigo postal *"
+              placeholder="Código postal *"
               placeholderTextColor="#9CA3AF"
               value={form.postalCode}
               onChangeText={(text) => handleChange("postalCode", text)}

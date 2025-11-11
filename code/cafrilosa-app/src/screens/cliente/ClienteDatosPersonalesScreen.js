@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { SafeAreaView, ScrollView, View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import EditTextFieldModal from "../../components/ui/EditTextFieldModal";
 import ChangeEmailModal from "../../components/ui/ChangeEmailModal";
@@ -21,6 +22,7 @@ const ClienteDatosPersonalesScreen = ({ navigation }) => {
 
   const [emailModalVisible, setEmailModalVisible] = useState(false);
   const [passwordModalVisible, setPasswordModalVisible] = useState(false);
+  const insets = useSafeAreaInsets();
 
   const openEditField = (fieldKey, label) => {
     setEditFieldKey(fieldKey);
@@ -54,7 +56,10 @@ const ClienteDatosPersonalesScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[styles.content, { paddingTop: insets.top + 12 }]}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Ionicons name="chevron-back" size={22} color="#111827" />
@@ -64,9 +69,9 @@ const ClienteDatosPersonalesScreen = ({ navigation }) => {
         </View>
 
         {renderRow("Nombre completo", personalData.fullName, () => openEditField("fullName", "nombre completo"), "account-edit")}
-        {renderRow("Correo electronico", personalData.email, () => setEmailModalVisible(true), "email-edit-outline")}
-        {renderRow("Telefono", personalData.phone, () => openEditField("phone", "telefono"), "phone")}
-        {renderRow("Contrasena", personalData.password, () => setPasswordModalVisible(true), "lock")}
+        {renderRow("Correo electrónico", personalData.email, () => setEmailModalVisible(true), "email-edit-outline")}
+        {renderRow("Teléfono", personalData.phone, () => openEditField("phone", "teléfono"), "phone")}
+        {renderRow("Contraseña", personalData.password, () => setPasswordModalVisible(true), "lock")}
       </ScrollView>
 
       <EditTextFieldModal
@@ -92,7 +97,7 @@ const ClienteDatosPersonalesScreen = ({ navigation }) => {
       <ChangePasswordModal
         visible={passwordModalVisible}
         onClose={() => setPasswordModalVisible(false)}
-        onPasswordChanged={() => console.log("Contrasena cambiada")}
+        onPasswordChanged={() => console.log("Contraseña cambiada")}
       />
     </SafeAreaView>
   );
@@ -172,3 +177,4 @@ const styles = StyleSheet.create({
 });
 
 export default ClienteDatosPersonalesScreen;
+
