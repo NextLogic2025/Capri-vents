@@ -1,41 +1,12 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { SafeAreaView, View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Modal } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import CartItemRow from "../../components/ui/CartItemRow";
+import { CartOrderState } from "../../state/CartOrderState";
 
-const initialCartItems = [
-  {
-    id: "c1",
-    productId: "p-chorizo-premium",
-    category: "Embutidos",
-    name: "Chorizo Parrillero Premium",
-    weight: "500g",
-    price: 12.99,
-    quantity: 2,
-    image: require("../../assets/images/cart-chorizo-premium.png"),
-  },
-  {
-    id: "c2",
-    productId: "p-salame-tandilero",
-    category: "Fiambres",
-    name: "Salame Tandilero",
-    weight: "400g",
-    price: 15.5,
-    quantity: 1,
-    image: require("../../assets/images/cart-salame.png"),
-  },
-  {
-    id: "c3",
-    productId: "p-jamón-cocido-premium",
-    category: "Fiambres",
-    name: "Jamón Cocido Premium",
-    weight: "300g",
-    price: 18.75,
-    quantity: 1,
-    image: require("../../assets/images/cart-jamon-cocido.png"),
-  },
-];
+// TODO: conectar con backend aqui para inicializar el carrito del usuario desde API
+const initialCartItems = CartOrderState.getCartItems();
 
 const paymentMethods = [
   { id: "card", label: "Tarjeta Credito/Debito", description: "Visa, Mastercard, Discover" },
@@ -71,23 +42,33 @@ const ClienteCarritoScreen = ({ navigation }) => {
   const totalItems = useMemo(() => cartItems.reduce((sum, item) => sum + item.quantity, 0), [cartItems]);
 
   const handleIncreaseQuantity = (itemId) => {
-    setCartItems((prev) => prev.map((item) => (item.id === itemId ? { ...item, quantity: item.quantity + 1 } : item)));
+    setCartItems((prev) => {
+      const next = prev.map((item) => (item.id === itemId ? { ...item, quantity: item.quantity + 1 } : item));
+      CartOrderState.setCartItems(next);
+      return next;
+    });
   };
 
   const handleDecreaseQuantity = (itemId) => {
-    setCartItems((prev) =>
-      prev.map((item) => {
+    setCartItems((prev) => {
+      const next = prev.map((item) => {
         if (item.id === itemId) {
           const nextQty = Math.max(1, item.quantity - 1);
           return { ...item, quantity: nextQty };
         }
         return item;
-      })
-    );
+      });
+      CartOrderState.setCartItems(next);
+      return next;
+    });
   };
 
   const handleRemoveItem = (itemId) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== itemId));
+    setCartItems((prev) => {
+      const next = prev.filter((item) => item.id !== itemId);
+      CartOrderState.setCartItems(next);
+      return next;
+    });
   };
 
   const handleApplyCoupon = () => {
@@ -96,8 +77,14 @@ const ClienteCarritoScreen = ({ navigation }) => {
   };
 
   const handleCheckout = () => {
-    Alert.alert("Compra finalizada", "Compra finalizada (simulado)");
     // TODO: conectar con backend aqui para procesar el pago y crear la orden
+    const newOrder = CartOrderState.createNewOrderFromCart();
+    if (!newOrder) {
+      Alert.alert("Carrito vacío", "Agrega productos antes de continuar");
+      return;
+    }
+    setCartItems(CartOrderState.getCartItems());
+    Alert.alert("Pedido creado", `Se creó el pedido ${newOrder.id} (simulado)`);
   };
 
   const handleSelectPaymentMethod = (methodId) => {
@@ -106,6 +93,8 @@ const ClienteCarritoScreen = ({ navigation }) => {
       setCardPickerVisible(true);
     } else if (methodId === "bank") {
       setTransferModalVisible(true);
+    } else if (methodId === "cash") {
+      CartOrderState.setPaymentSelection("cash", null);
     }
   };
 
@@ -115,6 +104,8 @@ const ClienteCarritoScreen = ({ navigation }) => {
       return;
     }
     setCardPickerVisible(false);
+    // TODO: enviar token/ID seguro de tarjeta al backend
+    CartOrderState.setPaymentSelection("card", { cardId: selectedCardId });
   };
 
   const handleAddCardFromModal = () => {
@@ -138,6 +129,8 @@ const ClienteCarritoScreen = ({ navigation }) => {
       return;
     }
     setTransferModalVisible(false);
+    // TODO: subir comprobante al backend y vincular a la orden
+    CartOrderState.setPaymentSelection("bank", { accountId: selectedTransferAccount, receipt: transferReceiptName });
   };
 
   const navigateToProductDetail = (item) => {
@@ -330,9 +323,31 @@ const ClienteCarritoScreen = ({ navigation }) => {
       </Modal>
 
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
-          <Text style={styles.checkoutButtonText}>Finalizar Compra</Text>
-        </TouchableOpacity>
+        <View style={styles.footerRow}>
+          <TouchableOpacity style={styles.mergeButton} onPress={() => {
+            if (cartItems.length === 0) {
+              Alert.alert('Carrito vacío', 'Agrega productos antes de continuar');
+              return;
+            }
+            cartItems.forEach((it) => {
+              CartOrderState.addToInProgressOrder({
+                id: it.productId,
+                name: it.name,
+                category: it.category,
+                price: it.price,
+                image: it.image,
+              }, it.quantity);
+            });
+            CartOrderState.clearCart();
+            setCartItems([]);
+            Alert.alert('Agregado al Pedido en Curso', 'Se movieron los productos al pedido en curso (simulado).');
+          }}>
+            <Text style={styles.mergeButtonText}>Agregar al Pedido en Curso</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
+            <Text style={styles.checkoutButtonText}>Finalizar Compra</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );

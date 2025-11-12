@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { SafeAreaView, ScrollView, View, Text, StyleSheet, TouchableOpacity, ImageBackground } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
@@ -80,12 +80,6 @@ const VendedorHomeScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const completedVisits = todayRoutes.filter((route) => route.completed).length;
 
-  const goToPedidosTab = () => {
-    const parent = navigation.getParent?.();
-    if (parent) parent.navigate("VendedorPedidos");
-    else navigation.navigate("VendedorPedidos");
-  };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 12 }]} showsVerticalScrollIndicator={false}>
@@ -137,6 +131,16 @@ const VendedorHomeScreen = ({ navigation }) => {
           ))}
         </View>
       </ScrollView>
+      {/* Floating button to open Catalogo de Productos */}
+      <TouchableOpacity
+        onPress={() => navigation.navigate("VendedorCatalogoProductos")}
+        style={styles.fab}
+        activeOpacity={0.9}
+      >
+        <View style={styles.fabInner}>
+          <Ionicons name="bag-outline" size={28} color="#E64A19" />
+        </View>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -165,6 +169,28 @@ const styles = StyleSheet.create({
   routeHeaderLeft: { flexDirection: "row", alignItems: "center", gap: 6 },
   routeTitle: { fontSize: 16, fontWeight: "700", color: "#111827" },
   routeCount: { fontSize: 13, color: "#6B7280" },
+  fab: {
+    position: "absolute",
+    right: 20,
+    bottom: 90,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 3,
+    borderColor: "#E64A19",
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+  },
+  fabInner: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
 
 export default VendedorHomeScreen;

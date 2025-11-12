@@ -62,7 +62,7 @@ const LoginScreen = ({ navigation }) => {
     } else if (user.role === "supervisor") {
       navigation.reset({
         index: 0,
-        routes: [{ name: "SupervisorHome" }],
+        routes: [{ name: "SupervisorTabs" }],
       });
     }
   };

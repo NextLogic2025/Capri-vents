@@ -56,7 +56,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 2,
-    zIndex: 2,
+    zIndex: 10,
+    elevation: 6,
   },
   badgeText: {
     color: "#FFFFFF",
@@ -68,6 +69,7 @@ const styles = StyleSheet.create({
     height: 90,
     borderRadius: 18,
     marginBottom: 12,
+    zIndex: 1,
   },
   name: {
     fontSize: 16,

@@ -26,6 +26,12 @@ const ClientePerfilScreen = ({ navigation }) => {
 
   const profileOptions = [
     {
+      title: "Configuraciones",
+      subtitle: "Notificaciones y modo oscuro",
+      icon: <MaterialCommunityIcons name="cog-outline" size={22} color="#E64A19" />,
+      route: "ClienteConfiguraciones",
+    },
+    {
       title: "Datos Personales",
       subtitle: "Edita tu informacion",
       icon: <MaterialCommunityIcons name="account-edit" size={22} color="#E64A19" />,

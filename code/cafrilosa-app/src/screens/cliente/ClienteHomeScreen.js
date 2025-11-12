@@ -12,9 +12,7 @@ const placeholderOffer = require("../../assets/images/login-header-meat.png");
 
 // TODO: conectar con backend aqui para cargar categorias, promociones y ofertas reales.
 const categories = [
-  { id: "embutidos", name: "Embutidos", count: 45, color: "#FDEDEC", icon: "restaurant-outline" },
-  { id: "jamones", name: "Jamones", count: 23, color: "#FDF2FF", icon: "pizza-outline" },
-  { id: "chorizos", name: "Chorizos", count: 18, color: "#FFF5EB", icon: "flame-outline" },
+  { id: "productos", name: "Productos", count: 86, color: "#E0F2FE", icon: "cube-outline" },
   { id: "promociones", name: "Promociones", count: 12, color: "#FEF9E7", icon: "pricetags-outline" },
 ];
 
@@ -142,12 +140,8 @@ const ClienteHomeScreen = ({ navigation, route }) => {
   const newAnnouncementsCount = announcements.filter((item) => item.isNew).length;
 
   const handleCategoryPress = (category) => {
-    if (category.id === "embutidos") {
-      navigation.navigate("ClienteEmbutidos");
-    } else if (category.id === "jamones") {
-      navigation.navigate("ClienteJamones");
-    } else if (category.id === "chorizos") {
-      navigation.navigate("ClienteChorizos");
+    if (category.id === "productos") {
+      navigation.navigate("ClienteProductos");
     } else if (category.id === "promociones") {
       navigation.navigate("ClientePromociones");
     }
@@ -215,9 +209,6 @@ const ClienteHomeScreen = ({ navigation, route }) => {
 
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Categorías</Text>
-          <TouchableOpacity onPress={() => console.log("Ver todas las categorías")}> 
-            <Text style={styles.viewAll}>Ver todas</Text>
-          </TouchableOpacity>
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoriesRow}>
           {categories.map((category) => (
@@ -240,9 +231,6 @@ const ClienteHomeScreen = ({ navigation, route }) => {
 
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Ofertas Especiales</Text>
-          <TouchableOpacity onPress={() => console.log("Ver todas las ofertas")}> 
-            <Text style={styles.viewAll}>Ver todo &gt;</Text>
-          </TouchableOpacity>
         </View>
         <View style={styles.offersGrid}>
           {offers.map((offer) => (

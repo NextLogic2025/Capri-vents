@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
-const problems = [
+const defaultProblems = [
   {
     key: "bad_product",
     title: "Producto en Mal Estado",
@@ -19,13 +19,14 @@ const problems = [
   },
 ];
 
-const OrderProblemModal = ({ visible, onClose, onSelectProblem }) => {
+const OrderProblemModal = ({ visible, onClose, onSelectProblem, problems }) => {
+  const items = problems && Array.isArray(problems) && problems.length > 0 ? problems : defaultProblems;
   return (
     <Modal visible={visible} animationType="fade" transparent statusBarTranslucent>
       <View style={styles.overlay}>
         <View style={styles.modalCard}>
           <Text style={styles.title}>?Que problema tuviste con tu pedido?</Text>
-          {problems.map((problem) => (
+          {items.map((problem) => (
             <TouchableOpacity
               key={problem.key}
               style={styles.problemCard}

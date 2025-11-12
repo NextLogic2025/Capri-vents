@@ -3,10 +3,12 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 
 const SellerCatalogProductItem = ({ product, onPressViewMore }) => {
   if (!product) return null;
+  const fallback = require("../../assets/images/login-header-meat.png");
+  const imgSrc = (product && product.image) ? product.image : fallback;
 
   return (
     <View style={styles.card}>
-      <Image source={product.image} style={styles.productImage} resizeMode="cover" />
+      <Image source={imgSrc} style={styles.productImage} resizeMode="cover" />
       <View style={styles.info}>
         <Text style={styles.name}>{product.name}</Text>
         <Text style={styles.code}>Código: {product.code}</Text>

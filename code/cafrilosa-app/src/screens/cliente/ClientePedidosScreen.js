@@ -1,16 +1,43 @@
 import React, { useMemo, useState } from "react";
-import { SafeAreaView, ScrollView, View, Text, StyleSheet, TouchableOpacity, TextInput } from "react-native";
+import { SafeAreaView, ScrollView, View, Text, StyleSheet, TextInput } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import OrderSummaryCard from "../../components/ui/OrderSummaryCard";
 import OrderHistoryItem from "../../components/ui/OrderHistoryItem";
 import OrderDetailModal from "../../components/ui/OrderDetailModal";
 import OrderProblemModal from "../../components/ui/OrderProblemModal";
+import InProgressOrderCard from "../../components/ui/InProgressOrderCard";
 
 const placeholderImage = require("../../assets/images/login-header-meat.png");
 
 // TODO: conectar con backend aqui para obtener pedidos del usuario.
 const orders = [
+  {
+    id: "PED-2024-003",
+    date: "15 de enero de 2024",
+    status: "En preparación",
+    items: [
+      {
+        id: "item-4",
+        name: "Salchicha Vienesa",
+        quantity: 3,
+        unitPrice: 5.0,
+        image: require("../../assets/images/cart-salame.png"),
+      },
+    ],
+    address: "Av. de los Shyris y Naciones Unidas, Quito",
+    estimatedDeliveryDate: "16/1/2024",
+    subtotal: 15.0,
+    shippingCost: 0,
+    total: 15.0,
+    paymentMethod: "Tarjeta",
+    tracking: [
+      { label: "Pedido Recibido", date: "15/1/2024, 10:00", completed: true },
+      { label: "En preparación", date: "15/1/2024, 10:30", completed: true },
+      { label: "En Camino", date: "", completed: false },
+      { label: "Entregado", date: "", completed: false },
+    ],
+  },
   {
     id: "PED-2024-001",
     date: "14 de enero de 2024",
@@ -77,13 +104,23 @@ const ClientePedidosScreen = ({ navigation }) => {
   const [problemModalVisible, setProblemModalVisible] = useState(false);
   const [selectedProblem, setSelectedProblem] = useState(null);
 
+  const inProgressOrders = useMemo(
+    () => orders.filter((order) => order.status === "En preparación"),
+    []
+  );
+
+  const otherOrders = useMemo(
+    () => orders.filter((order) => order.status !== "En preparación"),
+    []
+  );
+
   const inProgressCount = useMemo(() => orders.filter((order) => order.status !== "Entregado").length, []);
   const completedCount = useMemo(() => orders.filter((order) => order.status === "Entregado").length, []);
 
   const filteredOrders = useMemo(() => {
-    if (!search.trim()) return orders;
-    return orders.filter((order) => order.id.toLowerCase().includes(search.trim().toLowerCase()));
-  }, [search]);
+    if (!search.trim()) return otherOrders;
+    return otherOrders.filter((order) => order.id.toLowerCase().includes(search.trim().toLowerCase()));
+  }, [search, otherOrders]);
 
   const openOrderDetail = (order) => {
     setSelectedOrder(order);
@@ -95,6 +132,12 @@ const ClientePedidosScreen = ({ navigation }) => {
     setProblemModalVisible(true);
   };
 
+  const handleAddItems = () => {
+    // Navegar a la pantalla de inicio/productos para agregar más items.
+    // La lógica del carrito debería ser capaz de manejar la adición de items a un pedido existente.
+    navigation.navigate("ClienteHomeStack", { screen: "ClienteProductos" });
+  };
+
   const insets = useSafeAreaInsets();
 
   return (
@@ -104,24 +147,45 @@ const ClientePedidosScreen = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>Pedidos</Text>
+          <Text style={styles.title}>Mis Pedidos</Text>
         </View>
-
         <View style={styles.searchBar}>
           <Ionicons name="search" size={18} color="#9CA3AF" />
           <TextInput
             style={styles.searchInput}
-            placeholder="Buscar pedidos..."
+            placeholder="Buscar en tu historial..."
             placeholderTextColor="#9CA3AF"
             value={search}
             onChangeText={setSearch}
           />
         </View>
 
-        <Text style={styles.sectionTitle}>Estado de tus pedidos</Text>
+        <Text style={styles.sectionTitle}>Resumen de Actividad</Text>
         <OrderSummaryCard inProgressCount={inProgressCount} completedCount={completedCount} />
 
-        <Text style={[styles.sectionTitle, styles.sectionSpacing]}>Historial de Pedidos</Text>
+        {inProgressOrders.length > 0 && (
+          <>
+            <Text style={[styles.sectionTitle, styles.sectionSpacing]}>Pedido en Curso</Text>
+            {inProgressOrders.map((order) => (
+              <InProgressOrderCard
+                key={order.id}
+                order={order}
+                onAddItems={handleAddItems}
+                onShowDetails={() => openOrderDetail(order)}
+              />
+            ))}
+          </>
+        )}
+
+        <View style={[styles.sectionHeader, styles.sectionSpacing]}>
+          <Text style={styles.sectionTitle}>Historial de Pedidos</Text>
+          <Text
+            style={styles.viewAll}
+            onPress={() => navigation.navigate("ClientePerfilStack", { screen: "ClientePerfilHistorialPedidos" })}
+          >
+            Ver todas
+          </Text>
+        </View>
         {filteredOrders.map((order) => (
           <OrderHistoryItem key={order.id} order={order} onPress={() => openOrderDetail(order)} />
         ))}
@@ -172,8 +236,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: "700",
-    color: "#111827",
+    fontWeight: "800",
+    color: "#1F2937",
   },
   searchBar: {
     flexDirection: "row",
@@ -182,6 +246,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 12,
+    marginTop: 24,
     marginBottom: 20,
     borderWidth: 1,
     borderColor: "#E5E7EB",
@@ -195,11 +260,22 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#111827",
-    marginBottom: 12,
+    color: "#374151",
+    marginBottom: 16,
   },
   sectionSpacing: {
     marginTop: 24,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+  viewAll: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#F97316",
   },
 });
 

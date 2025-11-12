@@ -1,5 +1,5 @@
-﻿import React from "react";
-import { SafeAreaView, View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
+import React from "react";
+import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ProfileOptionItem from "../../components/ui/ProfileOptionItem";
@@ -32,11 +32,10 @@ const VendedorPerfilScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.searchBar}>
-        <Ionicons name="search-outline" size={18} color="#9CA3AF" />
-        <TextInput style={styles.searchInput} placeholder="Buscar dato..." placeholderTextColor="#9CA3AF" />
-      </View>
-
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 28 }}
+        showsVerticalScrollIndicator={false}
+      >
       <View style={styles.profileCard}>
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>{vendedor.initials}</Text>
@@ -48,23 +47,6 @@ const VendedorPerfilScreen = ({ navigation }) => {
         </View>
       </View>
 
-      <View style={styles.statsRow}>
-        <Stat label="Ventas Hoy" value={`$${vendedor.salesToday.toLocaleString("es-EC")}`} />
-        <Stat label="Clientes" value={`${vendedor.clientsCount}`} />
-        <Stat label="Meta" value={`${vendedor.goalPercent}%`} />
-      </View>
-
-      <View style={styles.goalCard}>
-        <View style={styles.goalHeader}>
-          <Text style={styles.goalTitle}>Meta Mensual</Text>
-          <Text style={styles.goalPercent}>{vendedor.goalPercent}%</Text>
-        </View>
-        <View style={styles.progressTrack}>
-          <View style={[styles.progressBar, { width: `${vendedor.goalPercent}%` }]} />
-        </View>
-        <Text style={styles.goalSubtitle}>$128,450 de $150,000 · Faltan $21,550</Text>
-      </View>
-
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Mi Cuenta</Text>
       </View>
@@ -73,20 +55,27 @@ const VendedorPerfilScreen = ({ navigation }) => {
         icon={<Ionicons name="person-outline" size={22} color="#F55A3C" />}
         title="Datos Personales"
         subtitle="Actualizar tu información"
-        onPress={() => console.log("Datos personales vendedor")}
+        onPress={() => navigation.navigate("VendedorDatosPersonales")}
       />
       <ProfileOptionItem
-        icon={<Ionicons name="notifications-outline" size={22} color="#F97316" />}
-        title="Notificaciones"
-        subtitle="Configuración de alertas"
-        onPress={() => console.log("Notificaciones vendedor")}
+        icon={<Ionicons name="settings-outline" size={22} color="#F97316" />}
+        title="Configuraciones"
+        subtitle="Notificaciones y modo oscuro"
+        onPress={() => navigation.navigate("VendedorConfiguraciones")}
       />
       <ProfileOptionItem
         icon={<Ionicons name="map-outline" size={22} color="#2563EB" />}
         title="Mi Zona y Ruta"
         subtitle="Conoce tu cobertura"
-        onPress={() => console.log("Ver zona")}
+        onPress={() => navigation.navigate("VendedorZonaRuta")}
       />
+      <ProfileOptionItem
+        icon={<Ionicons name="help-buoy-outline" size={22} color="#EF4444" />}
+        title="Soporte"
+        subtitle="Centro de ayuda y tickets"
+        onPress={() => navigation.navigate("VendedorCentroAyuda")}
+      />
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -103,25 +92,12 @@ const styles = StyleSheet.create({
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 },
   title: { fontSize: 24, fontWeight: "700", color: "#111827" },
   logoutButton: { width: 42, height: 42, borderRadius: 21, backgroundColor: "#FFFFFF", alignItems: "center", justifyContent: "center" },
-  searchBar: { flexDirection: "row", alignItems: "center", backgroundColor: "#FFFFFF", borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, marginBottom: 16 },
-  searchInput: { flex: 1, marginLeft: 8, color: "#111827" },
   profileCard: { flexDirection: "row", backgroundColor: "#FFFFFF", borderRadius: 24, padding: 18, alignItems: "center", marginBottom: 16 },
   avatar: { width: 64, height: 64, borderRadius: 32, backgroundColor: "#F55A3C", alignItems: "center", justifyContent: "center", marginRight: 16 },
   avatarText: { color: "#FFFFFF", fontSize: 22, fontWeight: "700" },
   name: { fontSize: 18, fontWeight: "700", color: "#111827" },
   email: { color: "#6B7280", marginTop: 2 },
   metaText: { color: "#9CA3AF", marginTop: 4 },
-  statsRow: { flexDirection: "row", gap: 12 },
-  statCard: { flex: 1, backgroundColor: "#FFFFFF", borderRadius: 18, paddingVertical: 12, alignItems: "center", marginBottom: 18 },
-  statValue: { fontSize: 16, fontWeight: "700", color: "#111827" },
-  statLabel: { fontSize: 12, color: "#6B7280" },
-  goalCard: { backgroundColor: "#FFFFFF", borderRadius: 24, padding: 18, marginBottom: 20 },
-  goalHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  goalTitle: { fontSize: 15, fontWeight: "700", color: "#111827" },
-  goalPercent: { fontSize: 18, fontWeight: "700", color: "#F55A3C" },
-  progressTrack: { height: 12, borderRadius: 6, backgroundColor: "#F3F4F6", marginTop: 12, overflow: "hidden" },
-  progressBar: { height: "100%", backgroundColor: "#F55A3C" },
-  goalSubtitle: { color: "#6B7280", marginTop: 10 },
   sectionHeader: { marginBottom: 12 },
   sectionTitle: { fontSize: 16, fontWeight: "700", color: "#111827" },
 });

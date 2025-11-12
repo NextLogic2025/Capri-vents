@@ -1,13 +1,11 @@
-﻿import React from "react";
+import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { View, Text, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import ClienteHomeScreen from "../screens/cliente/ClienteHomeScreen";
-import ClienteEmbutidosScreen from "../screens/cliente/ClienteEmbutidosScreen";
-import ClienteJamonesScreen from "../screens/cliente/ClienteJamonesScreen";
-import ClienteChorizosScreen from "../screens/cliente/ClienteChorizosScreen";
+import ClienteProductosScreen from "../screens/cliente/ClienteProductosScreen";
 import ClientePromocionesScreen from "../screens/cliente/ClientePromocionesScreen";
 import ClienteProductoDetalleScreen from "../screens/cliente/ClienteProductoDetalleScreen";
 import ClientePedidosScreen from "../screens/cliente/ClientePedidosScreen";
@@ -20,6 +18,7 @@ import ClienteDireccionesScreen from "../screens/cliente/ClienteDireccionesScree
 import ClienteMetodosPagoScreen from "../screens/cliente/ClienteMetodosPagoScreen";
 import ClientePerfilHistorialPedidosScreen from "../screens/cliente/ClientePerfilHistorialPedidosScreen";
 import ClienteCentroAyudaScreen from "../screens/cliente/ClienteCentroAyudaScreen";
+import ConfiguracionesScreen from "../screens/common/ConfiguracionesScreen";
 import ClienteNivelesScreen from "../screens/cliente/ClienteNivelesScreen";
 
 const Tab = createBottomTabNavigator();
@@ -33,9 +32,7 @@ const ClienteHomeStackScreen = ({ route }) => {
   return (
     <HomeStack.Navigator screenOptions={{ headerShown: false }}>
       <HomeStack.Screen name="ClienteHome" component={ClienteHomeScreen} initialParams={{ user }} />
-      <HomeStack.Screen name="ClienteEmbutidos" component={ClienteEmbutidosScreen} />
-      <HomeStack.Screen name="ClienteJamones" component={ClienteJamonesScreen} />
-      <HomeStack.Screen name="ClienteChorizos" component={ClienteChorizosScreen} />
+      <HomeStack.Screen name="ClienteProductos" component={ClienteProductosScreen} />
       <HomeStack.Screen name="ClientePromociones" component={ClientePromocionesScreen} />
       <HomeStack.Screen name="ClienteProductoDetalle" component={ClienteProductoDetalleScreen} />
       <HomeStack.Screen name="ClienteNiveles" component={ClienteNivelesScreen} />
@@ -64,6 +61,7 @@ const ClienteProfileStackScreen = () => {
         component={ClientePerfilHistorialPedidosScreen}
       />
       <ProfileStack.Screen name="ClienteCentroAyuda" component={ClienteCentroAyudaScreen} />
+      <ProfileStack.Screen name="ClienteConfiguraciones" component={ConfiguracionesScreen} />
       <ProfileStack.Screen name="ClienteTicketSoporte" component={ClienteTicketSoporteScreen} />
     </ProfileStack.Navigator>
   );

@@ -8,13 +8,19 @@ import { VENDEDOR_TAB_BAR_STYLE } from "./tabStyles";
 import VendedorHomeScreen from "../screens/vendedor/VendedorHomeScreen";
 import VendedorEntregasScreen from "../screens/vendedor/VendedorEntregasScreen";
 import VendedorPerfilScreen from "../screens/vendedor/VendedorPerfilScreen";
-import VendedorAgregarProductoScreen from "../screens/vendedor/VendedorAgregarProductoScreen";
+import VendedorDatosPersonalesScreen from "../screens/vendedor/VendedorDatosPersonalesScreen";
+import ConfiguracionesScreen from "../screens/common/ConfiguracionesScreen";
 import VendedorCatalogoProductosScreen from "../screens/vendedor/VendedorCatalogoProductosScreen";
 import VendedorListaRutasScreen from "../screens/vendedor/VendedorListaRutasScreen";
+import ClienteProductoDetalleScreen from "../screens/cliente/ClienteProductoDetalleScreen";
+import VendedorZonaRutaScreen from "../screens/vendedor/VendedorZonaRutaScreen";
+import VendedorCentroAyudaScreen from "../screens/vendedor/VendedorCentroAyudaScreen";
+import VendedorTicketSoporteScreen from "../screens/vendedor/VendedorTicketSoporteScreen";
 
 const Tab = createBottomTabNavigator();
 const VendedorHomeStack = createNativeStackNavigator();
 const VendedorEntregasStack = createNativeStackNavigator();
+const VendedorPerfilStack = createNativeStackNavigator();
 
 const renderTabButton = (iconName, label, IconComponent = Ionicons) => ({ focused }) => (
   <View style={styles.tabButtonWrapper}>
@@ -36,7 +42,7 @@ const VendedorHomeStackScreen = () => (
   <VendedorHomeStack.Navigator screenOptions={{ headerShown: false }}>
     <VendedorHomeStack.Screen name="VendedorHomeMain" component={VendedorHomeScreen} />
     <VendedorHomeStack.Screen name="VendedorCatalogoProductos" component={VendedorCatalogoProductosScreen} />
-    <VendedorHomeStack.Screen name="VendedorAgregarProducto" component={VendedorAgregarProductoScreen} />
+    <VendedorHomeStack.Screen name="VendedorProductoDetalle" component={ClienteProductoDetalleScreen} />
   </VendedorHomeStack.Navigator>
 );
 
@@ -45,6 +51,17 @@ const VendedorEntregasStackScreen = () => (
     <VendedorEntregasStack.Screen name="VendedorEntregasMain" component={VendedorEntregasScreen} />
     <VendedorEntregasStack.Screen name="VendedorListaRutas" component={VendedorListaRutasScreen} />
   </VendedorEntregasStack.Navigator>
+);
+
+const VendedorPerfilStackScreen = () => (
+  <VendedorPerfilStack.Navigator screenOptions={{ headerShown: false }}>
+    <VendedorPerfilStack.Screen name="VendedorPerfilMain" component={VendedorPerfilScreen} />
+    <VendedorPerfilStack.Screen name="VendedorDatosPersonales" component={VendedorDatosPersonalesScreen} />
+    <VendedorPerfilStack.Screen name="VendedorConfiguraciones" component={ConfiguracionesScreen} />
+    <VendedorPerfilStack.Screen name="VendedorZonaRuta" component={VendedorZonaRutaScreen} />
+    <VendedorPerfilStack.Screen name="VendedorCentroAyuda" component={VendedorCentroAyudaScreen} />
+    <VendedorPerfilStack.Screen name="VendedorTicketSoporte" component={VendedorTicketSoporteScreen} />
+  </VendedorPerfilStack.Navigator>
 );
 
 const VendedorTabNavigator = () => {
@@ -72,7 +89,7 @@ const VendedorTabNavigator = () => {
       />
       <Tab.Screen
         name="VendedorPerfil"
-        component={VendedorPerfilScreen}
+        component={VendedorPerfilStackScreen}
         options={{
           tabBarIcon: renderTabButton("person-circle-outline", "Perfil"),
         }}

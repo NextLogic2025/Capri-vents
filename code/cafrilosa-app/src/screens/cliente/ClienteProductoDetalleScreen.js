@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const ClienteProductoDetalleScreen = ({ navigation, route }) => {
   const product = route?.params?.product;
+  const insets = useSafeAreaInsets();
+  const isVendor = route?.name === 'VendedorProductoDetalle';
 
   const [quantity, setQuantity] = useState(1);
 
@@ -35,29 +38,17 @@ const ClienteProductoDetalleScreen = ({ navigation, route }) => {
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.imageWrapper}>
           <Image source={image} style={styles.image} />
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <TouchableOpacity style={[styles.backButton, { top: 10 + insets.top }]} onPress={() => navigation.goBack()}>
             <Ionicons name="chevron-back" size={22} color="#111827" />
           </TouchableOpacity>
-          <View style={styles.rightButtons}>
-            <TouchableOpacity style={styles.iconButton}>
-              <Ionicons name="heart-outline" size={20} color="#111827" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
-              <Ionicons name="share-outline" size={20} color="#111827" />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.categoryTag}>
+          <View style={[styles.categoryTag, { top: (10 + insets.top) + 44 }] }>
             <Text style={styles.categoryTagText}>{category}</Text>
           </View>
         </View>
 
         <View style={styles.contentWrapper}>
           <Text style={styles.productName}>{name}</Text>
-          <View style={styles.ratingRow}>
-            <Ionicons name="star" size={18} color="#FACC15" />
-            <Text style={styles.ratingText}>{rating.toFixed(1)}</Text>
-            <Text style={styles.reviewText}>({reviewsCount} reseNas)</Text>
-          </View>
+          {/* Rating and reviews removed as requested */}
           <View style={styles.priceRow}>
             <Text style={styles.mainPrice}>${price.toFixed(2)}</Text>
             <Text style={styles.weight}> / {weight}</Text>
@@ -82,20 +73,22 @@ const ClienteProductoDetalleScreen = ({ navigation, route }) => {
         </View>
       </ScrollView>
 
-      <View style={styles.bottomBar}>
-        <View style={styles.quantityBox}>
-          <TouchableOpacity onPress={() => setQuantity((prev) => Math.max(prev - 1, 1))}>
-            <Ionicons name="remove-circle-outline" size={24} color="#111827" />
-          </TouchableOpacity>
-          <Text style={styles.quantityText}>{quantity}</Text>
-          <TouchableOpacity onPress={() => setQuantity((prev) => prev + 1)}>
-            <Ionicons name="add-circle-outline" size={24} color="#111827" />
+      {!isVendor && (
+        <View style={styles.bottomBar}>
+          <View style={styles.quantityBox}>
+            <TouchableOpacity onPress={() => setQuantity((prev) => Math.max(prev - 1, 1))}>
+              <Ionicons name="remove-circle-outline" size={24} color="#111827" />
+            </TouchableOpacity>
+            <Text style={styles.quantityText}>{quantity}</Text>
+            <TouchableOpacity onPress={() => setQuantity((prev) => prev + 1)}>
+              <Ionicons name="add-circle-outline" size={24} color="#111827" />
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity style={styles.bottomButton} onPress={handleAdd}>
+            <Text style={styles.bottomButtonText}>Agregar ${price.toFixed(2)}</Text>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.bottomButton} onPress={handleAdd}>
-          <Text style={styles.bottomButtonText}>Agregar ${price.toFixed(2)}</Text>
-        </TouchableOpacity>
-      </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -126,30 +119,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  rightButtons: {
-    position: "absolute",
-    top: 20,
-    right: 20,
-    flexDirection: "row",
-  },
-  iconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.9)",
-    alignItems: "center",
-    justifyContent: "center",
-    marginLeft: 10,
-  },
   categoryTag: {
     position: "absolute",
-    top: 24,
     left: 20,
     backgroundColor: "#E64A19",
     borderRadius: 14,
     paddingHorizontal: 12,
     paddingVertical: 4,
-    marginTop: 60,
   },
   categoryTagText: {
     color: "#FFFFFF",
@@ -164,21 +140,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#111827",
   },
-  ratingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 8,
-  },
-  ratingText: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginLeft: 6,
-  },
-  reviewText: {
-    fontSize: 13,
-    color: "#6B7280",
-    marginLeft: 6,
-  },
+  
   priceRow: {
     flexDirection: "row",
     alignItems: "center",

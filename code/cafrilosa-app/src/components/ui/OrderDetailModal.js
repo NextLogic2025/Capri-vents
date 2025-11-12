@@ -30,7 +30,7 @@ const OrderDetailModal = ({ visible, order, onClose, onProblemPress }) => {
 
           <TouchableOpacity style={styles.problemButton} onPress={onProblemPress}>
             <Ionicons name="alert-circle-outline" size={20} color="#FFFFFF" />
-            <Text style={styles.problemButtonText}>?Tuviste algUn problema con este pedido?</Text>
+            <Text style={styles.problemButtonText}>¿Tuviste algún problema con este pedido?</Text>
           </TouchableOpacity>
 
           <ScrollView showsVerticalScrollIndicator={false}>

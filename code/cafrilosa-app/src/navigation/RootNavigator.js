@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import SplashScreen from "../screens/auth/SplashScreen";
 import LoginScreen from "../screens/auth/LoginScreen";
@@ -8,7 +8,7 @@ import ForgotPasswordCodeScreen from "../screens/auth/ForgotPasswordCodeScreen";
 import ForgotPasswordResetScreen from "../screens/auth/ForgotPasswordResetScreen";
 import ClienteTabNavigator from "./ClienteTabNavigator";
 import VendedorTabNavigator from "./VendedorTabNavigator";
-import SupervisorHomeScreen from "../screens/supervisor/SupervisorHomeScreen";
+import SupervisorTabNavigator from "./SupervisorTabNavigator";
 
 const Stack = createNativeStackNavigator();
 
@@ -27,7 +27,7 @@ export default function RootNavigator() {
         component={VendedorTabNavigator}
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="SupervisorHome" component={SupervisorHomeScreen} />
+      <Stack.Screen name="SupervisorTabs" component={SupervisorTabNavigator} />
     </Stack.Navigator>
   );
 }
