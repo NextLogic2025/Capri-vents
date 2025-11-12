@@ -38,7 +38,8 @@ Un **Mapa de Capacidades** organiza, en lenguaje de negocio, **lo que el sistema
 ![alt text](<Planificacion Comercial Gestión de Clientes.jpg>)
 ![alt text](<Gestión de Entregas Gestión de Pedidos.jpg>)
 ![alt text](<Gestión de Cobros y Créditos Postventa y Servicio al Cliente.jpg>)
-![Gestion Productos](https://github.com/user-attachments/assets/595f28fa-4cad-450f-99ea-a3547a62cebb)
+![WhatsApp Image 2025-11-11 at 9 45 51 PM](https://github.com/user-attachments/assets/16bce9f4-7e84-4cc8-ad26-52a7f671ca15)
+
 
 
 
