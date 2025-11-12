@@ -88,19 +88,21 @@ Esta herramienta permitirá a Cafrilosa centralizar sus operaciones comerciales,
 <table align="center">
   <tr>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/44a719ca-66f4-43c5-91ad-a5dd03a87631" alt="Vista Admin" width="300"/>
+      <img src="https://github.com/user-attachments/assets/5b537900-8b23-4051-8c04-475dfc1489c2" alt="Vista Admin" width="300"/>
       <br/><strong>Vista Cliente</strong>
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/488c7e5e-5c82-4b48-8ee3-ef51571124d3" alt="Vista Cliente" width="300"/>
+      <img src="https://github.com/user-attachments/assets/6a0fc22b-8fec-474f-84be-d58b43ea9951" alt="Vista Cliente" width="300"/>
       <br/><strong>Vista Vendedor</strong>
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/1718d111-3c7f-4ae8-b858-a0ad2a89804a" alt="Vista Cliente" width="300"/>
+      <img src="https://github.com/user-attachments/assets/72278cac-6807-4e0f-989d-21722188478d" alt="Vista Cliente" width="300"/>
       <br/><strong>Vista Supervisor</strong>
     </td>
   </tr>
 </table>
+
+
 
 
 
