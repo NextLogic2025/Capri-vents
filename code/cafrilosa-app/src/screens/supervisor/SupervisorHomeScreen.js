@@ -1,108 +1,164 @@
-import React from "react";
-import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
-import KpiCard from "../../components/supervisor/KpiCard";
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
+import UiKpiCard from '../../components/ui/KpiCard';
+import { Ionicons } from '@expo/vector-icons';
+import UiHeroHeader from '../../components/ui/UiHeroHeader';
+import UiRoleStatCard from '../../components/ui/UiRoleStatCard';
+import UiSummaryCard from '../../components/ui/UiSummaryCard';
+
+// TODO: conectar con backend aquí para KPIs del supervisor
+const kpiData = [
+  {
+    id: 'ventas-mes',
+    icon: 'cash-outline',
+    title: 'Ventas del Mes',
+    value: '$128,450',
+    subtitle: 'Meta: $135,000',
+    progress: 128450 / 135000,
+    progressColor: '#E64A2E',
+    trend: '+12.5%',
+    trendColor: '#16A34A',
+    iconBgColor: '#FFF1EB',
+    iconColor: '#E64A2E',
+  },
+  {
+    id: 'pedidos-activos',
+    icon: 'cart-outline',
+    title: 'Pedidos Activos',
+    value: '147',
+    subtitle: 'Meta: 160',
+    progress: 147 / 160,
+    progressColor: '#F59E0B',
+    trend: '+8',
+    trendColor: '#16A34A',
+    iconBgColor: '#FFF7E6',
+    iconColor: '#F59E0B',
+  },
+  {
+    id: 'cobertura-zonas',
+    icon: 'location-outline',
+    title: 'Cobertura Zonas',
+    value: '94%',
+    subtitle: 'Meta: 95%',
+    progress: 0.94,
+    progressColor: '#22C55E',
+    trend: '+3%',
+    trendColor: '#16A34A',
+    iconBgColor: '#ECFDF5',
+    iconColor: '#22C55E',
+  },
+  {
+    id: 'entregas-hoy',
+    icon: 'bus-outline',
+    title: 'Entregas Hoy',
+    value: '23/28',
+    subtitle: 'Meta: 28',
+    progress: 23 / 28,
+    progressColor: '#3B82F6',
+    trend: undefined,
+    iconBgColor: '#EAF2FF',
+    iconColor: '#3B82F6',
+  },
+];
 
 const SupervisorHomeScreen = ({ navigation }) => {
-  const kpis = [
-    { id: 'ventas', icon: 'cash', mainValue: '$128,450', title: 'Ventas del Mes', meta: 'Meta: $135,000', trend: '+12.5%', trendColor: '#4CAF50' },
-    { id: 'pedidosActivos', icon: 'cart-outline', mainValue: '147', title: 'Pedidos Activos', meta: 'Meta: 160', trend: '+8', trendColor: '#4CAF50' },
-    { id: 'cobertura', icon: 'map-outline', mainValue: '94%', title: 'Cobertura Zonas', meta: 'Meta: 95%', trend: '+3%', trendColor: '#4CAF50' },
-    { id: 'entregasHoy', icon: 'truck-outline', mainValue: '23/28', title: 'Entregas Hoy', meta: 'Meta: 28', trend: '', trendColor: '#90A4AE' },
-  ];
-
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 32 }}>
-        <LinearGradient colors={["#F65A3B", "#F59E0B"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.headerGradient}>
-          <View style={styles.headerRow}>
-            <View>
-              <Text style={styles.hello}>Hola, Supervisor 👋</Text>
-              <Text style={styles.welcome}>Bienvenido</Text>
-            </View>
-            <View style={styles.actionsRow}>
-              <TouchableOpacity style={styles.headerBtn} onPress={() => navigation.navigate('SupervisorPedidos')}>
-                <Ionicons name="search-outline" size={18} color="#F97316" />
-              </TouchableOpacity>
-              <View>
-                <TouchableOpacity style={styles.headerBtn}>
-                  <Ionicons name="notifications-outline" size={18} color="#F97316" />
-                </TouchableOpacity>
-                <View style={styles.dot} />
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 24 }} showsVerticalScrollIndicator={false}>
+        <UiHeroHeader
+          fullBleed
+          greetingText="Hola, Supervisor 👋"
+          headline="Bienvenido"
+          rightActions={[
+            { icon: 'search-outline', onPress: () => {} },
+            { icon: 'notifications-outline', badge: 3, onPress: () => { /* TODO: notificaciones supervisor */ } },
+          ]}
+        >
+          <UiRoleStatCard
+            variant="supervisor"
+            data={{ kpiTitle: 'Ventas del Mes', mainValue: '$128,450', goalText: 'Meta: $135,000', progressPercent: 86, rightIcon: 'analytics-outline' }}
+            onPrimaryAction={() => { /* TODO: navegar a dashboard de ventas o reporte */ }}
+          />
+        </UiHeroHeader>
+
+        <View style={styles.pagePadding}>
+          <Text style={styles.sectionTitle}>Rendimiento del Día</Text>
+          <View style={styles.kpiGrid}>
+            {kpiData.map((kpi) => (
+              <View key={kpi.id} style={styles.kpiCardContainer}>
+                <UiKpiCard
+                  icon={kpi.icon}
+                  title={kpi.title}
+                  value={kpi.value}
+                  subtitle={kpi.subtitle}
+                  progress={kpi.progress}
+                  progressColor={kpi.progressColor}
+                  trend={kpi.trend}
+                  trendColor={kpi.trendColor}
+                  iconBgColor={kpi.iconBgColor}
+                  iconColor={kpi.iconColor}
+                />
               </View>
-            </View>
+            ))}
           </View>
 
-          <View style={styles.quickRow}>
-            <QuickChip icon="home-outline" label="Inicio" active />
-            <QuickChip icon="map-outline" label="Rutas" onPress={() => navigation.navigate('SupervisorEntregas')} />
-            <QuickChip icon="people-outline" label="Equipo" onPress={() => navigation.navigate('SupervisorClientes')} />
-            <QuickChip icon="file-tray-full-outline" label="Pedidos" onPress={() => navigation.navigate('SupervisorPedidos')} />
-          </View>
-        </LinearGradient>
-
-        <View style={styles.kpiGrid}>
-          {kpis.map((k) => (
-            <View key={k.id} style={{ width: '48%' }}>
-              <KpiCard icon={k.icon} titleSmall={k.title} mainValue={k.mainValue} metaText={k.meta} trendText={k.trend} trendColor={k.trendColor} />
-            </View>
-          ))}
-        </View>
-
-        <View style={styles.summaryCard}>
-          <View style={styles.summaryHeader}>
-            <MaterialCommunityIcons name="chart-box-outline" size={18} color="#FFFFFF" />
-            <Text style={styles.summaryTitle}>Resumen del Día</Text>
-          </View>
-          <View style={styles.summaryRow}>
-            <MiniCard label="Pedidos" value="147" />
-            <MiniCard label="Entregas" value="23" />
-            <MiniCard label="Vendedores" value="12" />
-          </View>
-          {/* TODO: conectar con backend aquí para KPIs del día, notificaciones y novedades del equipo */}
+          <UiSummaryCard
+            title="Resumen del Día"
+            items={[
+              { value: '147', label: 'Pedidos' },
+              { value: '23', label: 'Entregas' },
+              { value: '12', label: 'Vendedores' },
+            ]}
+            style={{ marginTop: 12 }}
+          />
+          {/* TODO: conectar con backend aquí para KPIs y resumen del día */}
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
 
-const QuickChip = ({ icon, label, active, onPress }) => (
-  <TouchableOpacity style={[styles.chip, active && styles.chipActive]} onPress={onPress}>
-    <Ionicons name={icon} size={16} color={active ? '#FFFFFF' : '#F97316'} />
-    <Text style={[styles.chipText, active && styles.chipTextActive]}>{label}</Text>
-  </TouchableOpacity>
-);
-
-const MiniCard = ({ label, value }) => (
-  <View style={styles.miniCard}>
-    <Text style={styles.miniValue}>{value}</Text>
-    <Text style={styles.miniLabel}>{label}</Text>
-  </View>
-);
-
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#F7F7FB' },
-  headerGradient: { borderBottomLeftRadius: 28, borderBottomRightRadius: 28, padding: 16, paddingBottom: 18 },
-  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  hello: { color: '#FFE4E6', fontSize: 12 },
-  welcome: { color: '#FFFFFF', fontSize: 22, fontWeight: '800' },
-  actionsRow: { flexDirection: 'row', gap: 10 },
-  headerBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
-  dot: { position: 'absolute', right: 8, top: -2, width: 12, height: 12, borderRadius: 6, backgroundColor: '#EF4444', borderWidth: 2, borderColor: '#FFF' },
-  quickRow: { flexDirection: 'row', gap: 10, marginTop: 12 },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#FFF7ED', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 8 },
-  chipActive: { backgroundColor: 'rgba(255,255,255,0.25)' },
-  chipText: { color: '#F97316', fontWeight: '700' },
-  chipTextActive: { color: '#FFFFFF' },
-  kpiGrid: { flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap', paddingHorizontal: 16, marginTop: 16 },
-  summaryCard: { backgroundColor: '#F55A3C', marginTop: 16, marginHorizontal: 16, borderRadius: 22, padding: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 3 },
-  summaryHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
-  summaryTitle: { color: '#FFFFFF', fontWeight: '800' },
-  summaryRow: { flexDirection: 'row', gap: 10 },
-  miniCard: { flex: 1, backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 16, paddingVertical: 16, alignItems: 'center' },
-  miniValue: { color: '#FFFFFF', fontWeight: '800', fontSize: 18 },
-  miniLabel: { color: '#FFE4E6', marginTop: 4, fontSize: 12 },
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#F5F5F5',
+  },
+  container: {
+    flex: 1,
+    paddingHorizontal: 16,
+  },
+  pagePadding: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#111827',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#111827',
+    marginTop: 16,
+    marginBottom: 12,
+  },
+  kpiGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginHorizontal: -6,
+  },
+  kpiCardContainer: {
+    width: '50%',
+    paddingHorizontal: 6,
+    marginBottom: 12,
+  },
 });
 
 export default SupervisorHomeScreen;

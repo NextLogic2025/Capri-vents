@@ -21,7 +21,8 @@ export const CartOrderState = {
       cartItems[idx] = { ...cartItems[idx], quantity: cartItems[idx].quantity + quantity };
     } else {
       cartItems.push({
-        id: `c-${Date.now()}`,
+        // Stable, product-based ID prevents duplicate React keys
+        id: `c-${product.id}`,
         productId: product.id,
         category: product.category,
         name: product.name,

@@ -1,10 +1,13 @@
 import React, { useMemo, useState, useCallback } from "react";
-import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList } from "react-native";
+import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, FlatList } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
-import SellerCatalogProductItem from "../../components/vendedor/SellerCatalogProductItem";
-import SellerPromotionItem from "../../components/vendedor/SellerPromotionItem";
+import UiSectionTitle from "../../components/ui/UiSectionTitle";
+import UiProductCardVendor from "../../components/ui/UiProductCardVendor";
+import UiPromoCardWide from "../../components/ui/UiPromoCardWide";
+import UiSearchBar from "../../components/ui/UiSearchBar";
+import UiTabs from "../../components/ui/UiTabs";
 
 const CATALOG_PRODUCTS = [
   {
@@ -15,7 +18,7 @@ const CATALOG_PRODUCTS = [
     categoryLabel: "Chorizos",
     price: 12.99,
     unit: "kg",
-    stockLabel: "45 kg",
+    stockLabel: "40/60",
     image: require("../../assets/images/cart-chorizo-premium.png"),
   },
   {
@@ -26,7 +29,7 @@ const CATALOG_PRODUCTS = [
     categoryLabel: "Jamones",
     price: 24.9,
     unit: "kg",
-    stockLabel: "32 kg",
+    stockLabel: "32/64",
     image: require("../../assets/images/cart-jamon-cocido.png"),
   },
   {
@@ -37,7 +40,7 @@ const CATALOG_PRODUCTS = [
     categoryLabel: "Salchichas",
     price: 6.5,
     unit: "kg",
-    stockLabel: "58 kg",
+    stockLabel: "58/100",
     image: require("../../assets/images/cart-salame.png"),
   },
   {
@@ -56,26 +59,28 @@ const CATALOG_PRODUCTS = [
 // TODO: conectar con backend aquí para promociones vigentes por canal/vendedor.
 const PROMOS_DATA = [
   {
-    id: 'promo1',
-    title: 'Jamón Premium (15%)',
-    subtitle: 'Compra mayor a 10kg • Hasta 10 Nov',
+    id: 'PR-1',
+    title: 'Jamón Serrano Reserva',
+    subtitle: '2x1 en segunda unidad • Hasta 10 Nov',
     image: require('../../assets/images/offer-jamon-cocido.png'),
-    badgeText: '15% OFF',
-    badgeColor: '#E53935',
+    price: '$12.90',
+    badge: { type: 'deal', text: '2x1' },
+    productId: 'JAM-001',
   },
   {
-    id: 'promo2',
-    title: 'Pack Parrillero (2x1)',
-    subtitle: 'En segunda unidad • Hasta 15 Nov',
+    id: 'PR-2',
+    title: 'Chorizo Premium',
+    subtitle: '-50% en pack familiar',
     image: require('../../assets/images/offer-pack-parrillero.png'),
-    badgeText: '2x1',
-    badgeColor: '#FF9800',
+    price: '$4.50',
+    badge: { type: 'percent', text: '-50%' },
+    productId: 'CHO-001',
   },
 ];
 
 const TABS = [
-  { key: 'productos', label: 'Productos' },
-  { key: 'promociones', label: 'Promociones' },
+  { key: 'productos', title: 'Productos' },
+  { key: 'promos', title: 'Promociones' },
 ];
 
 const VendedorCatalogoProductosScreen = ({ navigation }) => {
@@ -127,33 +132,16 @@ const VendedorCatalogoProductosScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.searchBar}>
-        <Ionicons name="search-outline" size={18} color="#9CA3AF" />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Buscar en productos o promos..."
-          placeholderTextColor="#9CA3AF"
-          value={searchTerm}
-          onChangeText={setSearchTerm}
-        />
-      </View>
+      <UiSectionTitle title="Catálogo" />
 
-      <View style={styles.tabsRow}>
-        {TABS.map((t) => {
-          const active = activeTab === t.key;
-          return (
-            <TouchableOpacity
-              key={t.key}
-              onPress={() => setActiveTab(t.key)}
-              style={[styles.tabItem, active ? styles.tabItemActive : styles.tabItemInactive]}
-            >
-              <Text style={[styles.tabText, active ? styles.tabTextActive : styles.tabTextInactive]}>
-                {t.label}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
+      <UiSearchBar
+        placeholder="Buscar en productos o promos..."
+        value={searchTerm}
+        onChangeText={setSearchTerm}
+        style={{ marginBottom: 12 }}
+      />
+
+      <UiTabs tabs={TABS} initialTab={activeTab} activeKey={activeTab} onTabChange={(key) => setActiveTab(key)} style={{ marginBottom: 12 }} />
 
       {activeTab === 'productos' ? (
         <>
@@ -164,9 +152,14 @@ const VendedorCatalogoProductosScreen = ({ navigation }) => {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.listContent}
             renderItem={({ item }) => (
-              <SellerCatalogProductItem
-                product={item}
-                onPressViewMore={() => {
+              <UiProductCardVendor
+                image={item.image}
+                category={item.categoryLabel}
+                title={item.name}
+                price={`$${item.price}`}
+                stockLabel={`Stock: ${item.stockLabel}`}
+                onPressDetails={() => {
+                  // TODO: navegación a detalle de producto por ID
                   navigation.navigate('VendedorProductoDetalle', {
                     product: {
                       id: item.id,
@@ -189,6 +182,7 @@ const VendedorCatalogoProductosScreen = ({ navigation }) => {
         </>
       ) : (
         <>
+          <UiSectionTitle title="Promociones" rightLabel="Ver todas" />
           <Text style={styles.productCountText}>{filteredPromos.length} promociones encontradas</Text>
           <FlatList
             data={filteredPromos}
@@ -196,11 +190,28 @@ const VendedorCatalogoProductosScreen = ({ navigation }) => {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.listContent}
             renderItem={({ item }) => (
-              <SellerPromotionItem
-                promo={item}
-                onPress={() => {
-                  // TODO: ver detalle de la promo
-                  console.log('Ver detalle de promo', item.title);
+              <UiPromoCardWide
+                image={item.image}
+                title={item.title}
+                subtitle={item.subtitle}
+                price={item.price}
+                badge={item.badge}
+                onPressDetails={() => {
+                  // TODO: backend: promos vigentes para vendedor y navegación a detalle
+                  navigation.navigate('VendedorProductoDetalle', {
+                    product: {
+                      id: item.productId,
+                      name: item.title,
+                      category: 'Promoción',
+                      price: item.price,
+                      image: item.image,
+                      rating: 4.6,
+                      reviewsCount: 80,
+                      description: 'Detalle de promoción.',
+                      characteristics: ['Código: ' + (item.productId || 'PR-REF')],
+                      stock: '',
+                    },
+                  });
                 }}
               />
             )}
@@ -297,6 +308,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: 30,
+    paddingVertical: 12,
   },
   emptyText: {
     textAlign: "center",

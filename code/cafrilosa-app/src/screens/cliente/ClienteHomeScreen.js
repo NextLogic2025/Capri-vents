@@ -1,11 +1,12 @@
-﻿import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { SafeAreaView, ScrollView, View, Text, StyleSheet, TouchableOpacity, ImageBackground, Modal } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
 import CategoryCard from "../../components/ui/CategoryCard";
 import OfferProductCard from "../../components/ui/OfferProductCard";
+import UiHeroHeader from "../../components/ui/UiHeroHeader";
+import UiRoleStatCard from "../../components/ui/UiRoleStatCard";
 
 const promoImage = require("../../assets/images/login-header-meat.png");
 const placeholderOffer = require("../../assets/images/login-header-meat.png");
@@ -165,46 +166,20 @@ const ClienteHomeScreen = ({ navigation, route }) => {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView ref={scrollRef} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.headerWrapper}>
-          <LinearGradient colors={["#F65A3B", "#F6C453"]} style={[styles.headerGradient, { paddingTop: insets.top + 28 }]}>
-            <View style={styles.headerRow}>
-              <View style={styles.greetingBlock}>
-                <Text style={styles.greetingText}>Hola, {firstName} 👋</Text>
-                <Text style={styles.welcomeText}>Bienvenido</Text>
-                <Text style={styles.storeText}>Cafrilosa Online</Text>
-              </View>
-              <View style={styles.headerActions}>
-                <TouchableOpacity style={styles.roundIcon} onPress={() => setAnnouncementsVisible(true)}>
-                  <Ionicons name="megaphone-outline" size={20} color="#B45309" />
-                  {newAnnouncementsCount > 0 && (
-                    <View style={[styles.badge, styles.announcementBadge]}>
-                      <Text style={styles.badgeText}>{newAnnouncementsCount}</Text>
-                    </View>
-                  )}
-                </TouchableOpacity>
-              </View>
-            </View>
-          </LinearGradient>
-          <TouchableOpacity
-            style={styles.membershipCard}
-            activeOpacity={0.9}
-            onPress={() => {
-              navigation.navigate("ClienteNiveles");
-              // TODO: este tap podría abrir la sección de fidelidad usando datos reales del backend
-            }}
+          <UiHeroHeader
+            greetingText={`Hola, ${firstName} 👋`}
+            headline="Bienvenido"
+            subtitle="Cafrilosa Online"
+            rightActions={[{ icon: 'megaphone-outline', badge: newAnnouncementsCount, onPress: () => setAnnouncementsVisible(true) }]}
           >
-            <View>
-              <Text style={styles.levelText}>Tu nivel</Text>
-              <Text style={styles.levelTitle}>Cliente Gold ⭐</Text>
-              <Text style={styles.levelPoints}>1250 puntos acumulados</Text>
-              <View style={styles.rewardCard}>
-                <Text style={styles.rewardLabel}>Próxima recompensa</Text>
-                <Text style={styles.rewardValue}>Cupón de $5 de descuento</Text>
-              </View>
-            </View>
-            <View style={styles.giftCircle}>
-              <MaterialCommunityIcons name="gift-outline" size={36} color="#FFFFFF" />
-            </View>
-          </TouchableOpacity>
+            <UiRoleStatCard
+              variant="cliente"
+              data={{ levelLabel: 'Cliente Gold', points: 1250, nextRewardLabel: 'Cupón de $5 de descuento', rightIcon: 'gift-outline' }}
+              onPrimaryAction={() => {
+                navigation.navigate("ClienteNiveles");
+              }}
+            />
+          </UiHeroHeader>
         </View>
 
         <View style={styles.sectionHeader}>
@@ -289,122 +264,8 @@ const styles = StyleSheet.create({
   headerWrapper: {
     marginBottom: 24,
   },
-  headerGradient: {
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
-    paddingHorizontal: 24,
-    paddingBottom: 90,
-  },
-  headerRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  },
-  greetingBlock: {
-    flex: 1,
-  },
-  greetingText: {
-    color: "#FFEFE9",
-    fontSize: 14,
-    marginBottom: 8,
-  },
-  welcomeText: {
-    color: "#FFFFFF",
-    fontSize: 28,
-    fontWeight: "700",
-  },
-  storeText: {
-    color: "#FFEFE9",
-    fontSize: 15,
-    marginTop: 6,
-  },
-  headerActions: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-  },
-  roundIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: "rgba(255,255,255,0.9)",
-    alignItems: "center",
-    justifyContent: "center",
-    marginLeft: 12,
-    position: "relative",
-  },
-  badge: {
-    position: "absolute",
-    top: 4,
-    right: 6,
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: "#22C55E",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  badgeText: {
-    color: "#FFFFFF",
-    fontSize: 10,
-    fontWeight: "700",
-  },
-  announcementBadge: {
-    backgroundColor: "#F59E0B",
-  },
-  membershipCard: {
-    backgroundColor: "#E64A19",
-    borderRadius: 28,
-    padding: 20,
-    marginHorizontal: 24,
-    marginTop: -70,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 10,
-  },
-  levelText: {
-    color: "#FFE4D5",
-    fontSize: 13,
-    marginBottom: 4,
-  },
-  levelTitle: {
-    color: "#FFFFFF",
-    fontSize: 22,
-    fontWeight: "700",
-  },
-  levelPoints: {
-    color: "#FFE4D5",
-    fontSize: 14,
-    marginBottom: 12,
-  },
-  rewardCard: {
-    backgroundColor: "rgba(255,255,255,0.2)",
-    borderRadius: 20,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  rewardLabel: {
-    color: "#FFEFE9",
-    fontSize: 12,
-  },
-  rewardValue: {
-    color: "#FFFFFF",
-    fontSize: 14,
-    fontWeight: "600",
-    marginTop: 2,
-  },
-  giftCircle: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: "rgba(255,255,255,0.25)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  
+  
   sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",

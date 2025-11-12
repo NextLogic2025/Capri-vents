@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import CartItemRow from "../../components/ui/CartItemRow";
 import { CartOrderState } from "../../state/CartOrderState";
+import { useFocusEffect } from "@react-navigation/native";
 
 // TODO: conectar con backend aqui para inicializar el carrito del usuario desde API
 const initialCartItems = CartOrderState.getCartItems();
@@ -37,6 +38,42 @@ const ClienteCarritoScreen = ({ navigation }) => {
   const selectedCard = savedCards.find((card) => card.id === selectedCardId);
   const selectedTransferInfo = transferAccounts.find((account) => account.id === selectedTransferAccount);
   const insets = useSafeAreaInsets();
+
+  // Semilla de carrito: agrega 3 productos mock si el carrito está vacío (al enfocar la pantalla)
+  useFocusEffect(
+    React.useCallback(() => {
+      if (CartOrderState.getCartItems().length === 0) {
+        const p1 = {
+          id: 'cat-1',
+          name: 'Chorizo Parrillero Premium',
+          category: 'Chorizos',
+          price: 12.99,
+          image: require('../../assets/images/cart-chorizo-premium.png'),
+        };
+        const p2 = {
+          id: 'cat-2',
+          name: 'Jamón Serrano Reserva',
+          category: 'Jamones',
+          price: 24.9,
+          image: require('../../assets/images/cart-jamon-cocido.png'),
+        };
+        const p3 = {
+          id: 'cat-3',
+          name: 'Salchicha Frankfurt',
+          category: 'Salchichas',
+          price: 6.5,
+          image: require('../../assets/images/cart-salame.png'),
+        };
+        CartOrderState.addToCart(p1, 2);
+        CartOrderState.addToCart(p2, 1);
+        CartOrderState.addToCart(p3, 3);
+        setCartItems(CartOrderState.getCartItems());
+      } else {
+        // Refresca por si se modificó fuera
+        setCartItems(CartOrderState.getCartItems());
+      }
+    }, [])
+  );
 
   const subtotal = useMemo(() => cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0), [cartItems]);
   const totalItems = useMemo(() => cartItems.reduce((sum, item) => sum + item.quantity, 0), [cartItems]);
@@ -162,9 +199,9 @@ const ClienteCarritoScreen = ({ navigation }) => {
         </View>
 
         <View>
-          {cartItems.map((item) => (
+          {cartItems.map((item, index) => (
             <CartItemRow
-              key={item.id}
+              key={`${item.id}-${item.productId || 'p'}-${index}`}
               item={item}
               onIncrease={() => handleIncreaseQuantity(item.id)}
               onDecrease={() => handleDecreaseQuantity(item.id)}

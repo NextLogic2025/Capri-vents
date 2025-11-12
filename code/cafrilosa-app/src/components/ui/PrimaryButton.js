@@ -1,38 +1,34 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import UiButton from './UiButton';
 
-const PrimaryButton = ({ title, onPress, style, textStyle, disabled = false }) => {
+const PrimaryButton = ({
+  title,
+  onPress,
+  disabled,
+  size = 'md',
+  isFullWidth,
+  rounded,
+  leftIcon,
+  rightIcon,
+  style,
+  textStyle,
+}) => {
   return (
-    <TouchableOpacity
-      style={[styles.button, disabled && styles.buttonDisabled, style]}
-      activeOpacity={0.85}
+    <UiButton
+      title={title}
       onPress={onPress}
       disabled={disabled}
-    >
-      <Text style={[styles.buttonText, textStyle]}>{title}</Text>
-    </TouchableOpacity>
+      size={size}
+      isFullWidth={isFullWidth}
+      rounded={rounded}
+      leftIcon={leftIcon}
+      rightIcon={rightIcon}
+      style={style}
+      textStyle={textStyle}
+      variant="primary"
+    />
   );
 };
-
-const styles = StyleSheet.create({
-  button: {
-    height: 54,
-    borderRadius: 28,
-    backgroundColor: '#E64A19',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-    marginVertical: 12,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
 
 export default PrimaryButton;
 

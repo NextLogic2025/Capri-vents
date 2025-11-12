@@ -1,64 +1,29 @@
-﻿import React, { useMemo, useState } from "react";
-import { SafeAreaView, View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList } from "react-native";
+import React, { useMemo, useState } from "react";
+import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, FlatList } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import DeliveryCard from "../../components/vendedor/DeliveryCard";
+import UiDeliveryCard from "../../components/ui/UiDeliveryCard";
+import UiSearchBar from "../../components/ui/UiSearchBar";
+import UiConfirmDeliveryModal from "../../components/ui/UiConfirmDeliveryModal";
 
 const deliveries = [
-  {
-    id: "ENT-045",
-    orderCode: "PED-2024-088",
-    status: "Entregada",
-    statusBadgeColor: "#4CAF50",
-    time: "09:45",
-    clientName: "Minimarket La Esquina",
-    contactName: "Sra. María López",
-    address: "Av. 6 de Diciembre y Naciones Unidas, Local 12",
-    itemsCount: 8,
-    total: 230.5,
-    driverName: "Roberto Gómez",
-    finalStatusText: "Completada",
-  },
-  {
-    id: "ENT-046",
-    orderCode: "PED-2024-089",
-    status: "Por entregar",
-    statusBadgeColor: "#FFC107",
-    time: "11:00",
-    clientName: "Supermercado El Ahorro",
-    contactName: "Sr. Juan Pérez",
-    address: "Calle Bolívar 234 y García Moreno",
-    itemsCount: 12,
-    total: 450.0,
-    driverName: "Roberto Gómez",
-    finalStatusText: "Confirmar entrega",
-  },
-  {
-    id: "ENT-047",
-    orderCode: "PED-2024-090",
-    status: "En preparación",
-    statusBadgeColor: "#2196F3",
-    time: "14:30",
-    clientName: "Tienda Don Pepe",
-    contactName: "Sr. Pedro Rodríguez",
-    address: "Av. Amazonas 567",
-    itemsCount: 6,
-    total: 180.0,
-    driverName: "Roberto Gómez",
-    finalStatusText: "En bodega",
-  },
+  { code:'ENT-045', status:{ type:'success', label:'Entregada' }, orderCode:'PED-2024-088', time:'09:45', clientName:'Minimarket La Esquina', contactName:'Sra. María López', address:'Av. 6 de Diciembre y Naciones Unidas, Local 12', itemsCount:8, subtotal:'$230.50', driverName:'Roberto Gómez', badgeRight:{ visible:true, icon:'check-circle-outline', label:'Completada' } },
+  { code:'ENT-046', status:{ type:'warning', label:'Por entregar' }, orderCode:'PED-2024-089', time:'11:00', clientName:'Supermercado El Ahorro', contactName:'Sr. Juan Pérez', address:'Calle Bolívar 234 y García Moreno', itemsCount:12, subtotal:'$450.00', driverName:'Roberto Gómez', primaryAction:{ label:'Confirmar entrega' } },
+  { code:'ENT-047', status:{ type:'info', label:'En preparación' }, orderCode:'PED-2024-090', time:'14:30', clientName:'Tienda Don Pepe', contactName:'Sr. Pedro Rodríguez', address:'Av. Amazonas 567', itemsCount:6, subtotal:'$180.00', driverName:'Roberto Gómez', footerBadge:{ visible:true, icon:'warehouse', label:'En bodega' } },
 ];
 
 const VendedorEntregasScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const [searchTerm, setSearchTerm] = useState("");
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmData, setConfirmData] = useState(null);
 
   const filteredDeliveries = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
     if (!term) return deliveries;
     return deliveries.filter(
       (delivery) =>
-        delivery.id.toLowerCase().includes(term) ||
+        delivery.code.toLowerCase().includes(term) ||
         delivery.clientName.toLowerCase().includes(term) ||
         delivery.orderCode.toLowerCase().includes(term)
     );
@@ -74,16 +39,12 @@ const VendedorEntregasScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.searchRow}>
-        <View style={styles.searchBar}>
-          <Ionicons name="search-outline" size={18} color="#9CA3AF" />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Buscar pedido..."
-            placeholderTextColor="#9CA3AF"
-            value={searchTerm}
-            onChangeText={setSearchTerm}
-          />
-        </View>
+        <UiSearchBar
+          placeholder="Buscar pedido..."
+          value={searchTerm}
+          onChangeText={setSearchTerm}
+          style={{ flex: 1 }}
+        />
         <TouchableOpacity style={styles.addButton} onPress={() => console.log("Nueva programación")}> 
           <Ionicons name="add" size={22} color="#FFFFFF" />
         </TouchableOpacity>
@@ -111,17 +72,55 @@ const VendedorEntregasScreen = ({ navigation }) => {
 
       <FlatList
         data={filteredDeliveries}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.code}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
         renderItem={({ item }) => (
-          <DeliveryCard
-            delivery={item}
-            onPrimaryAction={(delivery) => {
-              console.log("Confirmar entrega", delivery.id);
-            }}
+          <UiDeliveryCard
+            code={item.code}
+            status={item.status}
+            orderCode={item.orderCode}
+            time={item.time}
+            clientName={item.clientName}
+            contactName={item.contactName}
+            address={item.address}
+            itemsCount={item.itemsCount}
+            subtotal={item.subtotal}
+            driverName={item.driverName}
+            badgeRight={item.badgeRight}
+            footerBadge={item.footerBadge}
+            primaryAction={item.primaryAction ? {
+              label: item.primaryAction.label,
+              onPress: () => {
+                // Abrir modal de confirmación
+                setConfirmData({ ...item, total: item.subtotal });
+                setConfirmOpen(true);
+              }
+            } : undefined}
           />
         )}
+      />
+
+      <UiConfirmDeliveryModal
+        visible={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        data={{
+          code: confirmData?.code,
+          orderCode: confirmData?.orderCode,
+          statusLabel: confirmData?.status?.label,
+          time: confirmData?.time,
+          clientName: confirmData?.clientName,
+          contactName: confirmData?.contactName,
+          address: confirmData?.address,
+          itemsCount: confirmData?.itemsCount,
+          total: confirmData?.total,
+          driverName: confirmData?.driverName,
+          products: confirmData?.products || [],
+        }}
+        onConfirm={async () => {
+          // TODO: PATCH /deliveries/{code} { status:'delivered' }
+          setConfirmOpen(false);
+        }}
       />
     </SafeAreaView>
   );

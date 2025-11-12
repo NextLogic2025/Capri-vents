@@ -1,8 +1,10 @@
-﻿import React, { useMemo, useState } from "react";
-import { SafeAreaView, View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList } from "react-native";
+import React, { useMemo, useState } from "react";
+import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, FlatList } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import SellerClientCard from "../../components/vendedor/SellerClientCard";
+import UiSearchBar from "../../components/ui/UiSearchBar";
+import UiChip from "../../components/ui/UiChip";
+import UiListItem from "../../components/ui/UiListItem";
 
 const CLIENTS_DATA = [
   {
@@ -74,16 +76,12 @@ const VendedorClientesScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.searchRow}>
-        <View style={styles.searchBar}>
-          <Ionicons name="search-outline" size={18} color="#9CA3AF" />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Buscar cliente..."
-            placeholderTextColor="#9CA3AF"
-            value={searchTerm}
-            onChangeText={setSearchTerm}
-          />
-        </View>
+        <UiSearchBar
+          placeholder="Buscar cliente..."
+          value={searchTerm}
+          onChangeText={setSearchTerm}
+          style={{ flex: 1 }}
+        />
         <TouchableOpacity style={styles.addButton} onPress={() => console.log("Agregar cliente")}> 
           <Ionicons name="add" size={22} color="#FFFFFF" />
         </TouchableOpacity>
@@ -101,15 +99,13 @@ const VendedorClientesScreen = ({ navigation }) => {
           { key: "activo", label: "Activos (2)" },
           { key: "inactivo", label: "Inactivos (1)" },
         ].map((item) => (
-          <TouchableOpacity
+          <UiChip
             key={item.key}
-            style={[styles.filterChip, filter === item.key && styles.filterChipActive]}
+            label={item.label}
+            isSelected={filter === item.key}
             onPress={() => setFilter(item.key)}
-          >
-            <Text style={[styles.filterChipText, filter === item.key && styles.filterChipTextActive]}>
-              {item.label}
-            </Text>
-          </TouchableOpacity>
+            style={{ flex: 1 }}
+          />
         ))}
       </View>
 
@@ -119,18 +115,11 @@ const VendedorClientesScreen = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
         renderItem={({ item }) => (
-          <SellerClientCard
-            client={item}
-            onNewOrder={(client) => {
-              const parent = navigation.getParent?.();
-              if (parent) {
-                parent.navigate("VendedorPedidos", { client });
-              } else {
-                navigation.navigate("VendedorAgregarProducto", { client });
-              }
-            }}
-            onCall={(client) => console.log("Llamar a", client.name)}
-            onProfile={(client) => console.log("Ver perfil de", client.name)}
+          <UiListItem
+            title={item.name}
+            subtitle={`${item.segment} • Frecuencia: ${item.frequency}`}
+            leftIcon={item.status === 'activo' ? 'checkmark-circle' : 'alert-circle-outline'}
+            onPress={() => navigation.navigate('VendedorCatalogoProductos', { client: item })}
           />
         )}
       />
