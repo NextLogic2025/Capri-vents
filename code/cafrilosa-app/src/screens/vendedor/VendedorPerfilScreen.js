@@ -25,7 +25,6 @@ const VendedorPerfilScreen = ({ navigation }) => {
         <TouchableOpacity
           style={styles.logoutButton}
           onPress={() => {
-            // TODO: limpiar sesión real en backend cuando se implemente auth
             navigation.reset({ index: 0, routes: [{ name: "Login" }] });
           }}
         >
@@ -71,19 +70,19 @@ const VendedorPerfilScreen = ({ navigation }) => {
       </View>
 
       <ProfileOptionItem
-        icon="person-outline"
+        icon={<Ionicons name="person-outline" size={22} color="#F55A3C" />}
         title="Datos Personales"
         subtitle="Actualizar tu información"
         onPress={() => console.log("Datos personales vendedor")}
       />
       <ProfileOptionItem
-        icon="notifications-outline"
+        icon={<Ionicons name="notifications-outline" size={22} color="#F97316" />}
         title="Notificaciones"
         subtitle="Configuración de alertas"
         onPress={() => console.log("Notificaciones vendedor")}
       />
       <ProfileOptionItem
-        icon="map-outline"
+        icon={<Ionicons name="map-outline" size={22} color="#2563EB" />}
         title="Mi Zona y Ruta"
         subtitle="Conoce tu cobertura"
         onPress={() => console.log("Ver zona")}

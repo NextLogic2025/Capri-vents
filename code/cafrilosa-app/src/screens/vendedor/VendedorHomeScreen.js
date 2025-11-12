@@ -120,9 +120,6 @@ const VendedorHomeScreen = ({ navigation }) => {
             <Text style={styles.bannerTitle}>¡Excelente trabajo, Carlos!</Text>
             <Text style={styles.bannerSubtitle}>Solo $550 más para alcanzar tu meta del día</Text>
           </View>
-          <TouchableOpacity style={styles.bannerButton} onPress={goToPedidosTab}>
-            <Ionicons name="add" size={20} color="#FFFFFF" />
-          </TouchableOpacity>
         </ImageBackground>
 
         <View style={styles.sectionCard}>
@@ -140,25 +137,6 @@ const VendedorHomeScreen = ({ navigation }) => {
           ))}
         </View>
       </ScrollView>
-
-      <View style={styles.fabContainer} pointerEvents="box-none">
-        <TouchableOpacity
-          style={styles.secondaryFab}
-          onPress={() => {
-            navigation.navigate("VendedorCatalogoProductos");
-          }}
-        >
-          <Ionicons name="bag-handle-outline" size={20} color="#F55A3C" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.primaryFab}
-          onPress={() => {
-            goToPedidosTab();
-          }}
-        >
-          <Ionicons name="add" size={22} color="#FFFFFF" />
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
   );
 };
@@ -183,14 +161,10 @@ const styles = StyleSheet.create({
   bannerContent: { padding: 20 },
   bannerTitle: { color: "#FFFFFF", fontSize: 18, fontWeight: "700" },
   bannerSubtitle: { color: "#F8FAFC", fontSize: 14, marginTop: 4 },
-  bannerButton: { position: "absolute", right: 20, bottom: 20, backgroundColor: "#F55A3C", width: 48, height: 48, borderRadius: 24, alignItems: "center", justifyContent: "center", shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 6 },
   routeHeaderRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 },
   routeHeaderLeft: { flexDirection: "row", alignItems: "center", gap: 6 },
   routeTitle: { fontSize: 16, fontWeight: "700", color: "#111827" },
   routeCount: { fontSize: 13, color: "#6B7280" },
-  fabContainer: { position: "absolute", right: 24, bottom: 70, alignItems: "center", gap: 10 },
-  secondaryFab: { width: 56, height: 56, borderRadius: 28, backgroundColor: "#FFFFFF", borderWidth: 2, borderColor: "#F55A3C", alignItems: "center", justifyContent: "center", shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.12, shadowRadius: 8, elevation: 6 },
-  primaryFab: { width: 60, height: 60, borderRadius: 30, backgroundColor: "#F55A3C", alignItems: "center", justifyContent: "center", shadowColor: "#000", shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.2, shadowRadius: 12, elevation: 8 },
 });
 
 export default VendedorHomeScreen;

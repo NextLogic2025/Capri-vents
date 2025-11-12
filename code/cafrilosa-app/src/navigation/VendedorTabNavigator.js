@@ -7,11 +7,10 @@ import { LinearGradient } from "expo-linear-gradient";
 import { VENDEDOR_TAB_BAR_STYLE } from "./tabStyles";
 import VendedorHomeScreen from "../screens/vendedor/VendedorHomeScreen";
 import VendedorEntregasScreen from "../screens/vendedor/VendedorEntregasScreen";
-import VendedorClientesScreen from "../screens/vendedor/VendedorClientesScreen";
 import VendedorPerfilScreen from "../screens/vendedor/VendedorPerfilScreen";
 import VendedorAgregarProductoScreen from "../screens/vendedor/VendedorAgregarProductoScreen";
 import VendedorCatalogoProductosScreen from "../screens/vendedor/VendedorCatalogoProductosScreen";
-import VendedorMapaRutaScreen from "../screens/vendedor/VendedorMapaRutaScreen";
+import VendedorListaRutasScreen from "../screens/vendedor/VendedorListaRutasScreen";
 
 const Tab = createBottomTabNavigator();
 const VendedorHomeStack = createNativeStackNavigator();
@@ -37,13 +36,14 @@ const VendedorHomeStackScreen = () => (
   <VendedorHomeStack.Navigator screenOptions={{ headerShown: false }}>
     <VendedorHomeStack.Screen name="VendedorHomeMain" component={VendedorHomeScreen} />
     <VendedorHomeStack.Screen name="VendedorCatalogoProductos" component={VendedorCatalogoProductosScreen} />
+    <VendedorHomeStack.Screen name="VendedorAgregarProducto" component={VendedorAgregarProductoScreen} />
   </VendedorHomeStack.Navigator>
 );
 
 const VendedorEntregasStackScreen = () => (
   <VendedorEntregasStack.Navigator screenOptions={{ headerShown: false }}>
     <VendedorEntregasStack.Screen name="VendedorEntregasMain" component={VendedorEntregasScreen} />
-    <VendedorEntregasStack.Screen name="VendedorMapaRuta" component={VendedorMapaRutaScreen} />
+    <VendedorEntregasStack.Screen name="VendedorListaRutas" component={VendedorListaRutasScreen} />
   </VendedorEntregasStack.Navigator>
 );
 
@@ -64,24 +64,10 @@ const VendedorTabNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="VendedorPedidos"
-        component={VendedorAgregarProductoScreen}
-        options={{
-          tabBarIcon: renderTabButton("cube-outline", "Pedidos"),
-        }}
-      />
-      <Tab.Screen
         name="VendedorEntregas"
         component={VendedorEntregasStackScreen}
         options={{
           tabBarIcon: renderTabButton("truck-delivery", "Entregas", MaterialCommunityIcons),
-        }}
-      />
-      <Tab.Screen
-        name="VendedorClientes"
-        component={VendedorClientesScreen}
-        options={{
-          tabBarIcon: renderTabButton("people-outline", "Clientes"),
         }}
       />
       <Tab.Screen

@@ -177,6 +177,7 @@ const VendedorAgregarProductoScreen = ({ navigation, route }) => {
       items: selectedProducts,
       total: orderTotal,
       status: "Pendiente",
+      paymentMethod: "Transferencia",
     };
 
     parentNav?.navigate("VendedorPedidos", { newOrder }) ??
