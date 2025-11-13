@@ -171,3 +171,30 @@ Proveer herramientas para la medición del desempeño de ventas, análisis de me
 | | *Analizar eficiencia de promociones* | Sup. Ventas, Gerente | • Medir impacto en ventas.<br>• Ajustar estrategias comerciales. |
 | *Reportar y Decidir Gerencialmente* | *Elaborar informes de resultados* | Sup. Ventas, Gerente | • Generar reporte de ventas por zona/canal.<br>• Analizar clientes inactivos y proponer reactivación. |
 | | *Tomar decisiones estratégicas* | Sup. Ventas, Gerente | • Redefinir metas o políticas de precio.<br>• Planificar nuevas campañas y asignar responsables. |
+
+
+---
+
+
+## 7) Módulo Gestión de Productos
+
+### Diagrama: Registro y Mantenimiento
+
+<img width="5888" height="5924" alt="image" src="https://github.com/user-attachments/assets/625e98af-c059-4128-990d-a04682e4cd7b" />
+<img width="8168" height="6848" alt="image" src="https://github.com/user-attachments/assets/4e73bcab-3448-4bd8-bc7d-0982f3690289" />
+<img width="6120" height="6512" alt="image" src="https://github.com/user-attachments/assets/56f9979e-68e2-4acf-9b1e-af3722f8caf3" />
+
+### Propósito
+Proveer la funcionalidad para crear, modificar y gestionar el ciclo de vida de los productos en el catálogo del sistema.
+
+### Actores
+* Supervisor
+* Almacen (Sistema)
+
+### Submódulos y Casos de Uso
+
+| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (<<include>>) |
+| :--- | :--- | :--- | :--- |
+| *Registro y Mantenimiento* | *Registrar Productos* | Supervisor | • Ingresar datos básicos del producto<br>• Asignar precio y categoría inicial<br>• Definir condiciones de conservación<br>• Validar unicidad de código y guardar en Cafrilosa |
+| | *Actualizar Productos* | Supervisor | • Modificar atributos existentes<br>• Propagar cambios a pedidos pendientes<br>• Registrar historial de modificaciones<br>• Notificar los cambios |
+| | *Desactivar Producto* | Supervisor | • Generar alerta desactivación<br>• Archivar para auditoría<br>• Bloquear nuevos pedidos<br>• Marcar como inactivo |
