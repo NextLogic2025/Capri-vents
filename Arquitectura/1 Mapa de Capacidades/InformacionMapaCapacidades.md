@@ -48,7 +48,7 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 ## Descripción de los Módulos
 
---
+
 ![alt text](<Planificacion Comercial Gestión de Clientes.jpg>)
 
 ### 1. Planificación Comercial
@@ -84,7 +84,9 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
     * **Mantener Comunicación Continua** - Enviar notificaciones de promociones, lanzamientos, beneficios o estados de cuenta.
     * **Implementar Programas de Beneficios** - Gestionar bonificaciones por volumen de compra, antigüedad o cumplimiento de pago.
 
---
+
+
+
 ![alt text](<Gestión de Entregas Gestión de Pedidos.jpg>)
 
 ### 3. Gestión de Entregas
@@ -120,6 +122,8 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
     * **Cierre Administrativo del Pedido** - Confirmar la entrega final y la facturación para completar el ciclo del pedido en el sistema.
 
 
+
+
 ![alt text](<Gestión de Cobros y Créditos Postventa y Servicio al Cliente.jpg>)
 
 ### 5. Gestión de Cobros y Créditos
@@ -152,6 +156,8 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
     * **Analizar Resultados y Retroalimentar al Equipo** - Identificar puntos críticos recurrentes en el servicio y proponer mejoras a las áreas involucradas (Logística, Ventas).
 * **Fidelización Continua:**
     * **Implementar Programas de Retención.** - Diseñar y ejecutar acciones (descuentos especiales, bonos) para premiar la lealtad y recurrencia de los clientes activos.
+
+
 
 
 ![WhatsApp Image 2025-11-11 at 9 45 51 PM](https://github.com/user-attachments/assets/16bce9f4-7e84-4cc8-ad26-52a7f671ca15)
