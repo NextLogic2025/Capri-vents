@@ -180,9 +180,12 @@ Proveer herramientas para la medición del desempeño de ventas, análisis de me
 
 ### Diagrama: Registro y Mantenimiento
 
-<img width="5888" height="5924" alt="image" src="https://github.com/user-attachments/assets/625e98af-c059-4128-990d-a04682e4cd7b" />
-<img width="8168" height="6848" alt="image" src="https://github.com/user-attachments/assets/4e73bcab-3448-4bd8-bc7d-0982f3690289" />
-<img width="6120" height="6512" alt="image" src="https://github.com/user-attachments/assets/56f9979e-68e2-4acf-9b1e-af3722f8caf3" />
+<img width="1591" height="1600" alt="image" src="https://github.com/user-attachments/assets/b972eae4-ba3c-43ce-a586-662e7bf295c9" />
+
+<img width="1600" height="1340" alt="image" src="https://github.com/user-attachments/assets/da961d5e-e8c6-4120-9a5a-0ae37a511af2" />
+
+<img width="1503" height="1600" alt="image" src="https://github.com/user-attachments/assets/e2225f9f-e57e-4c68-9bc4-cf3802d24e43" />
+
 
 ### Propósito
 Proveer la funcionalidad para crear, modificar y gestionar el ciclo de vida de los productos en el catálogo del sistema.
