@@ -86,7 +86,7 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 
 
-
+---
 ![alt text](<Gestión de Entregas Gestión de Pedidos.jpg>)
 
 ### 3. Gestión de Entregas
@@ -123,7 +123,7 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 
 
-
+---
 ![alt text](<Gestión de Cobros y Créditos Postventa y Servicio al Cliente.jpg>)
 
 ### 5. Gestión de Cobros y Créditos
@@ -159,7 +159,7 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 
 
-
+---
 ![WhatsApp Image 2025-11-11 at 9 45 51 PM](https://github.com/user-attachments/assets/16bce9f4-7e84-4cc8-ad26-52a7f671ca15)
 
 ### 7. Control y Análisis Comercial
