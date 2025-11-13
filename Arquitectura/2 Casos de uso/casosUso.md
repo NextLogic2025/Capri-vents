@@ -182,11 +182,6 @@ Proveer herramientas para la medición del desempeño de ventas, análisis de me
 
 <img width="1591" height="1600" alt="image" src="https://github.com/user-attachments/assets/b972eae4-ba3c-43ce-a586-662e7bf295c9" />
 
-<img width="1600" height="1340" alt="image" src="https://github.com/user-attachments/assets/da961d5e-e8c6-4120-9a5a-0ae37a511af2" />
-
-<img width="1503" height="1600" alt="image" src="https://github.com/user-attachments/assets/e2225f9f-e57e-4c68-9bc4-cf3802d24e43" />
-
-
 ### Propósito
 Proveer la funcionalidad para crear, modificar y gestionar el ciclo de vida de los productos en el catálogo del sistema.
 
@@ -201,3 +196,42 @@ Proveer la funcionalidad para crear, modificar y gestionar el ciclo de vida de l
 | *Registro y Mantenimiento* | *Registrar Productos* | Supervisor | • Ingresar datos básicos del producto<br>• Asignar precio y categoría inicial<br>• Definir condiciones de conservación<br>• Validar unicidad de código y guardar en Cafrilosa |
 | | *Actualizar Productos* | Supervisor | • Modificar atributos existentes<br>• Propagar cambios a pedidos pendientes<br>• Registrar historial de modificaciones<br>• Notificar los cambios |
 | | *Desactivar Producto* | Supervisor | • Generar alerta desactivación<br>• Archivar para auditoría<br>• Bloquear nuevos pedidos<br>• Marcar como inactivo |
+
+
+### Diagrama: Control de Inventario y Monitoreo
+
+<img width="1600" height="1340" alt="image" src="https://github.com/user-attachments/assets/da961d5e-e8c6-4120-9a5a-0ae37a511af2" />
+
+### Propósito (Control de Inventario)
+Gestionar los movimientos de stock, actualizar los niveles de inventario en tiempo real y definir los umbrales de reabastecimiento.
+
+### Actores (Control de Inventario)
+* Supervisor
+
+### Submódulos y Casos de Uso (Control de Inventario)
+
+| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (<<include>>) |
+| :--- | :--- | :--- | :--- |
+| *Control de Inventario* | *Gestionar Movimientos de Stock*<br>(*Monitorear Niveles de Inventario*) | Supervisor | • Registrar Salida por Venta o Despacho<br>• Registrar Entrada de Productos |
+| | *Actualizar Inventario Tiempo Real* | Supervisor | • Monitoreo en Tiempo Real<br>• Definir Umbrales Mínimos/Máximos |
+
+---
+
+### Diagrama: Monitoreo de Alertas
+
+<img width="1503" height="1600" alt="image" src="https://github.com/user-attachments/assets/e2225f9f-e57e-4c68-9bc4-cf3802d24e43" />
+
+### Propósito (Monitoreo y Alertas)
+Controlar la trazabilidad de los productos por lote, gestionar sus fechas de vencimiento, analizar la rotación y generar alertas automáticas.
+
+### Actores (Monitoreo y Alertas)
+* Supervisor
+
+### Submódulos y Casos de Uso (Monitoreo y Alertas)
+
+| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (<<include>>) |
+| :--- | :--- | :--- | :--- |
+| *Monitoreo y Alertas* | *Verificar Fechas de Vencimiento* | Supervisor | • Rastrear Trazabilidad por Lote<br>• Asociar Lotes a Pedidos Específicos<br>• Asignar Lote a Nuevos Ingresos |
+| | *Analizar Rotación de Inventario*<br>(*Incluido en Gestionar Movimientos*) | Supervisor | • Calcular indice de rotación<br>• Generar recomendaciones<br>• Identificar baja rotación |
+| | *Integrar Alertas Automáticas*<br>(*Extendido desde Actualizar Inventario*) | Supervisor | • Analizar Tendencias de Consumo<br>• (*Generar alertas de stock bajo/vencimiento*) |
+
