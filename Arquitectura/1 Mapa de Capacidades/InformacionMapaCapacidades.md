@@ -17,8 +17,7 @@
   - [6. Postventa y Servicio al Cliente](#6-postventa-y-servicio-al-cliente)
   - [7. Control y Análisis Comercial](#7-control-y-análisis-comercial)
   - [8. Gestión de Productos](#8-gestión-de-productos)
-- [Flujos clave — Vista del Cliente](#flujos-clave--vista-del-cliente)
-- [KPIs sugeridos](#kpis-sugeridos)
+
 
 
 ---
