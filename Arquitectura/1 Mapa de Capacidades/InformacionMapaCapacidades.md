@@ -32,15 +32,6 @@ En el contexto de la aplicación de ventas de Cafrilosa, un mapa de capacidades 
 Un mapa de capacidades generalmente se divide en módulos o áreas de alto nivel (Capacidades Nivel 1) que representan conjuntos de funcionalidades interrelacionadas. Cada módulo tiene una serie de subfunciones o componentes (Capacidades Nivel 2 y 3) que especifican en mayor detalle las capacidades que el sistema debe proporcionar. 
 Estos módulos suelen estar organizados de manera jerárquica y permiten a los desarrolladores, diseñadores y stakeholders entender el alcance de las funcionalidades de la aplicación. Este mapa para Cafrilosa se organiza en 8 módulos principales.
 
----
-
-## Mapa de Capacidades (Imagen)
-![alt text](<Gestión de Entregas Gestión de Pedidos.jpg>)
-![alt text](<Gestión de Cobros y Créditos Postventa y Servicio al Cliente.jpg>)
-![WhatsApp Image 2025-11-11 at 9 45 51 PM](https://github.com/user-attachments/assets/16bce9f4-7e84-4cc8-ad26-52a7f671ca15)
-
-
-
 
 ---
 
@@ -57,6 +48,7 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 ## Descripción de los Módulos
 
+--
 ![alt text](<Planificacion Comercial Gestión de Clientes.jpg>)
 
 ### 1. Planificación Comercial
@@ -92,7 +84,7 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
     * **Mantener Comunicación Continua** - Enviar notificaciones de promociones, lanzamientos, beneficios o estados de cuenta.
     * **Implementar Programas de Beneficios** - Gestionar bonificaciones por volumen de compra, antigüedad o cumplimiento de pago.
 
-
+--
 ![alt text](<Gestión de Entregas Gestión de Pedidos.jpg>)
 
 ### 3. Gestión de Entregas
