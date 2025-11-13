@@ -95,6 +95,8 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 ### 3. Gestión de Entregas
 
+![alt text](<Gestión de Entregas Gestión de Pedidos.jpg>)
+
 **Objetivo:** Asegurar que los pedidos preparados sean despachados y entregados al cliente de forma eficiente y puntual.
 
 **Capacidades:**
@@ -127,6 +129,8 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 ### 5. Gestión de Cobros y Créditos
 
+![alt text](<Gestión de Cobros y Créditos Postventa y Servicio al Cliente.jpg>)
+
 **Objetivo:** Administrar la salud financiera de las transacciones, gestionando las líneas de crédito y asegurando el recaudo de la cartera.
 
 **Capacidades:**
@@ -157,6 +161,8 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
     * **Implementar Programas de Retención.** - Diseñar y ejecutar acciones (descuentos especiales, bonos) para premiar la lealtad y recurrencia de los clientes activos.
 
 ### 7. Control y Análisis Comercial
+
+![WhatsApp Image 2025-11-11 at 9 45 51 PM](https://github.com/user-attachments/assets/16bce9f4-7e84-4cc8-ad26-52a7f671ca15)
 
 **Objetivo:** Proveer la inteligencia de negocio necesaria para la toma de decisiones estratégicas, midiendo el rendimiento de la operación.
 
