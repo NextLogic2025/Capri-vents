@@ -60,6 +60,8 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 ### 1. Planificación Comercial
 
+![alt text](<Planificacion Comercial Gestión de Clientes.jpg>)
+
 **Objetivo:** Establecer la estrategia, reglas de negocio y objetivos que guiarán la operación comercial.
 
 **Capacidades:**
