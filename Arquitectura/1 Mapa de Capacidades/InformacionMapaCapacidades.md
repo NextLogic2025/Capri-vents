@@ -65,15 +65,15 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 **Capacidades:**
 
 * **Definir Estrategia de Ventas:**
-    * Establecer Objetivos Comerciales
-    * Diseñar Politicas de Precios y Descuentos
-    * Planificar Promociones y Campañas
+    * **Establecer Objetivos Comerciales** - Definir metas de ventas, cobertura y participación por zona, canal y producto.
+    * **Diseñar Politicas de Precios y Descuentos** - Crear y administrar listas de precios y reglas de descuento por canal, volumen o condiciones de pago.
+    * **Planificar Promociones y Campañas** - Definir objetivos, mecánicas (ej. 2x1, combos) y vigencia de campañas para impulsar la rotación de stock.
 * **Asignar Rutas y Zonas de Venta:**
-    * Determinar Cobertura Geográfica
-    * Definir Frecuencia de Visitas
+    * **Determinar Cobertura Geográfica** - Mapear y asignar territorios (zonas, barrios) a la fuerza de ventas para evitar solapamientos.
+    * **Definir Frecuencia de Visitas** - Establecer la periodicidad de visitas a clientes según su clasificación (ej. semanal para clientes A, mensual para C).
 * **Capacitar Fuerza de Ventas:**
-    * Actualizar Conocimientos de Producto
-    * Capacitar en Técnicas de Venta y Servicio al Cliente
+    * **Actualizar Conocimientos de Producto** - Informar a la fuerza de ventas sobre nuevos productos, beneficios, cambios de formato o precios.
+    * **Capacitar en Técnicas de Venta y Servicio al Cliente** - Entrenar al equipo en habilidades de negociación, cierre de ventas, manejo de objeciones y protocolos de atención.
 
 ### 2. Gestión de Clientes
 
@@ -82,14 +82,14 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 **Capacidades:**
 
 * **Prospección de Clientes:**
-    * Identificar Nuevos Clientes Potenciales
-    * Evaluar Viabilidad Comercial
+    * **Identificar Nuevos Clientes Potenciales** - Registrar prospectos obtenidos de diferentes fuentes (referidos, visitas en frío, ferias).
+    * **Evaluar Viabilidad Comercial** - Analizar el potencial de compra, capacidad de pago e historial crediticio del prospecto.
 * **Registro y Clasificación de Clientes:**
-    * Ingresar Datos del Cliente (razón social, dirección, contacto)
-    * Clasificar según Canal, Tamaño y Frecuencia de Compra
+    * **Ingresar Datos del Cliente (razón social, dirección, contacto)** - Crear la ficha maestra del cliente en el sistema con su información fiscal, de contacto y de entrega.
+    * **Clasificar según Canal, Tamaño y Frecuencia de Compra** - Segmentar clientes (ej. A, B, C; Mayorista, Minorista, HORECA) para priorizar esfuerzos y asignar condiciones.
 * **Fidelización de Clientes:**
-    * Mantener Comunicación Continua
-    * Implementar Programas de Beneficios
+    * **Mantener Comunicación Continua** - Enviar notificaciones de promociones, lanzamientos, beneficios o estados de cuenta.
+    * **Implementar Programas de Beneficios** - Gestionar bonificaciones por volumen de compra, antigüedad o cumplimiento de pago.
 
 ### 3. Gestión de Entregas
 
@@ -98,14 +98,14 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 **Capacidades:**
 
 * **Preparación del Pedido:**
-    * Verificación de Producto y Lote
-    * Embalaje y Documentación
+    * **Verificación de Producto y Lote** - Escanear y validar que los productos, lotes y fechas de vencimiento del picking coincidan con el pedido.
+    * **Embalaje y Documentación** - Empacar los productos (manteniendo cadena de frío) y generar las guías de despacho y etiquetas de ruta.
 * **Distribución y Entrega:**
-    * Cargar y Transportar Productos
-    * Confirmar Entrega al Cliente
+    * **Cargar y Transportar Productos** - Asegurar la carga en el vehículo, optimizar la ruta y mantener las condiciones de seguridad y refrigeración.
+    * **Confirmar Entrega al Cliente** - Registrar en la app móvil la entrega exitosa (o parcial) capturando firma, foto u observaciones del cliente.
 * **Gestión de Incidencias:**
-    * Reportar Problemas de Entrega
-    * Coordinar Solución
+    * **Reportar Problemas de Entrega** - Documentar en tiempo real incidencias como producto dañado, faltante, rechazo del cliente o dirección incorrecta.
+    * **Coordinar Solución** - Gestionar la acción correctiva ante una incidencia (ej. programar reposición, devolución o emitir nota de crédito).
 
 ### 4. Gestión de Pedidos
 
@@ -114,14 +114,14 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 **Capacidades:**
 
 * **Recepción de Pedidos:**
-    * Tomar Pedido Durante Visita o por Canal Digital
-    * Validar Condiciones Comerciales
+    * **Tomar Pedido Durante Visita o por Canal Digital** - Registrar productos y cantidades desde la app móvil del vendedor o el portal web del cliente.
+    * **Validar Condiciones Comerciales** - Aplicar automáticamente precios, descuentos, promociones vigentes y verificar el stock disponible en tiempo real.
 * **Coordinación con Logística:**
-    * Enviar Pedido a Planta o Almacén
-    * Confirmar Fecha y Modo de Entrega
+    * **Enviar Pedido a Planta o Almacén** - Transmitir la orden aprobada (comercial y crediticiamente) al sistema de almacén (WMS) para iniciar el picking.
+    * **Confirmar Fecha y Modo de Entrega** - Validar la disponibilidad de inventario y agendar el pedido en una ruta de reparto y fecha de entrega.
 * **Control de Pedidos:**
-    * Seguimiento del Estado del Pedido
-    * Cierre Administrativo del Pedido
+    * **Seguimiento del Estado del Pedido** - Monitorear y comunicar las etapas del pedido (Recibido, Aprobado, En Preparación, En Ruta, Entregado).
+    * **Cierre Administrativo del Pedido** - Confirmar la entrega final y la facturación para completar el ciclo del pedido en el sistema.
 
 ### 5. Gestión de Cobros y Créditos
 
@@ -130,14 +130,14 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 **Capacidades:**
 
 * **Control de Cuentas por Cobrar:**
-    * Monitorear Facturas Pendientes
-    * Clasificar Clientes por Estado de Pago
+    * **Monitorear Facturas Pendientes** - Generar reportes de antigüedad de saldos para identificar deudas vencidas y gestionar la cartera.
+    * **Clasificar Clientes por Estado de Pago** - Etiquetar clientes (Al día, Atrasado, Moroso) para aplicar acciones de cobranza o bloquear pedidos.
 * **Ejecución de Cobros:**
-    * Coordinar Rutas de Cobranza
-    * Registrar Pagos Recibidos
+    * **Coordinar Rutas de Cobranza** - Planificar visitas de cobradores o vendedores para el recaudo de pagos en efectivo o cheques.
+    * **Registrar Pagos Recibidos** - Ingresar pagos (efectivo, transferencia, cheque) en el sistema y aplicarlos a las facturas correspondientes.
 * **Gestión de Créditos Comerciales:**
-    * Evaluar Solicitud de Crédito
-    * Controlar Cumplimiento de Condiciones
+    * **Evaluar Solicitud de Crédito** - Analizar el historial del cliente y documentos para aprobar, rechazar o modificar una línea de crédito.
+    * **Controlar Cumplimiento de Condiciones** - Monitorear el uso del cupo de crédito, plazos de pago y alertar sobre incumplimientos o excesos.
 
 ### 6. Postventa y Servicio al Cliente
 
@@ -146,13 +146,13 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 **Capacidades:**
 
 * **Atención de Reclamos:**
-    * Recibir Reclamos por Producto o Servicio
-    * Resolver Reclamo
+    * **Recibir Reclamos por Producto o Servicio** - Registrar quejas o solicitudes del cliente (sobre calidad, entrega, facturación) asignando un número de caso.
+    * **Resolver Reclamo** - Investigar la causa raíz del problema, coordinar con áreas internas y autorizar la solución (reposición, nota de crédito).
 * **Seguimiento de Satisfacción:**
-    * Aplicar Encuestas o Llamadas de Seguimiento
-    * Analizar Resultados y Retroalimentar al Equipo
+    * **Aplicar Encuestas o Llamadas de Seguimiento** - Medir la satisfacción del cliente (ej. NPS) después de una entrega o la resolución de un caso.
+    * **Analizar Resultados y Retroalimentar al Equipo** - Identificar puntos críticos recurrentes en el servicio y proponer mejoras a las áreas involucradas (Logística, Ventas).
 * **Fidelización Continua:**
-    * Implementar Programas de Retención.
+    * **Implementar Programas de Retención.** - Diseñar y ejecutar acciones (descuentos especiales, bonos) para premiar la lealtad y recurrencia de los clientes activos.
 
 ### 7. Control y Análisis Comercial
 
@@ -161,14 +161,14 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 **Capacidades:**
 
 * **Medición del Desempeño:**
-    * Evaluar Cumplimiento de Metas
-    * Monitorear Actividad de Ventas
+    * **Evaluar Cumplimiento de Metas** - Comparar las ventas reales contra los objetivos (KPIs) definidos para vendedores, zonas y productos.
+    * **Monitorear Actividad de Ventas** - Hacer seguimiento al número de visitas efectivas, pedidos registrados y cobros realizados por la fuerza de ventas.
 * **Análisis del Mercado:**
-    * Identificar Tendencias de Consumo
-    * Analizar Eficiencia de Promociones
+    * **Identificar Tendencias de Consumo** - Analizar qué productos, categorías o presentaciones están creciendo o decreciendo en ventas.
+    * **Analizar Eficiencia de Promociones** - Medir el retorno de la inversión (ROI) de las campañas y su impacto real en el volumen de ventas.
 * **Reportes Gerenciales:**
-    * Elaborar Informes de Resultados
-    * Tomar Decisiones Estratégicas
+    * **Elaborar Informes de Resultados** - Consolidar KPIs en dashboards visuales (ventas por zona, rentabilidad por cliente, etc.) para la gerencia.
+    * **Tomar Decisiones Estratégicas** - Usar los informes para redefinir metas, ajustar precios, o enfocar esfuerzos en zonas/clientes de alto potencial.
 
 ### 8. Gestión de Productos
 
@@ -177,15 +177,15 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 **Capacidades:**
 
 * **Registro y Mantenimiento:**
-    * Registro de Producto
-    * Actualización de datos
+    * **Registro de Producto** - Crear nuevos productos (SKUs) en el sistema con sus datos maestros (descripción, precio base, unidad de medida, fotos).
+    * **Actualización de datos** - Modificar atributos existentes de un producto (ej. cambiar precio, descripción, estado 'activo'/'inactivo').
 * **Control de Inventario:**
-    * Gestionar stock entradas/salidas
-    * Asignar y rastrear lotes
-    * Monitorear niveles de inventario
+    * **Gestionar stock entradas/salidas** - Registrar movimientos de inventario (compras, ventas, mermas, ajustes) actualizando el stock disponible en tiempo real.
+    * **Asignar y rastrear lotes** - Vincular productos a un lote específico desde su recepción para controlar su trazabilidad y fecha de vencimiento.
+    * **Monitorear niveles de inventario** - Consultar la disponibilidad de stock en tiempo real y definir niveles mínimos y máximos de seguridad.
 * **Monitoreo y Alertas:**
-    * Verificar fechas de vencimiento
-    * Generar alertas por stock bajo o vencimientos
-    * Análisis de rotación
+    * **Verificar fechas de vencimiento** - Monitorear productos próximos a vencer para gestionar su rotación prioritaria (FEFO - First Expires, First Out).
+    * **Generar alertas por stock bajo o vencimientos** - Notificar automáticamente cuando el stock llegue a un punto de reorden o esté por caducar.
+    * **Análisis de rotación** - Calcular indicadores de rotación (días de inventario) e identificar productos de bajo movimiento u obsoletos.
  
 ---
