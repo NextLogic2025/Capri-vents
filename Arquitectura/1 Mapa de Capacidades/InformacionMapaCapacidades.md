@@ -35,7 +35,6 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 ---
 
 ## Mapa de Capacidades (Imagen)
-![alt text](<Planificacion Comercial Gestión de Clientes.jpg>)
 ![alt text](<Gestión de Entregas Gestión de Pedidos.jpg>)
 ![alt text](<Gestión de Cobros y Créditos Postventa y Servicio al Cliente.jpg>)
 ![WhatsApp Image 2025-11-11 at 9 45 51 PM](https://github.com/user-attachments/assets/16bce9f4-7e84-4cc8-ad26-52a7f671ca15)
@@ -58,9 +57,9 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 ## Descripción de los Módulos
 
-### 1. Planificación Comercial
-
 ![alt text](<Planificacion Comercial Gestión de Clientes.jpg>)
+
+### 1. Planificación Comercial
 
 **Objetivo:** Establecer la estrategia, reglas de negocio y objetivos que guiarán la operación comercial.
 
@@ -93,9 +92,10 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
     * **Mantener Comunicación Continua** - Enviar notificaciones de promociones, lanzamientos, beneficios o estados de cuenta.
     * **Implementar Programas de Beneficios** - Gestionar bonificaciones por volumen de compra, antigüedad o cumplimiento de pago.
 
-### 3. Gestión de Entregas
 
 ![alt text](<Gestión de Entregas Gestión de Pedidos.jpg>)
+
+### 3. Gestión de Entregas
 
 **Objetivo:** Asegurar que los pedidos preparados sean despachados y entregados al cliente de forma eficiente y puntual.
 
@@ -127,9 +127,10 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
     * **Seguimiento del Estado del Pedido** - Monitorear y comunicar las etapas del pedido (Recibido, Aprobado, En Preparación, En Ruta, Entregado).
     * **Cierre Administrativo del Pedido** - Confirmar la entrega final y la facturación para completar el ciclo del pedido en el sistema.
 
-### 5. Gestión de Cobros y Créditos
 
 ![alt text](<Gestión de Cobros y Créditos Postventa y Servicio al Cliente.jpg>)
+
+### 5. Gestión de Cobros y Créditos
 
 **Objetivo:** Administrar la salud financiera de las transacciones, gestionando las líneas de crédito y asegurando el recaudo de la cartera.
 
@@ -160,9 +161,10 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 * **Fidelización Continua:**
     * **Implementar Programas de Retención.** - Diseñar y ejecutar acciones (descuentos especiales, bonos) para premiar la lealtad y recurrencia de los clientes activos.
 
-### 7. Control y Análisis Comercial
 
 ![WhatsApp Image 2025-11-11 at 9 45 51 PM](https://github.com/user-attachments/assets/16bce9f4-7e84-4cc8-ad26-52a7f671ca15)
+
+### 7. Control y Análisis Comercial
 
 **Objetivo:** Proveer la inteligencia de negocio necesaria para la toma de decisiones estratégicas, midiendo el rendimiento de la operación.
 
