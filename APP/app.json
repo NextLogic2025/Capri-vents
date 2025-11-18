@@ -1,0 +1,29 @@
+﻿{
+  "expo": {
+    "name": "CafrilosaApp",
+    "slug": "cafrilosa-app",
+    "scheme": "cafrilosa",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./frontend/assets/images/logo-cafrilosa.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./frontend/assets/images/logo-cafrilosa.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#e53935"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {"supportsTablet": true},
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./frontend/assets/images/logo-cafrilosa.png",
+        "backgroundColor": "#e53935"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./frontend/assets/images/logo-cafrilosa.png"
+    }
+  }
+}

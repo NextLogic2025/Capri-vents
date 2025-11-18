@@ -1,0 +1,28 @@
+const colors = {
+  primary: '#E03A2D',
+  primaryRed: '#E53935',
+  primaryDark: '#C92F23',
+  secondaryGold: '#F4B63E',
+  gold: '#F8C94B',
+  goldDark: '#D9AA23',
+  background: '#F6F4FA',
+  lightBackground: '#F6F4FA',
+  surface: '#FFFFFF',
+  cardBackground: '#FFFFFF',
+  white: '#FFFFFF',
+  darkText: '#1F1F1F',
+  textDark: '#1F1F1F',
+  textLight: '#7C7C88',
+  bodyText: '#4B4B5A',
+  textMuted: '#A1A1B3',
+  muted: '#B3B3C0',
+  borderSoft: '#F0F0F5',
+  border: '#E6E6F0',
+  inputBackground: '#F5F5F8',
+  danger: '#E53935',
+  success: '#2ECC71',
+  warning: '#FFB74D',
+  tabInactive: '#B3B3C0',
+};
+
+export default colors;

@@ -1,0 +1,2468 @@
+/// FILE: frontend/context/AppContext.js
+```javascript
+﻿import React, { createContext, useContext, useMemo, useState } from 'react';
+import productsData from '../data/products';
+import mockOrders from '../data/mockOrders';
+import mockCredits from '../data/mockCredits';
+
+const TAX_RATE = 0.12;
+
+const clientUser = {
+  id: 'cli-001',
+  name: 'Cliente Demo',
+  email: 'cliente@demo.com',
+  phone: '+593 99 000 0000',
+  address: 'Av. La Prensa 123, Quito',
+  tieneCredito: true,
+  saldoCreditoAprobado: 8000,
+  saldoCreditoDisponible: 660,
+  deudaActual: 4000,
+  deudaTotal: 4000,
+  cuotasVencidas: 1,
+};
+
+const vendorUser = {
+  id: 'vend-001',
+  name: 'Vendedor Demo',
+  email: 'vendedor@cafrilosa.com',
+  phone: '+593 99 999 9999',
+  zone: 'Loja Norte',
+  address: 'Centro de Distribucion Loja Norte',
+};
+
+const supervisorUser = {
+  id: 'sup-001',
+  name: 'Supervisor Cafrilosa',
+  email: 'supervisor@cafrilosa.com',
+  phone: '+593 98 222 3344',
+  address: 'Planta Matriz',
+  tieneCredito: false,
+  saldoCreditoAprobado: 0,
+  saldoCreditoDisponible: 0,
+  deudaActual: 0,
+  deudaTotal: 0,
+  cuotasVencidas: 0,
+};
+
+const AppContext = createContext();
+
+export const AppProvider = ({ children }) => {
+  const demoRole = 'vendedor';
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentRole, setCurrentRole] = useState(demoRole); // BACKEND: este rol vendrá del token del usuario autenticado.
+  const [user, setUser] = useState(demoRole === 'vendedor' ? vendorUser : clientUser);
+  const [cart, setCart] = useState([]);
+  const [orders, setOrders] = useState(mockOrders);
+  const normalizeCredits = (list) =>
+    list.map((credit) => ({
+      ...credit,
+      saldoPendiente: credit.saldoPendiente ?? credit.balance ?? credit.total,
+      installments: credit.installments || credit.cuotas || [],
+    }));
+
+  const [credits, setCredits] = useState(normalizeCredits(mockCredits));
+  const [products] = useState(productsData);
+  const [notifications, setNotifications] = useState({ pedidos: true, creditos: true });
+  const matchProduct = (item, productId) => item.id === productId || item.productId === productId;
+  const vendorAssignedOrders = useMemo(() => {
+    const normalizedOrders = Array.isArray(orders) ? orders : [];
+    return normalizedOrders
+      .filter(() => {
+        // BACKEND: filtrar pedidos asignados por assignedVendorId === vendorUser.id
+        return true;
+      })
+      .map((order, index) => {
+        const code = order.code || order.id || `PED-${index + 1}`;
+        const paymentMethod = order.paymentMethod || order.metodoPago || 'Transferencia';
+        const paymentStatus = order.paymentStatus || order.estadoPago || 'Pendiente';
+        const status = order.status || order.estadoPedido || 'PENDIENTE_ENTREGA';
+        return {
+          ...order,
+          code,
+          assignedVendorId: order.assignedVendorId || vendorUser.id,
+          clientName: order.clientName || order.clienteNombre || `Cliente ${index + 1}`,
+          clientPhone: order.clientPhone || '+593 98 765 4321',
+          clientAddress: order.clientAddress || order.address || 'Av. Principal y 10 de Agosto',
+          paymentMethod,
+          paymentStatus,
+          status,
+        };
+      });
+  }, [orders]);
+
+  const vendorAssignedCredits = useMemo(() => {
+    const normalizedCredits = Array.isArray(credits) ? credits : [];
+    return normalizedCredits
+      .filter(() => {
+        // BACKEND: filtrar créditos que correspondan a pedidos del vendorUser
+        return true;
+      })
+      .map((credit, index) => {
+        const installments = (credit.installments || credit.cuotas || []).map((installment, position) => ({
+          ...installment,
+          amount: installment.amount ?? installment.monto ?? 0,
+          dueDate: installment.dueDate || installment.fechaVencimiento || installment.due_date,
+          status: installment.status || installment.estado || 'Pendiente',
+          number: installment.number || installment.numero || position + 1,
+        }));
+        return {
+          ...credit,
+          clientName: credit.clientName || `Cliente crédito ${index + 1}`,
+          orderCode: credit.orderCode || credit.code || credit.id,
+          installments,
+        };
+      });
+  }, [credits]);
+
+  const cartTotals = useMemo(() => {
+    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const taxes = subtotal * TAX_RATE;
+    return {
+      subtotal,
+      taxes,
+      total: subtotal + taxes,
+    };
+  }, [cart]);
+
+  const addToCart = (product) => {
+    // BACKEND: agregar producto al carrito del usuario autenticado en la API.
+    if (!product) return;
+    setCart((prev) => {
+      const existing = prev.find((item) => matchProduct(item, product.id));
+      const maxQty = product.stockActual ?? existing?.stockActual ?? 1;
+      if (existing) {
+        return prev.map((item) =>
+          matchProduct(item, product.id)
+            ? { ...item, quantity: Math.min(item.quantity + 1, maxQty) }
+            : item
+        );
+      }
+      return [
+        ...prev,
+        {
+          id: product.id,
+          productId: product.id,
+          name: product.name,
+          presentation: product.presentation,
+          price: product.price,
+          quantity: 1,
+          stockActual: product.stockActual ?? 0,
+          stockMax: product.stockMax ?? 0,
+          image: product.image,
+        },
+      ];
+    });
+  };
+
+  const removeFromCart = (productId) => {
+    // BACKEND: eliminar un item del carrito en el backend.
+    setCart((prev) => prev.filter((item) => !matchProduct(item, productId)));
+  };
+
+  const updateCartQuantity = (productId, newQty) => {
+    // BACKEND: actualizar la cantidad de un item del carrito en la API.
+    setCart((prev) =>
+      prev
+        .map((item) => {
+          if (!matchProduct(item, productId)) return item;
+          if (newQty <= 0) return null;
+          const limit = item.stockActual ?? newQty;
+          return { ...item, quantity: Math.min(newQty, limit) };
+        })
+        .filter(Boolean)
+    );
+  };
+
+  const clearCart = () => {
+    // BACKEND: limpiar carrito del usuario.
+    setCart([]);
+  };
+
+  const createOrderFromCart = (metodoPago, payload = {}) => {
+    // BACKEND: aqui se llamaria a POST /orders con los productos seleccionados.
+    if (!cart.length) return null;
+    const orderId = `ORD-${Date.now()}`;
+    const code = `PED-${new Date().getFullYear()}-${String(orders.length + 1).padStart(3, '0')}`;
+    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const taxes = subtotal * TAX_RATE;
+    const total = subtotal + taxes;
+
+    const statusByMethod = {
+      TARJETA: 'PAGADO',
+      TRANSFERENCIA: 'EN_REVISION_PAGO',
+      EFECTIVO: 'PENDIENTE_PREPARACION',
+      CREDITO: 'PENDIENTE_PREPARACION',
+    };
+
+    const paymentStatusByMethod = {
+      TARJETA: 'PAGADO',
+      TRANSFERENCIA: 'TRANSFERENCIA_PENDIENTE',
+      EFECTIVO: 'EFECTIVO_ENTREGA_PENDIENTE',
+      CREDITO: 'CREDITO_ACTIVO',
+    };
+
+    const newOrder = {
+      id: orderId,
+      code,
+      date: new Date().toISOString().split('T')[0],
+      method: metodoPago,
+      paymentMethod: metodoPago,
+      paymentStatus: paymentStatusByMethod[metodoPago] || 'PENDIENTE',
+      status: statusByMethod[metodoPago] || 'CREADO',
+      total,
+      subtotal,
+      taxes,
+      deliveryInfo: {
+        address: payload.address || user.address,
+        phone: payload.phone || user.phone,
+        notes: payload.notes || '',
+      },
+      items: cart.map((item) => ({
+        productId: item.productId || item.id,
+        name: item.name,
+        presentation: item.presentation,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+    };
+
+    setOrders((prev) => [newOrder, ...prev]);
+    clearCart();
+    return newOrder;
+  };
+
+  const createCreditPlanFromOrder = (orderId, planConfig = { cuotas: [] }) => {
+    // BACKEND: POST /credits para generar el plan de cuotas asociado a un pedido.
+    const order = orders.find((item) => item.id === orderId);
+    if (!order || !planConfig?.cuotas?.length) return null;
+    const creditId = `CRED-${Date.now()}`;
+    const installments = planConfig.cuotas.map((cuota, index) => ({
+      id: `${creditId}-${index}`,
+      number: cuota.numero || index + 1,
+      amount: cuota.monto,
+      dueDate: cuota.fecha,
+      status: 'Pendiente',
+      paymentMethod: null,
+    }));
+
+    const newCredit = {
+      id: creditId,
+      orderId: order.id,
+      orderCode: order.code,
+      total: order.total,
+      saldoPendiente: order.total,
+      status: 'En curso',
+      installments,
+    };
+
+    setCredits((prev) => [newCredit, ...prev]);
+    setUser((prev) => {
+      const newDebt = (prev.deudaActual ?? prev.deudaTotal ?? 0) + order.total;
+      return {
+        ...prev,
+        saldoCreditoDisponible: Math.max(prev.saldoCreditoDisponible - order.total, 0),
+        deudaActual: newDebt,
+        deudaTotal: newDebt,
+      };
+    });
+
+    return newCredit;
+  };
+
+  const registerInstallmentPayment = (creditId, installmentId, metodoPago, info = {}) => {
+    // BACKEND: registrar pago de cuota y adjuntar comprobante para validacion del supervisor.
+    let paidAmount = 0;
+    setCredits((prev) =>
+      prev.map((credit) => {
+        if (credit.id !== creditId) return credit;
+        const installments = (credit.installments || []).map((installment) => {
+          if (installment.id !== installmentId) return installment;
+          let status = 'PAGO_PENDIENTE_VALIDACION';
+          if (metodoPago === 'EFECTIVO') status = 'PENDIENTE_COBRO_EFECTIVO';
+          if (metodoPago === 'TARJETA') {
+            status = 'Pagada';
+            paidAmount = installment.amount;
+          }
+          return {
+            ...installment,
+            status,
+            paymentMethod: metodoPago,
+            paymentInfo: info,
+          };
+        });
+        const saldoPendiente = installments
+          .filter((installment) => installment.status !== 'Pagada')
+          .reduce((sum, installment) => sum + installment.amount, 0);
+        return {
+          ...credit,
+          installments,
+          saldoPendiente,
+          status: saldoPendiente === 0 ? 'Cancelado' : 'En curso',
+        };
+      })
+    );
+
+    if (paidAmount) {
+      setUser((prev) => {
+        const newDebt = Math.max((prev.deudaActual ?? prev.deudaTotal ?? 0) - paidAmount, 0);
+        return { ...prev, deudaActual: newDebt, deudaTotal: newDebt };
+      });
+    }
+  };
+
+  const updateUserProfile = (payload) => {
+    // BACKEND: actualizar datos del usuario en /profile.
+    setUser((prev) => ({ ...prev, ...payload }));
+  };
+
+  const login = (roleKey = 'cliente') => {
+    // BACKEND: POST /auth/login para obtener tokens e informacion del usuario.
+    if (roleKey === 'vendedor') {
+      setUser(vendorUser);
+    } else if (roleKey === 'supervisor') {
+      setUser(supervisorUser);
+    } else {
+      setUser(clientUser);
+    }
+    setCurrentRole(roleKey);
+    setIsLoggedIn(true);
+  };
+
+  const logout = () => {
+    // BACKEND: invalidar el token de sesion.
+    setIsLoggedIn(false);
+    setCurrentRole(null);
+    setUser(clientUser);
+    clearCart();
+  };
+
+  const payCreditInstallment = (creditId, installmentId, metodoPago) => {
+    // BACKEND: compatibilidad - registrar pago de cuota.
+    registerInstallmentPayment(creditId, installmentId, metodoPago);
+  };
+
+  const markInstallmentPaid = (creditId, installmentId) => {
+    // BACKEND: compatibilidad - el supervisor marcaria la cuota como pagada.
+    registerInstallmentPayment(creditId, installmentId, 'TARJETA');
+  };
+
+  const value = {
+    products,
+    user,
+    setUser,
+    cart,
+    cartTotals,
+    addToCart,
+    removeFromCart,
+    updateCartQuantity,
+    clearCart,
+    orders,
+    setOrders,
+    credits,
+    setCredits,
+    createOrderFromCart,
+    createCreditPlanFromOrder,
+    registerInstallmentPayment,
+    payCreditInstallment,
+    markInstallmentPaid,
+    notifications,
+    setNotifications,
+    updateUserProfile,
+    currentRole,
+    setCurrentRole,
+    vendorUser,
+    vendorAssignedOrders,
+    vendorAssignedCredits,
+    isLoggedIn,
+    login,
+    logout,
+  };
+
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+};
+
+export const useAppContext = () => useContext(AppContext);
+
+```
+
+/// FILE: frontend/Vendedor/navigation/VendedorTabNavigator.js
+```javascript
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Ionicons } from '@expo/vector-icons';
+import colors from '../../theme/colors';
+import VendedorPedidosScreen from '../screens/VendedorPedidosScreen';
+import VendedorCobrosScreen from '../screens/VendedorCobrosScreen';
+import VendedorProductosScreen from '../screens/VendedorProductosScreen';
+import VendedorPerfilScreen from '../screens/VendedorPerfilScreen';
+
+const Tab = createBottomTabNavigator();
+
+const TAB_ITEMS = {
+  Pedidos: { icon: 'list-outline', label: 'Pedidos' },
+  CobrosCreditos: { icon: 'cash-outline', label: 'Cobros & Creditos' },
+  Productos: { icon: 'pricetags-outline', label: 'Productos' },
+  PerfilVendedor: { icon: 'person-circle-outline', label: 'Perfil' },
+};
+
+const TabIcon = ({ icon, label, focused }) => (
+  <View style={styles.tabItem}>
+    <View style={[styles.iconPill, focused && styles.iconPillActive]}>
+      <Ionicons name={icon} size={22} color={focused ? colors.white : colors.tabInactive} />
+    </View>
+    <Text style={[styles.tabLabel, focused && styles.tabLabelActive]} numberOfLines={1}>
+      {label}
+    </Text>
+  </View>
+);
+
+const VendedorTabNavigator = () => {
+  return (
+    <Tab.Navigator
+      initialRouteName="Pedidos"
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarShowLabel: false,
+        tabBarStyle: styles.tabBar,
+        tabBarHideOnKeyboard: true,
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.tabInactive,
+        tabBarIcon: ({ focused }) => {
+          const tabInfo = TAB_ITEMS[route.name] || { icon: 'ellipse', label: route.name };
+          return <TabIcon icon={tabInfo.icon} label={tabInfo.label} focused={focused} />;
+        },
+      })}
+    >
+      <Tab.Screen name="Pedidos" component={VendedorPedidosScreen} />
+      <Tab.Screen
+        name="CobrosCreditos"
+        component={VendedorCobrosScreen}
+        options={{ tabBarLabel: 'Cobros' }}
+      />
+      <Tab.Screen name="Productos" component={VendedorProductosScreen} />
+      <Tab.Screen name="PerfilVendedor" component={VendedorPerfilScreen} options={{ title: 'Perfil' }} />
+    </Tab.Navigator>
+  );
+};
+
+const styles = StyleSheet.create({
+  tabBar: {
+    backgroundColor: colors.white,
+    borderTopWidth: 0,
+    height: 88,
+    paddingTop: 6,
+    paddingBottom: 14,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: -2 },
+    elevation: 10,
+  },
+  tabItem: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconPill: {
+    width: 48,
+    height: 48,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.white,
+  },
+  iconPillActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+    shadowColor: colors.primary,
+    shadowOpacity: 0.27,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+  },
+  tabLabel: {
+    fontSize: 12,
+    color: colors.tabInactive,
+    marginTop: 6,
+    fontWeight: '600',
+  },
+  tabLabelActive: {
+    color: colors.primary,
+  },
+});
+
+export default VendedorTabNavigator;
+
+```
+
+/// FILE: frontend/Vendedor/components/VendedorOrderCard.js
+```javascript
+import React from 'react';
+import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import colors from '../../theme/colors';
+import globalStyles from '../../theme/styles';
+
+const methodIcons = {
+  EFECTIVO: 'cash-outline',
+  CASH: 'cash-outline',
+  TRANSFERENCIA: 'swap-horizontal-outline',
+  TRANSFER: 'swap-horizontal-outline',
+  TARJETA: 'card-outline',
+  CREDITO: 'document-text-outline',
+};
+
+const statusColors = {
+  ENTREGADO: colors.success,
+  ENTREGADA: colors.success,
+  EN_RUTA: colors.gold,
+  PENDIENTE_ENTREGA: colors.primary,
+  PENDIENTE: colors.primary,
+  EN_PREPARACION: colors.secondaryGold,
+};
+
+const formatCurrency = (value = 0) => {
+  const amount = Number(value) || 0;
+  return amount.toFixed(2);
+};
+
+const formatDate = (value) => {
+  if (!value) return 'Hoy';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  try {
+    return date.toLocaleDateString('es-EC', { day: '2-digit', month: 'short' });
+  } catch (error) {
+    return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}`;
+  }
+};
+
+const getStatusColor = (status = '') => {
+  const key = status.toUpperCase();
+  return statusColors[key] || colors.primary;
+};
+
+const getMethodIcon = (method = '') => {
+  const key = method.toUpperCase();
+  return methodIcons[key] || 'document-text-outline';
+};
+
+const normalizeText = (text, fallback) => {
+  if (!text) return fallback;
+  return text;
+};
+
+const VendedorOrderCard = ({ order, onPress }) => {
+  if (!order) return null;
+
+  const code = order.code || order.id || 'Pedido';
+  const clientName = normalizeText(order.clientName || order.clienteNombre, 'Cliente sin nombre');
+  const clientAddress = normalizeText(
+    order.clientAddress || order.clienteDireccion || order.address,
+    'Sin direccion'
+  );
+  const paymentMethod = (order.paymentMethod || order.metodoPago || '').toUpperCase();
+  const orderStatus = order.status || order.estadoPedido || 'PENDIENTE_ENTREGA';
+  const paymentStatus = order.paymentStatus || order.estadoPago || 'Pendiente';
+
+  return (
+    <TouchableOpacity style={styles.card} activeOpacity={0.92} onPress={onPress}>
+      <View style={styles.rowBetween}>
+        <Text style={styles.code}>{code}</Text>
+        <Text style={styles.date}>{formatDate(order.date || order.fecha)}</Text>
+      </View>
+
+      <View style={styles.clientBlock}>
+        <Text style={styles.clientName} numberOfLines={1}>
+          {clientName}
+        </Text>
+        <Text style={styles.clientAddress} numberOfLines={2}>
+          {clientAddress}
+        </Text>
+      </View>
+
+      <View style={styles.paymentRow}>
+        <View style={styles.methodInfo}>
+          <View style={styles.methodIcon}>
+            <Ionicons name={getMethodIcon(paymentMethod)} size={18} color={colors.primary} />
+          </View>
+          <View>
+            <Text style={styles.methodLabel}>
+              {paymentMethod || order.metodoPago || 'Transferencia'}
+            </Text>
+            <Text style={styles.paymentStatus} numberOfLines={1}>
+              {paymentStatus}
+            </Text>
+          </View>
+        </View>
+        <Text style={styles.total}>${formatCurrency(order.total)}</Text>
+      </View>
+
+      <View style={styles.footer}>
+        <View style={[styles.badge, { backgroundColor: getStatusColor(orderStatus) }]}>
+          <Text style={styles.badgeText}>{orderStatus}</Text>
+        </View>
+        <Text style={styles.footerStatus}>Pago: {paymentStatus}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+const styles = StyleSheet.create({
+  card: {
+    ...globalStyles.card,
+    marginBottom: 16,
+    padding: 18,
+  },
+  rowBetween: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  code: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.textDark,
+  },
+  date: {
+    fontSize: 12,
+    color: colors.textLight,
+  },
+  clientBlock: {
+    marginTop: 12,
+  },
+  clientName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.textDark,
+  },
+  clientAddress: {
+    fontSize: 13,
+    color: colors.textLight,
+    marginTop: 4,
+  },
+  paymentRow: {
+    marginTop: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  methodInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginRight: 12,
+  },
+  methodIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 14,
+    backgroundColor: '#FFF4F0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+  methodLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.textDark,
+    textTransform: 'capitalize',
+  },
+  paymentStatus: {
+    fontSize: 12,
+    color: colors.textLight,
+    marginTop: 2,
+  },
+  total: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: colors.primary,
+  },
+  footer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 16,
+  },
+  badge: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+  badgeText: {
+    color: colors.white,
+    fontSize: 12,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+  },
+  footerStatus: {
+    fontSize: 12,
+    color: colors.textLight,
+  },
+});
+
+export default VendedorOrderCard;
+
+```
+
+/// FILE: frontend/Vendedor/components/VendedorCobroCard.js
+```javascript
+import React from 'react';
+import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import colors from '../../theme/colors';
+import globalStyles from '../../theme/styles';
+
+const cobroIcons = {
+  PEDIDO: 'cube-outline',
+  CUOTA: 'calendar-outline',
+  CREDITO: 'card-outline',
+};
+
+const cobroColors = {
+  VENCIDA: colors.danger,
+  VENCIDO: colors.danger,
+  PENDIENTE: colors.primary,
+  PAGO_PENDIENTE_VALIDACION: colors.gold,
+  PENDIENTE_COBRO: colors.gold,
+  PAGADA: colors.success,
+};
+
+const getIcon = (type = '') => cobroIcons[type] || cobroIcons.PEDIDO;
+
+const getBadgeColor = (status = '') => {
+  const key = status.toUpperCase();
+  return cobroColors[key] || colors.gold;
+};
+
+const formatCurrency = (value = 0) => {
+  const amount = Number(value) || 0;
+  return amount.toFixed(2);
+};
+
+const formatDate = (value) => {
+  if (!value) return 'Sin fecha';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  try {
+    return date.toLocaleDateString('es-EC', {
+      day: '2-digit',
+      month: 'short',
+    });
+  } catch (error) {
+    return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}`;
+  }
+};
+
+const VendedorCobroCard = ({ item, onPress }) => {
+  if (!item) return null;
+  const type = (item.tipo || item.type || 'PEDIDO').toUpperCase();
+  const status = item.estado || item.status || 'Pendiente';
+  const clienteNombre = item.clienteNombre || item.clientName || 'Cliente sin nombre';
+  const title =
+    item.title ||
+    (type === 'CUOTA'
+      ? `Cuota #${item.numero || item.number || '?'} ${item.pedidoCodigo || item.orderCode || ''}`
+      : `Pedido contado ${item.code || item.codigo || ''}`);
+
+  return (
+    <TouchableOpacity style={styles.card} activeOpacity={0.92} onPress={onPress}>
+      <View style={styles.row}>
+        <View style={styles.iconWrapper}>
+          <Ionicons name={getIcon(type)} size={20} color={colors.primary} />
+        </View>
+        <View style={styles.info}>
+          <Text style={styles.title} numberOfLines={1}>
+            {title.trim() || 'Cobro'}
+          </Text>
+          <Text style={styles.subtitle} numberOfLines={1}>
+            {clienteNombre}
+          </Text>
+          <Text style={styles.subtitle} numberOfLines={1}>
+            Vence: {formatDate(item.fechaVencimiento || item.dueDate)}
+          </Text>
+        </View>
+        <View style={styles.amountBlock}>
+          <Text style={styles.amount}>${formatCurrency(item.monto ?? item.amount)}</Text>
+          <View style={[styles.badge, { backgroundColor: getBadgeColor(status) }]}>
+            <Text style={styles.badgeText}>{status}</Text>
+          </View>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+const styles = StyleSheet.create({
+  card: {
+    ...globalStyles.card,
+    padding: 16,
+    marginBottom: 14,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconWrapper: {
+    width: 46,
+    height: 46,
+    borderRadius: 16,
+    backgroundColor: '#FFF4F0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  info: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.textDark,
+  },
+  subtitle: {
+    fontSize: 12,
+    color: colors.textLight,
+    marginTop: 2,
+  },
+  amountBlock: {
+    alignItems: 'flex-end',
+  },
+  amount: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: colors.primary,
+  },
+  badge: {
+    marginTop: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+  badgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: colors.white,
+  },
+});
+
+export default VendedorCobroCard;
+
+```
+
+/// FILE: frontend/Vendedor/screens/VendedorPedidosScreen.js
+```javascript
+import React, { useMemo, useState } from 'react';
+import {
+  Alert,
+  FlatList,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import colors from '../../theme/colors';
+import globalStyles from '../../theme/styles';
+import { useAppContext } from '../../context/AppContext';
+import GradientHeader from '../../Cliente/components/GradientHeader';
+import SectionCard from '../../Cliente/components/SectionCard';
+import PrimaryButton from '../../Cliente/components/PrimaryButton';
+import EmptyState from '../../Cliente/components/EmptyState';
+import VendedorOrderCard from '../components/VendedorOrderCard';
+
+const FILTERS = [
+  { key: 'HOY', label: 'Hoy' },
+  { key: 'PENDIENTES', label: 'Pendientes' },
+  { key: 'ENTREGADOS', label: 'Entregados' },
+];
+
+const formatCurrency = (value = 0) => {
+  const amount = Number(value) || 0;
+  return amount.toFixed(2);
+};
+
+const VendedorPedidosScreen = () => {
+  const navigation = useNavigation();
+  const { vendorAssignedOrders = [], vendorUser } = useAppContext();
+  const [filter, setFilter] = useState('PENDIENTES');
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [detailVisible, setDetailVisible] = useState(false);
+  const [cashModalVisible, setCashModalVisible] = useState(false);
+  const [cashAmount, setCashAmount] = useState('');
+  const [invoiceNumber, setInvoiceNumber] = useState('');
+  const todayISO = new Date().toISOString().split('T')[0];
+
+  const filteredOrders = useMemo(() => {
+    return vendorAssignedOrders.filter((order) => {
+      const status = (order.status || order.estadoPedido || '').toUpperCase();
+      if (filter === 'HOY') {
+        return (order.date || order.fecha || '').startsWith(todayISO);
+      }
+      if (filter === 'PENDIENTES') {
+        return status !== 'ENTREGADO' && status !== 'ENTREGADA';
+      }
+      if (filter === 'ENTREGADOS') {
+        return status === 'ENTREGADO' || status === 'ENTREGADA';
+      }
+      return true;
+    });
+  }, [vendorAssignedOrders, filter, todayISO]);
+
+  const resumen = useMemo(() => {
+    const total = vendorAssignedOrders.length;
+    const pendientes = vendorAssignedOrders.filter((order) => {
+      const status = (order.status || order.estadoPedido || '').toUpperCase();
+      return status !== 'ENTREGADO' && status !== 'ENTREGADA';
+    }).length;
+    const entregados = total - pendientes;
+    return { total, pendientes, entregados };
+  }, [vendorAssignedOrders]);
+
+  const openDetail = (order) => {
+    setSelectedOrder(order);
+    setDetailVisible(true);
+    setCashAmount(formatCurrency(order?.total));
+    setInvoiceNumber('');
+  };
+
+  const closeDetail = () => {
+    setDetailVisible(false);
+    setSelectedOrder(null);
+  };
+
+  const openCashModal = () => {
+    if (!selectedOrder) return;
+    setCashAmount(formatCurrency(selectedOrder.total));
+    setCashModalVisible(true);
+  };
+
+  const closeCashModal = () => setCashModalVisible(false);
+
+  const handleViewReceipt = () => {
+    // BACKEND: aqui se abriria la imagen del comprobante de transferencia.
+    Alert.alert('Comprobante', 'Se mostraria el comprobante cargado por el cliente.');
+  };
+
+  const handleUploadInvoice = () => {
+    // BACKEND: aqui se subiria la foto o archivo de la factura.
+    Alert.alert('Subir factura', 'Se simula carga de imagen. // BACKEND: subir archivo');
+  };
+
+  const handleConfirmCash = () => {
+    if (!selectedOrder) return;
+    // BACKEND: registrar cobro en efectivo y actualizar estados del pedido.
+    console.log('Registrar cobro en efectivo', {
+      orderId: selectedOrder.id,
+      amount: cashAmount,
+      invoiceNumber,
+    });
+    Alert.alert('Cobro registrado', 'Se registro el cobro en efectivo.');
+    setCashModalVisible(false);
+    setDetailVisible(false);
+    setSelectedOrder(null);
+  };
+
+  const goToCredits = () => {
+    // BACKEND: podria navegar al detalle del plan en otra pantalla
+    navigation.navigate('CobrosCreditos');
+    setDetailVisible(false);
+  };
+
+  const renderFilterChips = () => (
+    <View style={styles.filterRow}>
+      {FILTERS.map((item) => {
+        const active = filter === item.key;
+        return (
+          <TouchableOpacity
+            key={item.key}
+            style={[styles.chip, active && styles.chipActive]}
+            onPress={() => setFilter(item.key)}
+          >
+            <Text style={[styles.chipText, active && styles.chipTextActive]}>{item.label}</Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+
+  const renderHeader = () => (
+    <View>
+      <View style={styles.headerWrapper}>
+        <GradientHeader
+          name={vendorUser?.name || 'Vendedor'}
+          storeName={`Ruta / Zona: ${vendorUser?.zone || 'Sin asignar'}`}
+          notificationsCount={resumen.pendientes}
+        />
+      </View>
+      <View style={styles.headerContent}>
+        <SectionCard title="Resumen diario">
+          <View style={styles.statsRow}>
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>{resumen.total}</Text>
+              <Text style={styles.statLabel}>Asignados</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>{resumen.pendientes}</Text>
+              <Text style={styles.statLabel}>Pendientes</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>{resumen.entregados}</Text>
+              <Text style={styles.statLabel}>Entregados</Text>
+            </View>
+          </View>
+          {renderFilterChips()}
+        </SectionCard>
+      </View>
+    </View>
+  );
+
+  const renderOrderDetail = () => {
+    if (!selectedOrder) return null;
+    const paymentMethod = (selectedOrder.paymentMethod || '').toUpperCase();
+    const isCash = paymentMethod === 'EFECTIVO';
+    const isTransfer = paymentMethod.includes('TRANSFER');
+    const isCredit = paymentMethod.includes('CREDITO');
+
+    return (
+      <Modal visible={detailVisible} animationType="slide" transparent onRequestClose={closeDetail}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{selectedOrder.code || selectedOrder.id}</Text>
+              <TouchableOpacity onPress={closeDetail} style={styles.closeButton}>
+                <Text style={styles.closeButtonText}>x</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <SectionCard title="Cliente">
+                <Text style={styles.detailLabel}>Nombre</Text>
+                <Text style={styles.detailValue}>{selectedOrder.clientName}</Text>
+                <Text style={styles.detailLabel}>Telefono</Text>
+                <Text style={styles.detailValue}>{selectedOrder.clientPhone}</Text>
+                <Text style={styles.detailLabel}>Direccion</Text>
+                <Text style={styles.detailValue}>{selectedOrder.clientAddress}</Text>
+              </SectionCard>
+              <SectionCard title="Productos">
+                {Array.isArray(selectedOrder.items) &&
+                  selectedOrder.items.map((item) => (
+                    <View style={styles.productRow} key={item.productId || item.name}>
+                      <View>
+                        <Text style={styles.productName}>{item.name}</Text>
+                        <Text style={styles.productMeta}>
+                          {item.presentation}  -  {item.quantity} uds
+                        </Text>
+                      </View>
+                      <Text style={styles.productAmount}>
+                        ${(item.price * item.quantity).toFixed(2)}
+                      </Text>
+                    </View>
+                  ))}
+                <View style={styles.totalRow}>
+                  <Text style={styles.totalLabel}>Total</Text>
+                  <Text style={styles.totalValue}>${formatCurrency(selectedOrder.total)}</Text>
+                </View>
+              </SectionCard>
+              <SectionCard title="Pago & estado">
+                <Text style={styles.detailLabel}>Metodo de pago</Text>
+                <Text style={styles.detailValue}>{selectedOrder.paymentMethod}</Text>
+                <Text style={styles.detailLabel}>Estado del pedido</Text>
+                <Text style={styles.detailValue}>{selectedOrder.status}</Text>
+                <Text style={styles.detailLabel}>Estado del pago</Text>
+                <Text style={styles.detailValue}>{selectedOrder.paymentStatus}</Text>
+                {isTransfer && (
+                  <PrimaryButton
+                    title="Ver comprobante"
+                    style={styles.modalButton}
+                    onPress={handleViewReceipt}
+                  />
+                )}
+                {isCash && (
+                  <PrimaryButton
+                    title="Registrar cobro en efectivo"
+                    style={styles.modalButton}
+                    onPress={openCashModal}
+                  />
+                )}
+                {isCredit && (
+                  <TouchableOpacity style={styles.secondaryButton} onPress={goToCredits}>
+                    <Text style={styles.secondaryButtonText}>Ver plan de cuotas</Text>
+                  </TouchableOpacity>
+                )}
+              </SectionCard>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
+  const renderCashModal = () => {
+    if (!selectedOrder) return null;
+    return (
+      <Modal
+        visible={cashModalVisible}
+        animationType="fade"
+        transparent
+        onRequestClose={closeCashModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.cashModalCard}>
+            <Text style={styles.modalTitle}>Registrar cobro en efectivo</Text>
+            <Text style={styles.detailLabel}>Monto recibido</Text>
+            <TextInput
+              keyboardType="decimal-pad"
+              style={styles.input}
+              value={cashAmount}
+              onChangeText={setCashAmount}
+            />
+            <Text style={styles.detailLabel}>Numero de factura</Text>
+            <TextInput
+              placeholder="Ej. F001-12345"
+              style={styles.input}
+              value={invoiceNumber}
+              onChangeText={setInvoiceNumber}
+            />
+            <TouchableOpacity style={styles.secondaryButton} onPress={handleUploadInvoice}>
+              <Text style={styles.secondaryButtonText}>Subir foto de factura</Text>
+            </TouchableOpacity>
+            <PrimaryButton title="Confirmar" onPress={handleConfirmCash} style={{ marginTop: 12 }} />
+            <TouchableOpacity onPress={closeCashModal} style={styles.modalCancel}>
+              <Text style={styles.modalCancelText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <FlatList
+        data={filteredOrders}
+        keyExtractor={(item) => item.id || item.code}
+        ListHeaderComponent={renderHeader}
+        contentContainerStyle={styles.listContent}
+        renderItem={({ item }) => <VendedorOrderCard order={item} onPress={() => openDetail(item)} />}
+        ListEmptyComponent={
+          <EmptyState
+            title="Sin pedidos"
+            subtitle="No tienes pedidos asignados con este filtro."
+            iconName="clipboard-outline"
+          />
+        }
+      />
+      {renderOrderDetail()}
+      {renderCashModal()}
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  listContent: {
+    paddingBottom: 120,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+  headerWrapper: {
+    marginHorizontal: -16,
+  },
+  headerContent: {
+    paddingTop: 16,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  statItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  statValue: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.textDark,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: colors.textLight,
+    marginTop: 4,
+  },
+  filterRow: {
+    flexDirection: 'row',
+    marginTop: 8,
+    flexWrap: 'wrap',
+  },
+  chip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.white,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  chipActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  chipText: {
+    color: colors.textDark,
+    fontWeight: '600',
+  },
+  chipTextActive: {
+    color: colors.white,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  modalCard: {
+    width: '100%',
+    maxHeight: '90%',
+    backgroundColor: colors.white,
+    borderRadius: 26,
+    padding: 16,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.textDark,
+  },
+  closeButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 14,
+    backgroundColor: colors.borderSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  closeButtonText: {
+    fontSize: 20,
+    color: colors.textDark,
+    fontWeight: '700',
+  },
+  detailLabel: {
+    fontSize: 12,
+    color: colors.textLight,
+    marginTop: 8,
+  },
+  detailValue: {
+    fontSize: 14,
+    color: colors.textDark,
+    fontWeight: '600',
+    marginTop: 2,
+  },
+  productRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  productName: {
+    fontWeight: '600',
+    color: colors.textDark,
+  },
+  productMeta: {
+    fontSize: 12,
+    color: colors.textLight,
+    marginTop: 2,
+  },
+  productAmount: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.textDark,
+  },
+  totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 12,
+  },
+  totalLabel: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: colors.textDark,
+  },
+  totalValue: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: colors.primary,
+  },
+  modalButton: {
+    marginTop: 12,
+  },
+  secondaryButton: {
+    ...globalStyles.secondaryButton,
+    marginTop: 12,
+  },
+  secondaryButtonText: {
+    ...globalStyles.secondaryButtonText,
+  },
+  cashModalCard: {
+    width: '100%',
+    backgroundColor: colors.white,
+    borderRadius: 22,
+    padding: 20,
+  },
+  input: {
+    ...globalStyles.input,
+    marginTop: 6,
+  },
+  modalCancel: {
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  modalCancelText: {
+    color: colors.textLight,
+    fontWeight: '600',
+  },
+});
+
+export default VendedorPedidosScreen;
+
+```
+
+/// FILE: frontend/Vendedor/screens/VendedorCobrosScreen.js
+```javascript
+import React, { useMemo, useState } from 'react';
+import {
+  Alert,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import colors from '../../theme/colors';
+import globalStyles from '../../theme/styles';
+import { useAppContext } from '../../context/AppContext';
+import SectionCard from '../../Cliente/components/SectionCard';
+import PrimaryButton from '../../Cliente/components/PrimaryButton';
+import EmptyState from '../../Cliente/components/EmptyState';
+import VendedorCobroCard from '../components/VendedorCobroCard';
+
+const formatCurrency = (value = 0) => {
+  const amount = Number(value) || 0;
+  return amount.toFixed(2);
+};
+
+const isOverdue = (item) => {
+  const status = (item.estado || item.status || '').toUpperCase();
+  if (status === 'VENCIDA' || status === 'VENCIDO') return true;
+  const due = new Date(item.fechaVencimiento || item.dueDate);
+  if (Number.isNaN(due.getTime())) return false;
+  const today = new Date();
+  return due < today;
+};
+
+const normalizeStatus = (status = '') => {
+  const key = status.toUpperCase();
+  if (key.includes('PAGAD')) return 'PAGADA';
+  if (key.includes('VENC')) return 'VENCIDA';
+  if (key.includes('PEND')) return 'PENDIENTE';
+  return key || 'PENDIENTE';
+};
+
+const VendedorCobrosScreen = () => {
+  const { vendorAssignedOrders = [], vendorAssignedCredits = [] } = useAppContext();
+  const [selectedCobro, setSelectedCobro] = useState(null);
+  const [detailVisible, setDetailVisible] = useState(false);
+  const [cashModalVisible, setCashModalVisible] = useState(false);
+  const [cashAmount, setCashAmount] = useState('');
+  const [invoiceNumber, setInvoiceNumber] = useState('');
+
+  const cobros = useMemo(() => {
+    const pendingOrders = vendorAssignedOrders
+      .filter((order) => {
+        const method = (order.paymentMethod || '').toUpperCase();
+        const paymentStatus = (order.paymentStatus || '').toUpperCase();
+        return method === 'EFECTIVO' && !paymentStatus.includes('PAGAD');
+      })
+      .map((order) => ({
+        id: `PED-${order.id}`,
+        tipo: 'PEDIDO',
+        code: order.code,
+        clienteNombre: order.clientName,
+        monto: order.total,
+        fechaVencimiento: order.deliveryDate || order.date,
+        estado: normalizeStatus(order.paymentStatus),
+        paymentMethod: order.paymentMethod,
+        reference: order.id,
+      }));
+
+    const pendingInstallments = vendorAssignedCredits.flatMap((credit) => {
+      return (credit.installments || []).map((installment) => {
+        const status = normalizeStatus(installment.status);
+        if (status === 'PAGADA') return null;
+        return {
+          id: `${credit.id}-${installment.id}`,
+          tipo: 'CUOTA',
+          code: credit.orderCode,
+          clienteNombre: credit.clientName,
+          monto: installment.amount,
+          fechaVencimiento: installment.dueDate,
+          estado: status,
+          numero: installment.number,
+          paymentMethod: installment.paymentMethod || 'EFECTIVO',
+          reference: credit.id,
+        };
+      });
+    }).filter(Boolean);
+
+    return [...pendingOrders, ...pendingInstallments];
+  }, [vendorAssignedOrders, vendorAssignedCredits]);
+
+  const prioridad = cobros.filter(isOverdue);
+  const proximos = cobros.filter((item) => !isOverdue(item));
+
+  const openDetail = (item) => {
+    setSelectedCobro(item);
+    setDetailVisible(true);
+    setCashAmount(formatCurrency(item.monto ?? item.amount));
+    setInvoiceNumber('');
+  };
+
+  const closeDetail = () => {
+    setDetailVisible(false);
+    setSelectedCobro(null);
+  };
+
+  const openCashModal = () => setCashModalVisible(true);
+  const closeCashModal = () => setCashModalVisible(false);
+
+  const handleViewReceipt = () => {
+    // BACKEND: descargar o abrir comprobante asociado
+    Alert.alert('Comprobante', 'Se mostraria el comprobante registrado para este cobro.');
+  };
+
+  const handleUploadInvoice = () => {
+    // BACKEND: subir archivo/foto del comprobante en efectivo
+    Alert.alert('Factura', 'Simulacion de cargar factura fisica.');
+  };
+
+  const handleConfirmCash = () => {
+    if (!selectedCobro) return;
+    // BACKEND: registrar pago manual del cobro / cuota
+    console.log('Registrar pago efectivo', {
+      cobroId: selectedCobro.id,
+      amount: cashAmount,
+      invoiceNumber,
+    });
+    Alert.alert('Pago registrado', 'Pago en efectivo registrado correctamente.');
+    setCashModalVisible(false);
+    setDetailVisible(false);
+    setSelectedCobro(null);
+  };
+
+  const renderCobroDetail = () => {
+    if (!selectedCobro) return null;
+    const isTransfer = (selectedCobro.paymentMethod || '').toUpperCase().includes('TRANS');
+    const isPaid = (selectedCobro.estado || '').toUpperCase() === 'PAGADA';
+    return (
+      <Modal
+        visible={detailVisible}
+        animationType="slide"
+        transparent
+        onRequestClose={closeDetail}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{selectedCobro.tipo}</Text>
+              <TouchableOpacity onPress={closeDetail} style={styles.closeButton}>
+                <Text style={styles.closeButtonText}>x</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <SectionCard title="Detalle">
+                <Text style={styles.detailLabel}>Cliente</Text>
+                <Text style={styles.detailValue}>{selectedCobro.clienteNombre}</Text>
+                <Text style={styles.detailLabel}>Referencia</Text>
+                <Text style={styles.detailValue}>{selectedCobro.code || selectedCobro.reference}</Text>
+                <Text style={styles.detailLabel}>Monto</Text>
+                <Text style={styles.totalValue}>${formatCurrency(selectedCobro.monto)}</Text>
+                <Text style={styles.detailLabel}>Fecha de vencimiento</Text>
+                <Text style={styles.detailValue}>
+                  {selectedCobro.fechaVencimiento || 'Sin fecha'}
+                </Text>
+                <Text style={styles.detailLabel}>Estado</Text>
+                <Text style={styles.detailValue}>{selectedCobro.estado}</Text>
+              </SectionCard>
+              <SectionCard title="Acciones">
+                {isTransfer && (
+                  <PrimaryButton
+                    title="Ver comprobante"
+                    style={{ marginBottom: 12 }}
+                    onPress={handleViewReceipt}
+                  />
+                )}
+                {!isPaid && (
+                  <PrimaryButton title="Registrar pago en efectivo" onPress={openCashModal} />
+                )}
+              </SectionCard>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
+  const renderCashModal = () => {
+    if (!selectedCobro) return null;
+    return (
+      <Modal
+        visible={cashModalVisible}
+        animationType="fade"
+        transparent
+        onRequestClose={closeCashModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.cashModalCard}>
+            <Text style={styles.modalTitle}>Registrar pago</Text>
+            <Text style={styles.detailLabel}>Monto</Text>
+            <TextInput
+              style={styles.input}
+              keyboardType="decimal-pad"
+              value={cashAmount}
+              onChangeText={setCashAmount}
+            />
+            <Text style={styles.detailLabel}>Numero de factura</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Ej. F001-123"
+              value={invoiceNumber}
+              onChangeText={setInvoiceNumber}
+            />
+            <TouchableOpacity style={styles.secondaryButton} onPress={handleUploadInvoice}>
+              <Text style={styles.secondaryButtonText}>Subir foto de factura</Text>
+            </TouchableOpacity>
+            <PrimaryButton title="Confirmar" onPress={handleConfirmCash} style={{ marginTop: 12 }} />
+            <TouchableOpacity onPress={closeCashModal} style={styles.modalCancel}>
+              <Text style={styles.modalCancelText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
+  const renderCobrosSection = (title, data, emptyMessage) => (
+    <SectionCard title={title}>
+      {data.length === 0 ? (
+        <EmptyState title={emptyMessage} subtitle="" iconName="checkmark-circle-outline" />
+      ) : (
+        data.map((item) => (
+          <VendedorCobroCard key={item.id} item={item} onPress={() => openDetail(item)} />
+        ))
+      )}
+    </SectionCard>
+  );
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
+        <Text style={styles.screenTitle}>Cobros & Creditos</Text>
+        <Text style={styles.screenSubtitle}>
+          Gestiona cobros pendientes de pedidos al contado y cuotas de credito.
+        </Text>
+        {renderCobrosSection('Prioridad (Vencidos)', prioridad, 'Sin cobros vencidos')}
+        {renderCobrosSection('Proximos a vencer', proximos, 'Sin cobros pendientes')}
+      </ScrollView>
+      {renderCobroDetail()}
+      {renderCashModal()}
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  contentContainer: {
+    padding: 16,
+    paddingBottom: 140,
+  },
+  screenTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: colors.textDark,
+  },
+  screenSubtitle: {
+    marginTop: 4,
+    color: colors.textLight,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+  },
+  modalCard: {
+    width: '100%',
+    maxHeight: '90%',
+    backgroundColor: colors.white,
+    borderRadius: 26,
+    padding: 18,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.textDark,
+  },
+  closeButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 14,
+    backgroundColor: colors.borderSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  closeButtonText: {
+    fontSize: 20,
+    color: colors.textDark,
+    fontWeight: '700',
+  },
+  detailLabel: {
+    fontSize: 12,
+    color: colors.textLight,
+    marginTop: 10,
+  },
+  detailValue: {
+    fontSize: 14,
+    color: colors.textDark,
+    fontWeight: '600',
+    marginTop: 2,
+  },
+  totalValue: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: colors.primary,
+    marginTop: 4,
+  },
+  cashModalCard: {
+    width: '100%',
+    backgroundColor: colors.white,
+    borderRadius: 22,
+    padding: 20,
+  },
+  input: {
+    ...globalStyles.input,
+    marginTop: 6,
+  },
+  secondaryButton: {
+    ...globalStyles.secondaryButton,
+    marginTop: 14,
+  },
+  secondaryButtonText: {
+    ...globalStyles.secondaryButtonText,
+  },
+  modalCancel: {
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  modalCancelText: {
+    color: colors.textLight,
+    fontWeight: '600',
+  },
+});
+
+export default VendedorCobrosScreen;
+
+```
+
+/// FILE: frontend/Vendedor/screens/VendedorProductosScreen.js
+```javascript
+import React, { useMemo, useState } from 'react';
+import {
+  FlatList,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import colors from '../../theme/colors';
+import globalStyles from '../../theme/styles';
+import { useAppContext } from '../../context/AppContext';
+import EmptyState from '../../Cliente/components/EmptyState';
+import LogoCafrilosa from '../../assets/images/logo-cafrilosa.png';
+
+const VendedorProductosScreen = () => {
+  const { products = [] } = useAppContext();
+  const [search, setSearch] = useState('');
+  const [category, setCategory] = useState('Todos');
+
+  const categories = useMemo(() => {
+    const unique = Array.from(new Set(products.map((product) => product.category).filter(Boolean)));
+    return ['Todos', ...unique];
+  }, [products]);
+
+  const filtered = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return products.filter((product) => {
+      const matchCategory = category === 'Todos' || product.category === category;
+      const matchSearch = product.name.toLowerCase().includes(query);
+      return matchCategory && matchSearch;
+    });
+  }, [products, search, category]);
+
+  const renderProduct = ({ item }) => (
+    <View style={styles.card}>
+      <Image
+        source={item.image || LogoCafrilosa}
+        defaultSource={LogoCafrilosa}
+        resizeMode="cover"
+        style={styles.image}
+      />
+      <View style={styles.cardBody}>
+        <Text style={styles.name} numberOfLines={2}>
+          {item.name}
+        </Text>
+        <Text style={styles.presentation}>{item.presentation}</Text>
+        <Text style={styles.price}>${item.price.toFixed(2)}</Text>
+        <View style={styles.stockRow}>
+          <Ionicons
+            name={item.stockActual > 0 ? 'checkmark-circle' : 'close-circle'}
+            size={16}
+            color={item.stockActual > 0 ? colors.success : colors.danger}
+          />
+          <Text style={styles.stockText}>
+            Stock: {item.stockActual}/{item.stockMax}
+          </Text>
+        </View>
+      </View>
+    </View>
+  );
+
+  const renderHeader = () => (
+    <View style={styles.header}>
+      <Text style={styles.screenTitle}>Catalogo de productos</Text>
+      <Text style={styles.screenSubtitle}>
+        Informacion en tiempo real para apoyar tu gestion. Solo lectura.
+      </Text>
+      <View style={styles.searchContainer}>
+        <Ionicons name="search-outline" size={20} color={colors.muted} style={{ marginHorizontal: 8 }} />
+        <TextInput
+          placeholder="Buscar por nombre..."
+          placeholderTextColor={colors.muted}
+          style={styles.searchInput}
+          value={search}
+          onChangeText={setSearch}
+        />
+      </View>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
+        {categories.map((cat) => {
+          const active = category === cat;
+          return (
+            <TouchableOpacity
+              key={cat}
+              style={[styles.chip, active && styles.chipActive]}
+              onPress={() => setCategory(cat)}
+            >
+              <Text style={[styles.chipText, active && styles.chipTextActive]}>{cat}</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+    </View>
+  );
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <FlatList
+        data={filtered}
+        keyExtractor={(item) => item.id}
+        numColumns={2}
+        columnWrapperStyle={{ justifyContent: 'space-between' }}
+        contentContainerStyle={styles.listContent}
+        ListHeaderComponent={renderHeader}
+        renderItem={renderProduct}
+        ListEmptyComponent={
+          <EmptyState
+            title="Sin productos"
+            subtitle="Aun no hay productos que coincidan con tu busqueda."
+            iconName="pricetag-outline"
+          />
+        }
+        showsVerticalScrollIndicator={false}
+      />
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  listContent: {
+    paddingBottom: 120,
+    paddingHorizontal: 16,
+  },
+  header: {
+    marginBottom: 16,
+  },
+  screenTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: colors.textDark,
+  },
+  screenSubtitle: {
+    color: colors.textLight,
+    marginTop: 4,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.cardBackground,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginTop: 14,
+    paddingVertical: 4,
+    ...globalStyles.shadow,
+  },
+  searchInput: {
+    flex: 1,
+    color: colors.textDark,
+    paddingHorizontal: 8,
+    fontSize: 16,
+  },
+  filterScroll: {
+    paddingVertical: 12,
+  },
+  chip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.white,
+    marginRight: 10,
+  },
+  chipActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  chipText: {
+    fontWeight: '600',
+    color: colors.textDark,
+  },
+  chipTextActive: {
+    color: colors.white,
+  },
+  card: {
+    width: '48%',
+    backgroundColor: colors.white,
+    borderRadius: 24,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#F2C3BC',
+    marginBottom: 16,
+    ...globalStyles.shadow,
+  },
+  image: {
+    width: '100%',
+    height: 110,
+  },
+  cardBody: {
+    padding: 12,
+  },
+  name: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: colors.textDark,
+  },
+  presentation: {
+    fontSize: 12,
+    color: colors.textLight,
+    marginTop: 3,
+  },
+  price: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: colors.primary,
+    marginTop: 6,
+  },
+  stockRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  stockText: {
+    marginLeft: 6,
+    fontSize: 12,
+    color: colors.textDark,
+    fontWeight: '600',
+  },
+});
+
+export default VendedorProductosScreen;
+
+```
+
+/// FILE: frontend/Vendedor/screens/VendedorPerfilScreen.js
+```javascript
+import React, { useState } from 'react';
+import {
+  Alert,
+  Linking,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import colors from '../../theme/colors';
+import globalStyles from '../../theme/styles';
+import { useAppContext } from '../../context/AppContext';
+import SectionCard from '../../Cliente/components/SectionCard';
+import PrimaryButton from '../../Cliente/components/PrimaryButton';
+
+const VendedorPerfilScreen = () => {
+  const { vendorUser, logout } = useAppContext();
+  const [passwordModalVisible, setPasswordModalVisible] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [editingPhone, setEditingPhone] = useState(false);
+  const [phone, setPhone] = useState(vendorUser?.phone || '');
+
+  const initials = vendorUser?.name
+    ?.split(' ')
+    .filter(Boolean)
+    .map((word) => word[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+
+  const handleSavePhone = () => {
+    // BACKEND: PUT /vendor/profile para guardar telefono
+    Alert.alert('Perfil actualizado', 'Telefono actualizado correctamente.');
+    setEditingPhone(false);
+  };
+
+  const handlePasswordChange = () => {
+    if (!newPassword || newPassword !== confirmPassword) {
+      Alert.alert('Error', 'La nueva contrasena no coincide.');
+      return;
+    }
+    // BACKEND: POST /vendor/change-password
+    Alert.alert('Contrasena actualizada', 'Se envio la solicitud de cambio de contrasena.');
+    setPasswordModalVisible(false);
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+  };
+
+  const handleSupportWhatsapp = () => {
+    const url = 'https://wa.me/593999999999';
+    Linking.openURL(url).catch(() => {
+      Alert.alert('Atencion', 'No se pudo abrir WhatsApp.');
+    });
+  };
+
+  const handleSupportEmail = () => {
+    const url = 'mailto:soporte@cafrilosa.com';
+    Linking.openURL(url).catch(() => {
+      Alert.alert('Atencion', 'No se pudo abrir el correo.');
+    });
+  };
+
+  const handleLogout = () => {
+    logout();
+  };
+
+  const renderPasswordModal = () => (
+    <Modal
+      visible={passwordModalVisible}
+      transparent
+      animationType="fade"
+      onRequestClose={() => setPasswordModalVisible(false)}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalCard}>
+          <Text style={styles.modalTitle}>Cambiar contrasena</Text>
+          <Text style={styles.detailLabel}>Contrasena actual</Text>
+          <TextInput
+            style={styles.input}
+            secureTextEntry
+            value={currentPassword}
+            onChangeText={setCurrentPassword}
+          />
+          <Text style={styles.detailLabel}>Nueva contrasena</Text>
+          <TextInput
+            style={styles.input}
+            secureTextEntry
+            value={newPassword}
+            onChangeText={setNewPassword}
+          />
+          <Text style={styles.detailLabel}>Confirmar contrasena</Text>
+          <TextInput
+            style={styles.input}
+            secureTextEntry
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+          />
+          <PrimaryButton title="Actualizar" onPress={handlePasswordChange} style={{ marginTop: 14 }} />
+          <TouchableOpacity onPress={() => setPasswordModalVisible(false)} style={styles.modalCancel}>
+            <Text style={styles.modalCancelText}>Cancelar</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.headerCard}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>{initials || 'VD'}</Text>
+          </View>
+          <Text style={styles.name}>{vendorUser?.name}</Text>
+          <Text style={styles.email}>{vendorUser?.email}</Text>
+          <Text style={styles.zone}>Zona asignada: {vendorUser?.zone || 'Sin zona'}</Text>
+        </View>
+
+        <SectionCard title="Datos personales">
+          <View style={styles.infoRow}>
+            <View>
+              <Text style={styles.infoLabel}>Telefono</Text>
+              {editingPhone ? (
+                <TextInput style={styles.inlineInput} value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
+              ) : (
+                <Text style={styles.infoValue}>{phone}</Text>
+              )}
+            </View>
+            <TouchableOpacity
+              style={styles.linkButton}
+              onPress={editingPhone ? handleSavePhone : () => setEditingPhone(true)}
+            >
+              <Text style={styles.linkButtonText}>{editingPhone ? 'Guardar' : 'Editar'}</Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.infoLabel}>Correo</Text>
+          <Text style={styles.infoValue}>{vendorUser?.email}</Text>
+          <Text style={styles.infoLabel}>Bodega base</Text>
+          <Text style={styles.infoValue}>{vendorUser?.address}</Text>
+        </SectionCard>
+
+        <SectionCard title="Seguridad">
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => setPasswordModalVisible(true)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.menuTitle}>Cambiar contrasena</Text>
+            <Text style={styles.menuSubtitle}>Actualiza tu contrasena periodicamente.</Text>
+          </TouchableOpacity>
+        </SectionCard>
+
+        <SectionCard title="Soporte">
+          <Text style={styles.infoLabel}>Canales disponibles</Text>
+          <View style={styles.supportRow}>
+            <TouchableOpacity style={styles.secondaryButton} onPress={handleSupportWhatsapp}>
+              <Text style={styles.secondaryButtonText}>Contactar supervisor</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.secondaryButton} onPress={handleSupportEmail}>
+              <Text style={styles.secondaryButtonText}>Correo soporte</Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={[styles.menuSubtitle, { marginTop: 12 }]}>
+            Tambien puedes revisar las FAQs en la intranet. // BACKEND: cargar contenido dinamico.
+          </Text>
+        </SectionCard>
+
+        <PrimaryButton title="Cerrar sesion" onPress={handleLogout} style={styles.logoutButton} />
+      </ScrollView>
+      {renderPasswordModal()}
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  content: {
+    padding: 16,
+    paddingBottom: 120,
+  },
+  headerCard: {
+    ...globalStyles.card,
+    alignItems: 'center',
+  },
+  avatar: {
+    width: 82,
+    height: 82,
+    borderRadius: 30,
+    backgroundColor: '#FFE1D8',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  avatarText: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: colors.primary,
+  },
+  name: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.textDark,
+  },
+  email: {
+    color: colors.textLight,
+    marginTop: 4,
+  },
+  zone: {
+    marginTop: 6,
+    color: colors.textDark,
+    fontWeight: '600',
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  infoLabel: {
+    fontSize: 12,
+    color: colors.textLight,
+    marginTop: 10,
+  },
+  infoValue: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.textDark,
+  },
+  menuItem: {
+    paddingVertical: 6,
+  },
+  menuTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.textDark,
+  },
+  menuSubtitle: {
+    fontSize: 13,
+    color: colors.textLight,
+  },
+  supportRow: {
+    marginTop: 12,
+  },
+  secondaryButton: {
+    ...globalStyles.secondaryButton,
+    marginBottom: 10,
+  },
+  secondaryButtonText: {
+    ...globalStyles.secondaryButtonText,
+  },
+  logoutButton: {
+    marginTop: 18,
+  },
+  linkButton: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 14,
+    backgroundColor: '#FFE1D8',
+  },
+  linkButtonText: {
+    color: colors.primary,
+    fontWeight: '700',
+  },
+  inlineInput: {
+    ...globalStyles.input,
+    width: 180,
+    marginTop: 6,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+  },
+  modalCard: {
+    width: '100%',
+    backgroundColor: colors.white,
+    borderRadius: 24,
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.textDark,
+    marginBottom: 10,
+  },
+  detailLabel: {
+    fontSize: 12,
+    color: colors.textLight,
+    marginTop: 10,
+  },
+  input: {
+    ...globalStyles.input,
+    marginTop: 6,
+  },
+  modalCancel: {
+    marginTop: 12,
+    alignItems: 'center',
+  },
+  modalCancelText: {
+    color: colors.textLight,
+    fontWeight: '600',
+  },
+});
+
+export default VendedorPerfilScreen;
+
+```
+
+/// FILE: App.js
+```javascript
+import 'react-native-gesture-handler';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Ionicons } from '@expo/vector-icons';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import colors from './frontend/theme/colors';
+import { AppProvider, useAppContext } from './frontend/context/AppContext';
+import VendedorTabNavigator from './frontend/Vendedor/navigation/VendedorTabNavigator';
+
+// Auth screens
+import SplashScreen from './frontend/Auth/screens/SplashScreen';
+import LoginScreen from './frontend/Auth/screens/LoginScreen';
+import RegisterScreen from './frontend/Auth/screens/RegisterScreen';
+import ForgotPasswordScreen from './frontend/Auth/screens/ForgotPasswordScreen';
+
+// Cliente tabs
+import InicioScreen from './frontend/Cliente/screens/InicioScreen';
+import CarritoScreen from './frontend/Cliente/screens/CarritoScreen';
+import PedidosScreen from './frontend/Cliente/screens/PedidosScreen';
+import CreditosScreen from './frontend/Cliente/screens/CreditosScreen';
+import PerfilScreen from './frontend/Cliente/screens/PerfilScreen';
+import ProductDetailScreen from './frontend/Cliente/screens/ProductDetailScreen';
+
+// Flujo cliente adicional
+import CheckoutScreen from './frontend/Cliente/screens/CheckoutScreen';
+import SeleccionPlanCreditoScreen from './frontend/Cliente/screens/SeleccionPlanCreditoScreen';
+import DetallePedidoScreen from './frontend/Cliente/screens/DetallePedidoScreen';
+import DetalleCreditoScreen from './frontend/Cliente/screens/DetalleCreditoScreen';
+import PagoCuotaScreen from './frontend/Cliente/screens/PagoCuotaScreen';
+import PedidoConfirmacionScreen from './frontend/Cliente/screens/PedidoConfirmacionScreen';
+import CreditoConfirmacionScreen from './frontend/Cliente/screens/CreditoConfirmacionScreen';
+import SupervisorPlaceholderScreen from './frontend/Supervisor/screens/SupervisorPlaceholderScreen';
+
+const RootStack = createNativeStackNavigator();
+const AuthStack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
+const TAB_ITEMS = {
+  Inicio: { icon: 'home-outline', label: 'Inicio' },
+  Carrito: { icon: 'cart-outline', label: 'Carrito' },
+  Pedidos: { icon: 'cube-outline', label: 'Pedidos' },
+  Creditos: { icon: 'card-outline', label: 'Credito' },
+  Perfil: { icon: 'person-outline', label: 'Perfil' },
+};
+
+const TabIcon = ({ icon, label, focused }) => (
+  <View style={styles.tabItem}>
+    <View style={[styles.iconPill, focused && styles.iconPillActive]}>
+      <Ionicons
+        name={icon}
+        size={20}
+        color={focused ? colors.white : colors.tabInactive}
+      />
+    </View>
+    <Text style={[styles.tabLabel, focused && styles.tabLabelActive]} numberOfLines={1}>
+      {label}
+    </Text>
+  </View>
+);
+
+const navTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: colors.background,
+  },
+};
+
+const AuthStackNavigator = () => (
+  <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+    <AuthStack.Screen name="Login" component={LoginScreen} />
+    <AuthStack.Screen name="Register" component={RegisterScreen} />
+    <AuthStack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+  </AuthStack.Navigator>
+);
+
+const ClienteTabsNavigator = () => {
+  const { credits } = useAppContext();
+  const pendingInstallments = credits.reduce(
+    (sum, credit) =>
+      sum + credit.installments.filter((installment) => installment.status !== 'Pagada').length,
+    0
+  );
+
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarShowLabel: false,
+        tabBarStyle: styles.tabBar,
+        tabBarIcon: ({ focused }) => {
+          const tabInfo = TAB_ITEMS[route.name] ?? { icon: 'ellipse', label: route.name };
+          return <TabIcon icon={tabInfo.icon} label={tabInfo.label} focused={focused} />;
+        },
+      })}
+    >
+      <Tab.Screen name="Inicio" component={InicioScreen} />
+      <Tab.Screen name="Carrito" component={CarritoScreen} />
+      <Tab.Screen name="Pedidos" component={PedidosScreen} />
+      <Tab.Screen
+        name="Creditos"
+        component={CreditosScreen}
+        options={{ tabBarBadge: pendingInstallments > 0 ? pendingInstallments : undefined, tabBarBadgeStyle: { backgroundColor: colors.danger } }}
+      />
+      <Tab.Screen name="Perfil" component={PerfilScreen} />
+    </Tab.Navigator>
+  );
+};
+
+const AppNavigator = () => {
+  const { currentRole } = useAppContext();
+  const normalizedRole = (currentRole || '').toLowerCase();
+
+  if (normalizedRole === 'vendedor') {
+    return (
+      <NavigationContainer theme={navTheme}>
+        <VendedorTabNavigator />
+      </NavigationContainer>
+    );
+  }
+
+  return (
+    <NavigationContainer theme={navTheme}>
+      <RootStack.Navigator screenOptions={{ headerTintColor: colors.darkText }}>
+        <RootStack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
+        <RootStack.Screen name="AuthStack" component={AuthStackNavigator} options={{ headerShown: false }} />
+        <RootStack.Screen name="ClienteTabs" component={ClienteTabsNavigator} options={{ headerShown: false }} />
+        <RootStack.Screen name="Checkout" component={CheckoutScreen} options={{ title: 'Checkout' }} />
+        <RootStack.Screen name="ProductDetail" component={ProductDetailScreen} options={{ headerShown: false }} />
+        <RootStack.Screen name="SeleccionPlanCredito" component={SeleccionPlanCreditoScreen} options={{ title: 'Plan de credito' }} />
+        <RootStack.Screen name="DetallePedido" component={DetallePedidoScreen} options={{ title: 'Detalle de pedido' }} />
+        <RootStack.Screen name="DetalleCredito" component={DetalleCreditoScreen} options={{ title: 'Detalle de credito' }} />
+        <RootStack.Screen name="PagoCuota" component={PagoCuotaScreen} options={{ title: 'Pago de cuota' }} />
+        <RootStack.Screen name="PedidoConfirmacion" component={PedidoConfirmacionScreen} options={{ headerShown: false }} />
+        <RootStack.Screen name="CreditoConfirmacion" component={CreditoConfirmacionScreen} options={{ headerShown: false }} />
+        <RootStack.Screen name="VendedorModulo" component={VendedorTabNavigator} options={{ headerShown: false }} />
+        <RootStack.Screen name="SupervisorModulo" component={SupervisorPlaceholderScreen} options={{ title: 'Modulo Supervisor' }} />
+      </RootStack.Navigator>
+    </NavigationContainer>
+  );
+};
+
+export default function App() {
+  return (
+    <AppProvider>
+      <SafeAreaProvider>
+        <AppNavigator />
+      </SafeAreaProvider>
+    </AppProvider>
+  );
+}
+
+const styles = StyleSheet.create({
+  tabBar: {
+    backgroundColor: colors.white,
+    borderTopWidth: 0,
+    height: 90,
+    paddingTop: 6,
+    paddingBottom: 14,
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: -2 },
+    elevation: 8,
+  },
+  tabItem: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+  },
+  iconPill: {
+    width: 48,
+    height: 48,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.white,
+  },
+  iconPillActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+    shadowColor: colors.primary,
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+  },
+  tabLabel: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: colors.tabInactive,
+    marginTop: 6,
+    textAlign: 'center',
+  },
+  tabLabelActive: {
+    color: colors.primary,
+  },
+});
+
+```
+
