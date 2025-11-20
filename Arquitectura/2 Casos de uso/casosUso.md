@@ -31,22 +31,21 @@ Un diagrama de casos de uso (UML) muestra qué hace el sistema desde la perspect
 
 
 ### Propósito
-Gestionar el ciclo de vida del cliente, desde la identificación de oportunidades y prospección, hasta su registro formal, clasificación y fidelización continua.
+Gestionar el registro formal de clientes asegurando la integridad de datos fiscales y crediticios, así como ejecutar estrategias de fidelización mediante comunicación continua y programas de beneficios.
 
 ### Actores
-* Personal, Supervisor de Ventas, Analista Comercial, Vendedor, Marketing
-* Cafrilosa (sistema/ente externo), SRI (ente fiscal externo), Cliente
+* **Internos:** Personal (Agrupación de: Marketing, Supervisor de Ventas, Vendedor).
+* **Externos:** Cliente, SRI (Servicio de Rentas Internas).
+* **Sistemas:** Cafrilosa (ERP/Sistema central).
 
 ### Submódulos y Casos de Uso
 
-| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (<<include>>) |
+| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (`<<include>>`) |
 | :--- | :--- | :--- | :--- |
-| *Prospectar Clientes* | *Identificar nuevos clientes potenciales* | Personal, Sup. Ventas, Analista, Cafrilosa | • Analizar el mercado local y la competencia.<br>• Recibir referencias de clientes actuales. |
-| | *Evaluar viabilidad comercial* | Personal, Sup. Ventas, Analista | • Revisar capacidad de pago.<br>• Validar requisitos legales o sanitarios. |
-| *Registrar y Clasificar* | *Ingresar Datos del Cliente* | Cliente, Personal, Sup. Ventas, Analista | • Verificar validez fiscal (SRI).<br>• Ingresar datos (razón social, dirección, etc.). |
-| | *Clasificar cliente según perfil comercial* | Personal, Sup. Ventas, Analista, Cafrilosa | • Asignar canal de venta (mayorista, minorista).<br>• Categorizar según tamaño y frecuencia. |
-| *Fidelizar Clientes* | *Mantener comunicación continua* | Personal, Sup. Ventas, Vendedor, Mkt, Cliente | • Enviar información sobre promociones.<br>• Realizar seguimiento postventa. |
-| | *Implementar programas de beneficios* | Personal, Sup. Ventas, Vendedor, Marketing | • Aplicar bonificaciones por volumen.<br>• Otorgar descuentos por antigüedad. |
+| **Registro y Mantenimiento** | *Ingresar Datos del Cliente* | Cliente, SRI, Cafrilosa | • Ingresar datos (dirección, teléfono, correo, contacto).<br>• Verificar validez de información fiscal en el sistema SRI. |
+| | *Clasificación de Cliente* | Cafrilosa (Sistema) | • Vincular Políticas de Crédito y Descuentos. |
+| **Fidelizar Clientes** | *Mantener comunicación continua* | Personal (Mkt, Sup. Ventas, Vendedor), Cliente | • Enviar información sobre promociones y nuevos productos.<br>• Realizar seguimiento postventa para medir satisfacción. |
+| | *Implementar programas de beneficios* | Personal (Mkt, Sup. Ventas, Vendedor), Cliente | • Aplicar bonificaciones por volumen de compra.<br>• Otorgar descuentos por antigüedad o cumplimiento de condiciones. |
 
 ---
 
