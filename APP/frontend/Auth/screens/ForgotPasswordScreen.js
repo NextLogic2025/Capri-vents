@@ -1,7 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  ScrollView,
+  Image,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../../theme/colors';
+import LogoCafrilosa from '../../assets/images/logo-cafrilosa.png';
 
 const ForgotPasswordScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -14,7 +24,10 @@ const ForgotPasswordScreen = ({ navigation }) => {
       return;
     }
     // BACKEND: aquí se ejecuta la petición POST /auth/forgot-password para generar el código temporal.
-    Alert.alert('Revisa tu correo', 'Enviamos un código para que puedas restablecer tu contraseña.');
+    Alert.alert(
+      'Revisa tu correo',
+      'Enviamos un código para que puedas restablecer tu contraseña.'
+    );
     navigation.goBack();
   };
 
@@ -23,18 +36,31 @@ const ForgotPasswordScreen = ({ navigation }) => {
       setError('Ingresa tu correo para reenviar el código.');
       return;
     }
-    Alert.alert('Correo reenviado', 'Si el correo existe, recibirás un nuevo código en segundos.');
+    // BACKEND: reintento de envío del correo de recuperación.
+    Alert.alert(
+      'Correo reenviado',
+      'Si el correo existe, recibirás un nuevo código en segundos.'
+    );
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+    >
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Ionicons name="chevron-back" size={26} color={colors.darkText} />
       </TouchableOpacity>
 
-      <View style={styles.card}>
-        <Text style={styles.heading}>Olvidaste tu contraseña</Text>
-        <Text style={styles.description}>Por favor ingresa tu correo para recuperar tu contraseña.</Text>
+      <Image source={LogoCafrilosa} style={styles.logo} />
+
+      <View style={styles.form}>
+        <Text style={styles.heading}>¿Olvidaste tu contraseña?</Text>
+        <Text style={styles.description}>
+          Ingresa tu correo electrónico y te enviaremos un código para que puedas crear
+          una nueva contraseña.
+        </Text>
 
         <Text style={styles.fieldLabel}>Correo electrónico</Text>
         <View style={styles.inputWrapper}>
@@ -42,7 +68,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
           <TextInput
             value={email}
             onChangeText={setEmail}
-            placeholder="Ingresa tu correo"
+            placeholder="tucorreo@cafrilosa.com"
             placeholderTextColor={colors.textMuted}
             autoCapitalize="none"
             keyboardType="email-address"
@@ -52,27 +78,29 @@ const ForgotPasswordScreen = ({ navigation }) => {
         {!!error && <Text style={styles.errorText}>{error}</Text>}
 
         <TouchableOpacity style={styles.primaryButton} onPress={handleSubmit}>
-          <Text style={styles.primaryButtonText}>Te enviamos un código</Text>
+          <Text style={styles.primaryButtonText}>Enviar código</Text>
         </TouchableOpacity>
 
         <Text style={styles.helperText}>
-          Una vez recibido el correo, ingresa el código para verificar tu identidad y establecer una nueva contraseña.
+          Revisa tu bandeja de entrada (y también la carpeta de spam). Usa el código para
+          verificar tu identidad y restablecer tu contraseña.
         </Text>
 
         <TouchableOpacity onPress={handleResend}>
           <Text style={styles.helperLink}>Reenviar correo electrónico</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: colors.background,
     paddingHorizontal: 24,
-    paddingTop: 40,
+    paddingBottom: 40,
+    paddingTop: 32,
   },
   backButton: {
     width: 40,
@@ -81,22 +109,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.white,
-    marginBottom: 16,
+    marginBottom: 12,
     shadowColor: '#000',
     shadowOpacity: 0.05,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
     elevation: 3,
   },
-  card: {
-    backgroundColor: colors.white,
-    borderRadius: 24,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 5,
+  logo: {
+    width: 170,
+    height: 100,
+    resizeMode: 'contain',
+    alignSelf: 'center',
+    marginBottom: 24,
+  },
+  form: {
+    width: '100%',
   },
   heading: {
     fontSize: 24,
@@ -116,18 +144,18 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 16,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: colors.border,
     paddingHorizontal: 14,
-    backgroundColor: colors.inputBackground,
+    backgroundColor: colors.white,
   },
   inputIcon: {
     marginRight: 8,
   },
   input: {
     flex: 1,
-    paddingVertical: 14,
+    paddingVertical: 12,
     fontSize: 16,
     color: colors.darkText,
   },
@@ -140,7 +168,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     paddingVertical: 14,
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 22,
   },
   primaryButtonText: {
     color: colors.white,

@@ -65,7 +65,7 @@ const CarritoScreen = ({ navigation }) => {
 
   return (
     <View style={styles.screen}>
-      <ScreenHeader title="Carrito" rounded={false} style={styles.header} />
+      <ScreenHeader title="Carrito" subtitle="Tus productos listos para comprar"/>
       <FlatList
         data={cart}
         keyExtractor={(item) => (item.productId || item.id || Math.random().toString())}
@@ -113,10 +113,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 24,
-  },
-  header: {
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
   },
   summaryCard: {
     backgroundColor: colors.white,

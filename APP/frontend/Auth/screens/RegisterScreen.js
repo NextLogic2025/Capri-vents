@@ -42,7 +42,11 @@ const AuthInput = ({
       />
       {secure && (
         <TouchableOpacity style={styles.eyeButton} onPress={onTogglePassword}>
-          <Ionicons name={showPassword ? 'eye-outline' : 'eye-off-outline'} size={20} color={colors.muted} />
+          <Ionicons
+            name={showPassword ? 'eye-outline' : 'eye-off-outline'}
+            size={20}
+            color={colors.muted}
+          />
         </TouchableOpacity>
       )}
     </View>
@@ -79,28 +83,40 @@ const RegisterScreen = ({ navigation }) => {
       return;
     }
     if (!acceptTerms) {
-      Alert.alert('T�rminos', 'Debes aceptar los t�rminos y la pol�tica de privacidad.');
+      Alert.alert(
+        'Términos',
+        'Debes aceptar los términos y la política de privacidad.'
+      );
       return;
     }
+
     const payload = {
       name: form.name,
       email: form.email,
       phone: form.phone,
       password: form.password,
     };
-    // BACKEND: el tel�fono debe guardarse al crear el cliente
-    // para luego mostrarlo y editarlo en la secci�n Perfil.
-    // BACKEND: aqu� se debe invocar el endpoint de registro para crear el cliente en Cafrilosa.
-    Alert.alert('Cuenta creada', 'Hemos enviado tus datos al backend. Revisa tu correo para activar la cuenta.', [
-      { text: 'Ir al login', onPress: () => navigation.navigate('Login') },
-    ]);
+    // BACKEND: el teléfono debe guardarse al crear el cliente
+    // para luego mostrarlo y editarlo en la sección Perfil.
+    // BACKEND: aquí se debe invocar el endpoint de registro para crear el cliente en Cafrilosa.
+    console.log('Payload registro:', payload);
+
+    Alert.alert(
+      'Cuenta creada',
+      'Hemos enviado tus datos al backend. Revisa tu correo para activar la cuenta.',
+      [{ text: 'Ir al login', onPress: () => navigation.navigate('Login') }]
+    );
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      contentContainerStyle={styles.container}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+    >
       <Image source={LogoCafrilosa} style={styles.logo} />
 
-      <View style={styles.card}>
+      <View style={styles.form}>
         <Text style={styles.heading}>Crear Cuenta</Text>
         <Text style={styles.subheading}>Completa los datos para registrarte</Text>
 
@@ -121,11 +137,11 @@ const RegisterScreen = ({ navigation }) => {
           keyboardType="email-address"
         />
         <AuthInput
-          label="Telefono"
+          label="Teléfono"
           icon="call-outline"
           value={form.phone}
           onChangeText={(text) => handleChange('phone', text)}
-          placeholder="099999999"
+          placeholder="0999999999"
           keyboardType="phone-pad"
         />
         <AuthInput
@@ -150,20 +166,21 @@ const RegisterScreen = ({ navigation }) => {
         />
 
         <View style={styles.termsRow}>
-          <Checkbox value={acceptTerms} onValueChange={setAcceptTerms} color={colors.secondaryGold} />
+          <Checkbox
+            value={acceptTerms}
+            onValueChange={setAcceptTerms}
+            color={acceptTerms ? colors.secondaryGold : undefined}
+          />
           <Text style={styles.termsText}>
-            Acepto los <Text style={styles.termsLink}>Términos y Condiciones</Text> y la{' '}
+            Acepto los{' '}
+            <Text style={styles.termsLink}>Términos y Condiciones</Text> y la{' '}
             <Text style={styles.termsLink}>Política de Privacidad</Text>.
           </Text>
         </View>
 
-        <TouchableOpacity style={styles.secondaryButton} onPress={handleRegister}>
-          <Text style={styles.secondaryButtonText}>Crear Cuenta</Text>
+        <TouchableOpacity style={styles.primaryButton} onPress={handleRegister}>
+          <Text style={styles.primaryButtonText}>Crear Cuenta</Text>
         </TouchableOpacity>
-
-        <Text style={styles.backendNote}>
-          El registro envía esta información al backend para vincularte con créditos, pedidos y tu ejecutivo de cuenta.
-        </Text>
 
         <View style={styles.footerRow}>
           <Text style={styles.subtleText}>¿Ya tienes una cuenta?</Text>
@@ -180,32 +197,24 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: colors.background,
-    alignItems: 'center',
     paddingHorizontal: 24,
-    paddingBottom: 48,
+    paddingBottom: 40,
+    alignItems: 'center',
   },
   logo: {
-    width: 180,
-    height: 110,
+    width: 190,
+    height: 120,
     marginTop: 40,
     resizeMode: 'contain',
   },
   slogan: {
     color: colors.goldDark,
-    marginTop: 8,
-    marginBottom: 16,
+    marginTop: 4,
+    marginBottom: 20,
     fontWeight: '600',
   },
-  card: {
+  form: {
     width: '100%',
-    backgroundColor: colors.white,
-    borderRadius: 28,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 6,
   },
   heading: {
     fontSize: 26,
@@ -215,6 +224,7 @@ const styles = StyleSheet.create({
   subheading: {
     color: colors.textLight,
     marginBottom: 24,
+    marginTop: 4,
   },
   fieldGroup: {
     marginBottom: 18,
@@ -227,18 +237,18 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 16,
+    borderRadius: 20,
     paddingHorizontal: 14,
     borderWidth: 1,
     borderColor: colors.border,
-    backgroundColor: colors.inputBackground,
+    backgroundColor: colors.white,
   },
   inputIcon: {
     marginRight: 8,
   },
   input: {
     flex: 1,
-    paddingVertical: 14,
+    paddingVertical: 12,
     fontSize: 16,
     color: colors.darkText,
   },
@@ -248,37 +258,34 @@ const styles = StyleSheet.create({
   termsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 18,
+    marginBottom: 22,
+    marginTop: 4,
   },
   termsText: {
     flex: 1,
     marginLeft: 10,
     color: colors.bodyText,
+    fontSize: 13,
   },
   termsLink: {
     color: colors.primaryRed,
     fontWeight: '700',
   },
-  secondaryButton: {
+  primaryButton: {
     backgroundColor: colors.secondaryGold,
     borderRadius: 22,
     paddingVertical: 14,
     alignItems: 'center',
   },
-  secondaryButtonText: {
+  primaryButtonText: {
     color: colors.darkText,
     fontWeight: '700',
     fontSize: 16,
   },
-  backendNote: {
-    marginTop: 18,
-    color: colors.textMuted,
-    fontSize: 13,
-  },
   footerRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 20,
+    marginTop: 24,
   },
   subtleText: {
     color: colors.textMuted,

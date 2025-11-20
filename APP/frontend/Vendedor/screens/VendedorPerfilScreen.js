@@ -1,69 +1,62 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Alert,
   Linking,
-  Modal,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import colors from '../../theme/colors';
-import globalStyles from '../../theme/styles';
 import { useAppContext } from '../../context/AppContext';
-import SectionCard from '../../Cliente/components/SectionCard';
-import PrimaryButton from '../../Cliente/components/PrimaryButton';
-import VendedorHeader from '../components/VendedorHeader';
+import ScreenHeader from '../../Cliente/components/ScreenHeader';
+
+/** Bloque de título de sección (Información personal, Seguridad, Soporte) */
+const Section = ({ title, children }) => (
+  <View style={styles.section}>
+    <Text style={styles.sectionLabel}>{title}</Text>
+    <View style={styles.sectionCard}>{children}</View>
+  </View>
+);
+
+/** Ítem de menú reutilizable (ícono rojo + título + subtítulo + chevron) */
+const ProfileMenuItem = ({ iconName, title, subtitle, onPress }) => (
+  <TouchableOpacity style={styles.menuItem} onPress={onPress} activeOpacity={0.8}>
+    <View style={styles.menuIcon}>
+      <Ionicons name={iconName} size={22} color={colors.white} />
+    </View>
+    <View style={styles.menuTextContainer}>
+      <Text style={styles.menuTitle}>{title}</Text>
+      {subtitle ? <Text style={styles.menuSubtitle}>{subtitle}</Text> : null}
+    </View>
+    <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
+  </TouchableOpacity>
+);
 
 const VendedorPerfilScreen = () => {
   const { vendorUser, logout } = useAppContext();
-  const [passwordModalVisible, setPasswordModalVisible] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [editingPhone, setEditingPhone] = useState(false);
-  const [phone, setPhone] = useState(vendorUser?.phone || '');
 
   const initials = vendorUser?.name
     ?.split(' ')
     .filter(Boolean)
-    .map((word) => word[0])
+    .map((w) => w[0])
     .slice(0, 2)
     .join('')
     .toUpperCase();
 
-  const handleSavePhone = () => {
-    // BACKEND: PUT /vendor/profile para guardar telefono
-    Alert.alert('Perfil actualizado', 'Telefono actualizado correctamente.');
-    setEditingPhone(false);
-  };
-
-  const handlePasswordChange = () => {
-    if (!newPassword || newPassword !== confirmPassword) {
-      Alert.alert('Error', 'La nueva contrasena no coincide.');
-      return;
-    }
-    // BACKEND: POST /vendor/change-password
-    Alert.alert('Contrasena actualizada', 'Se envio la solicitud de cambio de contrasena.');
-    setPasswordModalVisible(false);
-    setCurrentPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
-  };
-
   const handleSupportWhatsapp = () => {
     const url = 'https://wa.me/593999999999';
     Linking.openURL(url).catch(() => {
-      Alert.alert('Atencion', 'No se pudo abrir WhatsApp.');
+      Alert.alert('Atención', 'No se pudo abrir WhatsApp.');
     });
   };
 
   const handleSupportEmail = () => {
     const url = 'mailto:soporte@cafrilosa.com';
     Linking.openURL(url).catch(() => {
-      Alert.alert('Atencion', 'No se pudo abrir el correo.');
+      Alert.alert('Atención', 'No se pudo abrir el correo.');
     });
   };
 
@@ -71,118 +64,83 @@ const VendedorPerfilScreen = () => {
     logout();
   };
 
-  const renderPasswordModal = () => (
-    <Modal
-      visible={passwordModalVisible}
-      transparent
-      animationType="fade"
-      onRequestClose={() => setPasswordModalVisible(false)}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalCard}>
-          <Text style={styles.modalTitle}>Cambiar contrasena</Text>
-          <Text style={styles.detailLabel}>Contrasena actual</Text>
-          <TextInput
-            style={styles.input}
-            secureTextEntry
-            value={currentPassword}
-            onChangeText={setCurrentPassword}
-          />
-          <Text style={styles.detailLabel}>Nueva contrasena</Text>
-          <TextInput
-            style={styles.input}
-            secureTextEntry
-            value={newPassword}
-            onChangeText={setNewPassword}
-          />
-          <Text style={styles.detailLabel}>Confirmar contrasena</Text>
-          <TextInput
-            style={styles.input}
-            secureTextEntry
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-          />
-          <PrimaryButton title="Actualizar" onPress={handlePasswordChange} style={{ marginTop: 14 }} />
-          <TouchableOpacity onPress={() => setPasswordModalVisible(false)} style={styles.modalCancel}>
-            <Text style={styles.modalCancelText}>Cancelar</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
-  );
+  const handlePlaceholder = (msg) => {
+    Alert.alert('Próximamente', msg);
+  };
 
   return (
     <View style={styles.screen}>
-      <VendedorHeader
-        name={vendorUser?.name}
-        title="Bienvenido"
-        subtitle="Perfil"
-        notificationsCount={0}
-        onPressNotifications={() => {}}
-        style={styles.header}
-      />
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.headerCard}>
+      <ScreenHeader title="Perfil" sectionLabel="Gestiona tu cuenta" />
+
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Cabecera con avatar, nombre y datos básicos */}
+        <View style={styles.profileHeader}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>{initials || 'VD'}</Text>
           </View>
-          <Text style={styles.name}>{vendorUser?.name}</Text>
+          <Text style={styles.name}>{vendorUser?.name || 'Vendedor asignado'}</Text>
           <Text style={styles.email}>{vendorUser?.email}</Text>
-          <Text style={styles.zone}>Zona asignada: {vendorUser?.zone || 'Sin zona'}</Text>
+          <Text style={styles.zone}>
+            Zona: {vendorUser?.zone || 'Sin zona asignada'}
+          </Text>
         </View>
 
-        <SectionCard title="Datos personales">
-          <View style={styles.infoRow}>
-            <View>
-              <Text style={styles.infoLabel}>Telefono</Text>
-              {editingPhone ? (
-                <TextInput style={styles.inlineInput} value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
-              ) : (
-                <Text style={styles.infoValue}>{phone}</Text>
-              )}
-            </View>
-            <TouchableOpacity
-              style={styles.linkButton}
-              onPress={editingPhone ? handleSavePhone : () => setEditingPhone(true)}
-            >
-              <Text style={styles.linkButtonText}>{editingPhone ? 'Guardar' : 'Editar'}</Text>
-            </TouchableOpacity>
-          </View>
-          <Text style={styles.infoLabel}>Correo</Text>
-          <Text style={styles.infoValue}>{vendorUser?.email}</Text>
-          <Text style={styles.infoLabel}>Bodega base</Text>
-          <Text style={styles.infoValue}>{vendorUser?.address}</Text>
-        </SectionCard>
+        {/* INFORMACIÓN PERSONAL */}
+        <Section title="Información personal">
+          <ProfileMenuItem
+            iconName="person-circle-outline"
+            title="Datos personales"
+            subtitle="Nombre, correo y teléfono"
+            onPress={() =>
+              handlePlaceholder('Aquí irá la pantalla de Datos Personales del vendedor.')
+            }
+          />
+          <ProfileMenuItem
+            iconName="navigate-outline"
+            title="Zona y bodega base"
+            subtitle={vendorUser?.address || 'Configura tu zona de trabajo'}
+            onPress={() =>
+              handlePlaceholder('Aquí podrás ajustar zona y bodega base del vendedor.')
+            }
+          />
+        </Section>
 
-        <SectionCard title="Seguridad">
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => setPasswordModalVisible(true)}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.menuTitle}>Cambiar contrasena</Text>
-            <Text style={styles.menuSubtitle}>Actualiza tu contrasena periodicamente.</Text>
-          </TouchableOpacity>
-        </SectionCard>
+        {/* SEGURIDAD */}
+        <Section title="Seguridad">
+          <ProfileMenuItem
+            iconName="lock-closed-outline"
+            title="Contraseña"
+            subtitle="Cambia tu contraseña de acceso"
+            onPress={() =>
+              handlePlaceholder('Aquí se gestionará el cambio de contraseña del vendedor.')
+            }
+          />
+        </Section>
 
-        <SectionCard title="Soporte">
-          <Text style={styles.infoLabel}>Canales disponibles</Text>
-          <View style={styles.supportRow}>
-            <TouchableOpacity style={styles.secondaryButton} onPress={handleSupportWhatsapp}>
-              <Text style={styles.secondaryButtonText}>Contactar supervisor</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.secondaryButton} onPress={handleSupportEmail}>
-              <Text style={styles.secondaryButtonText}>Correo soporte</Text>
-            </TouchableOpacity>
-          </View>
-          <Text style={[styles.menuSubtitle, { marginTop: 12 }]}>
-            Tambien puedes revisar las FAQs en la intranet. // BACKEND: cargar contenido dinamico.
-          </Text>
-        </SectionCard>
+        {/* SOPORTE */}
+        <Section title="Soporte">
+          <ProfileMenuItem
+            iconName="chatbubble-ellipses-outline"
+            title="Contactar supervisor"
+            subtitle="Abre una conversación en WhatsApp"
+            onPress={handleSupportWhatsapp}
+          />
+          <ProfileMenuItem
+            iconName="help-circle-outline"
+            title="Soporte TI"
+            subtitle="Escríbenos por correo para ayuda técnica"
+            onPress={handleSupportEmail}
+          />
+        </Section>
 
-        <PrimaryButton title="Cerrar sesion" onPress={handleLogout} style={styles.logoutButton} />
+        {/* BOTÓN CERRAR SESIÓN */}
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutText}>Cerrar sesión</Text>
+        </TouchableOpacity>
       </ScrollView>
-      {renderPasswordModal()}
     </View>
   );
 };
@@ -192,28 +150,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  header: {
-    marginBottom: 12,
-  },
   content: {
-    padding: 16,
-    paddingBottom: 120,
+    paddingHorizontal: 16,
+    paddingBottom: 32,
+    paddingTop: 16,
   },
-  headerCard: {
-    ...globalStyles.card,
+  profileHeader: {
     alignItems: 'center',
+    marginBottom: 24,
   },
   avatar: {
-    width: 82,
-    height: 82,
-    borderRadius: 30,
+    width: 90,
+    height: 90,
+    borderRadius: 45,
     backgroundColor: '#FFE1D8',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
   },
   avatarText: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: '800',
     color: colors.primary,
   },
@@ -231,24 +187,45 @@ const styles = StyleSheet.create({
     color: colors.textDark,
     fontWeight: '600',
   },
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  section: {
     marginBottom: 16,
   },
-  infoLabel: {
-    fontSize: 12,
-    color: colors.textLight,
-    marginTop: 10,
-  },
-  infoValue: {
-    fontSize: 15,
+  sectionLabel: {
+    fontSize: 13,
     fontWeight: '600',
-    color: colors.textDark,
+    color: colors.textMuted,
+    marginBottom: 8,
+    textTransform: 'uppercase',
+  },
+  sectionCard: {
+    backgroundColor: colors.white,
+    borderRadius: 24,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
   },
   menuItem: {
-    paddingVertical: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderSoft,
+  },
+  menuIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 16,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  menuTextContainer: {
+    flex: 1,
   },
   menuTitle: {
     fontSize: 15,
@@ -258,70 +235,19 @@ const styles = StyleSheet.create({
   menuSubtitle: {
     fontSize: 13,
     color: colors.textLight,
-  },
-  supportRow: {
-    marginTop: 12,
-  },
-  secondaryButton: {
-    ...globalStyles.secondaryButton,
-    marginBottom: 10,
-  },
-  secondaryButtonText: {
-    ...globalStyles.secondaryButtonText,
+    marginTop: 2,
   },
   logoutButton: {
-    marginTop: 18,
-  },
-  linkButton: {
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 14,
-    backgroundColor: '#FFE1D8',
-  },
-  linkButtonText: {
-    color: colors.primary,
-    fontWeight: '700',
-  },
-  inlineInput: {
-    ...globalStyles.input,
-    width: 180,
-    marginTop: 6,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.45)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
-  },
-  modalCard: {
-    width: '100%',
-    backgroundColor: colors.white,
+    marginTop: 24,
+    backgroundColor: colors.primary,
     borderRadius: 24,
-    padding: 20,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.textDark,
-    marginBottom: 10,
-  },
-  detailLabel: {
-    fontSize: 12,
-    color: colors.textLight,
-    marginTop: 10,
-  },
-  input: {
-    ...globalStyles.input,
-    marginTop: 6,
-  },
-  modalCancel: {
-    marginTop: 12,
+    paddingVertical: 14,
     alignItems: 'center',
   },
-  modalCancelText: {
-    color: colors.textLight,
-    fontWeight: '600',
+  logoutText: {
+    color: colors.white,
+    fontWeight: '700',
+    fontSize: 16,
   },
 });
 

@@ -1,54 +1,73 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Modal,
-  TextInput,
   Linking,
   Alert,
 } from 'react-native';
-import SupervisorHeader from '../components/SupervisorHeader';
-import SectionCard from '../../Cliente/components/SectionCard';
-import PrimaryButton from '../../Cliente/components/PrimaryButton';
-import globalStyles from '../../theme/styles';
+import { Ionicons } from '@expo/vector-icons';
+import ScreenHeader from '../../Cliente/components/ScreenHeader';
 import colors from '../../theme/colors';
 import { useAppContext } from '../../context/AppContext';
+
+/** Sección con título + tarjeta contenedora */
+const Section = ({ title, children }) => (
+  <View style={styles.section}>
+    <Text style={styles.sectionLabel}>{title}</Text>
+    <View style={styles.sectionCard}>{children}</View>
+  </View>
+);
+
+/** Fila reutilizable de menú (icono rojo + título + subtítulo + chevron) */
+const ProfileMenuItem = ({ iconName, title, subtitle, onPress }) => (
+  <TouchableOpacity style={styles.menuItem} onPress={onPress} activeOpacity={0.8}>
+    <View style={styles.menuIcon}>
+      <Ionicons name={iconName} size={22} color={colors.white} />
+    </View>
+    <View style={styles.menuTextContainer}>
+      <Text style={styles.menuTitle}>{title}</Text>
+      {subtitle ? <Text style={styles.menuSubtitle}>{subtitle}</Text> : null}
+    </View>
+    <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
+  </TouchableOpacity>
+);
 
 const SupervisorPerfilScreen = () => {
   const {
     supervisorUser,
-    updateUserProfile,
     logout,
-    vendorAssignedOrders,
-    credits,
+    vendorAssignedOrders = [],
+    credits = [],
   } = useAppContext();
-  const [phoneModalVisible, setPhoneModalVisible] = useState(false);
-  const [passwordModalVisible, setPasswordModalVisible] = useState(false);
-  const [phoneValue, setPhoneValue] = useState(supervisorUser?.phone || '');
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
 
   const vendedoresActivos = vendorAssignedOrders.length;
   const clientesConCredito = credits.length;
 
-  const handlePhoneSave = () => {
-    updateUserProfile({ phone: phoneValue });
-    setPhoneModalVisible(false);
-    // BACKEND: actualizar datos del supervisor.
+  const initials = supervisorUser?.name
+    ?.split(' ')
+    .filter(Boolean)
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+
+  const handleSupportEmail = () => {
+    Linking.openURL('mailto:soporte@cafrilosa.com').catch(() => {
+      Alert.alert('Atención', 'No se pudo abrir el correo.');
+    });
   };
 
-  const handleChangePassword = () => {
-    if (newPassword !== confirmPassword) {
-      Alert.alert('Error', 'Las contraseñas no coinciden.');
-      return;
-    }
-    setPasswordModalVisible(false);
-    // BACKEND: endpoint de cambio de contraseña.
-    Alert.alert('Contraseña actualizada', 'Se aplicará el cambio en el backend.');
+  const handleSupportWhatsapp = () => {
+    Linking.openURL('https://wa.me/593999999999').catch(() => {
+      Alert.alert('Atención', 'No se pudo abrir WhatsApp.');
+    });
+  };
+
+  const handlePlaceholder = (msg) => {
+    Alert.alert('Próximamente', msg);
   };
 
   const handleLogout = () => {
@@ -58,7 +77,6 @@ const SupervisorPerfilScreen = () => {
         text: 'Cerrar sesión',
         style: 'destructive',
         onPress: () => {
-          // BACKEND: invalidar token si aplica.
           logout();
         },
       },
@@ -66,181 +84,183 @@ const SupervisorPerfilScreen = () => {
   };
 
   return (
-    <View style={globalStyles.screen}>
-      <SupervisorHeader
-        name={supervisorUser?.name}
-        title="Bienvenido"
-        subtitle="Perfil"
-        notificationsCount={0}
-        onPressNotifications={() => {
-          // BACKEND: centro de notificaciones de seguridad.
-        }}
-      />
+    <View style={styles.screen}>
+      <ScreenHeader title="Perfil" sectionLabel="Gestiona tu cuenta" />
 
-      <ScrollView contentContainerStyle={[globalStyles.contentContainer, { paddingTop: 8 }]} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header con avatar y datos básicos */}
         <View style={styles.profileHeader}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{supervisorUser?.name?.charAt(0)}</Text>
+            <Text style={styles.avatarText}>{initials || 'S'}</Text>
           </View>
-          <View>
-            <Text style={styles.profileName}>{supervisorUser?.name}</Text>
-            <Text style={styles.profileEmail}>{supervisorUser?.email}</Text>
-            <Text style={styles.profileRole}>{supervisorUser?.role}</Text>
-          </View>
+          <Text style={styles.name}>{supervisorUser?.name || 'Supervisor'}</Text>
+          <Text style={styles.email}>{supervisorUser?.email}</Text>
+          <Text style={styles.role}>{supervisorUser?.role || 'Supervisor'}</Text>
         </View>
 
-        <SectionCard title="Datos personales">
-          <Text style={styles.cardText}>Teléfono: {supervisorUser?.phone}</Text>
-          <PrimaryButton title="Editar teléfono" onPress={() => setPhoneModalVisible(true)} style={{ marginTop: 8 }} />
-        </SectionCard>
+        {/* INFORMACIÓN PERSONAL */}
+        <Section title="Información personal">
+          <ProfileMenuItem
+            iconName="person-circle-outline"
+            title="Datos personales"
+            subtitle={`Teléfono: ${supervisorUser?.phone || 'Sin registrar'}`}
+            onPress={() =>
+              handlePlaceholder('Aquí irá la pantalla de datos personales del supervisor.')
+            }
+          />
+          <ProfileMenuItem
+            iconName="people-outline"
+            title="Equipo y resumen"
+            subtitle={`Vendedores activos: ${vendedoresActivos} · Clientes con crédito: ${clientesConCredito}`}
+            onPress={() =>
+              handlePlaceholder('Aquí verás el resumen detallado de tu equipo y clientes.')
+            }
+          />
+        </Section>
 
-        <SectionCard title="Equipo / resumen">
-          <Text style={styles.cardText}>Vendedores activos: {vendedoresActivos}</Text>
-          <Text style={styles.cardText}>Clientes con crédito: {clientesConCredito}</Text>
-          <Text style={styles.cardText}>Pedidos bajo seguimiento: {vendorAssignedOrders.length}</Text>
-        </SectionCard>
+        {/* SEGURIDAD */}
+        <Section title="Seguridad">
+          <ProfileMenuItem
+            iconName="lock-closed-outline"
+            title="Contraseña"
+            subtitle="Cambia tu contraseña de acceso"
+            onPress={() =>
+              handlePlaceholder('Aquí se configurará el cambio de contraseña.')
+            }
+          />
+        </Section>
 
-        <SectionCard title="Seguridad">
-          <PrimaryButton title="Cambiar contraseña" onPress={() => setPasswordModalVisible(true)} />
-        </SectionCard>
-
-        <SectionCard title="Soporte">
-          <Text style={styles.cardText}>¿Cómo aprobar un pago?</Text>
-          <Text style={styles.cardText}>¿Cómo ajustar stock?</Text>
-          <PrimaryButton
+        {/* SOPORTE */}
+        <Section title="Soporte">
+          <ProfileMenuItem
+            iconName="mail-outline"
             title="Contactar TI"
-            onPress={() => Linking.openURL('mailto:soporte@cafrilosa.com')}
-            style={{ marginTop: 8 }}
+            subtitle="Envíanos un correo para soporte técnico"
+            onPress={handleSupportEmail}
           />
-          <PrimaryButton
+          <ProfileMenuItem
+            iconName="logo-whatsapp"
             title="WhatsApp soporte"
-            onPress={() => Linking.openURL('https://wa.me/593999999999')}
-            style={{ marginTop: 8 }}
+            subtitle="Chatea con soporte o tu contacto TI"
+            onPress={handleSupportWhatsapp}
           />
-        </SectionCard>
+        </Section>
 
-        <PrimaryButton title="Cerrar sesión" onPress={handleLogout} style={styles.logoutButton} />
+        {/* CERRAR SESIÓN */}
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutText}>Cerrar sesión</Text>
+        </TouchableOpacity>
       </ScrollView>
-
-      <Modal visible={phoneModalVisible} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Editar teléfono</Text>
-            <TextInput
-              style={styles.input}
-              value={phoneValue}
-              onChangeText={setPhoneValue}
-              keyboardType="phone-pad"
-            />
-            <PrimaryButton title="Guardar" onPress={handlePhoneSave} />
-            <PrimaryButton title="Cancelar" onPress={() => setPhoneModalVisible(false)} style={{ marginTop: 8 }} />
-          </View>
-        </View>
-      </Modal>
-
-      <Modal visible={passwordModalVisible} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Cambiar contraseña</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Contraseña actual"
-              secureTextEntry
-              value={currentPassword}
-              onChangeText={setCurrentPassword}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Nueva contraseña"
-              secureTextEntry
-              value={newPassword}
-              onChangeText={setNewPassword}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Confirmar contraseña"
-              secureTextEntry
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-            />
-            <PrimaryButton title="Guardar" onPress={handleChangePassword} />
-            <PrimaryButton
-              title="Cancelar"
-              onPress={() => setPasswordModalVisible(false)}
-              style={{ marginTop: 8 }}
-            />
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  content: {
+    paddingHorizontal: 16,
+    paddingBottom: 32,
+    paddingTop: 16,
+  },
   profileHeader: {
-    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 24,
   },
   avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: '#FFE1D8',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  avatarText: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: colors.primary,
+  },
+  name: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.textDark,
+  },
+  email: {
+    color: colors.textLight,
+    marginTop: 4,
+  },
+  role: {
+    marginTop: 6,
+    color: colors.primary,
+    fontWeight: '600',
+  },
+  section: {
+    marginBottom: 16,
+  },
+  sectionLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.textMuted,
+    marginBottom: 8,
+    textTransform: 'uppercase',
+  },
+  sectionCard: {
+    backgroundColor: colors.white,
+    borderRadius: 24,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderSoft,
+  },
+  menuIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 16,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
   },
-  avatarText: {
-    color: colors.white,
-    fontSize: 24,
-    fontWeight: '700',
+  menuTextContainer: {
+    flex: 1,
   },
-  profileName: {
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  profileEmail: {
-    fontSize: 14,
-    color: colors.textMuted,
-  },
-  profileRole: {
-    fontSize: 14,
-    color: colors.primary,
+  menuTitle: {
+    fontSize: 15,
     fontWeight: '600',
+    color: colors.textDark,
   },
-  cardText: {
-    color: colors.textMuted,
-    marginBottom: 4,
+  menuSubtitle: {
+    fontSize: 13,
+    color: colors.textLight,
+    marginTop: 2,
   },
   logoutButton: {
-    marginTop: 12,
+    marginTop: 24,
+    backgroundColor: colors.primary,
+    borderRadius: 24,
+    paddingVertical: 14,
+    alignItems: 'center',
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.45)',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  modalContent: {
-    backgroundColor: colors.white,
-    borderRadius: 16,
-    padding: 18,
-    elevation: 6,
-  },
-  modalTitle: {
-    fontSize: 18,
+  logoutText: {
+    color: colors.white,
     fontWeight: '700',
-    marginBottom: 12,
-  },
-  input: {
-    backgroundColor: colors.inputBackground,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: colors.borderSoft,
-    marginBottom: 10,
+    fontSize: 16,
   },
 });
 

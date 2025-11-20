@@ -1,21 +1,35 @@
+// frontend/Cliente/screens/InicioScreen.js
 import React, { useMemo, useState } from 'react';
-import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import {
+  View,
+  Text,
+  TextInput,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import { useAppContext } from '../../context/AppContext';
 import colors from '../../theme/colors';
 import sharedStyles from '../../theme/styles';
-import GradientHeader from '../components/GradientHeader';
 import NotificationsModal from '../components/NotificationsModal';
 import ProductCard from '../components/ProductCard';
+import ScreenHeader from '../components/ScreenHeader';
+import GlobalToast from '../../components/GlobalToast'; // 👈 usamos el nuevo toast
 
 const InicioScreen = () => {
   const navigation = useNavigation();
   const { products, orders = [], credits = [] } = useAppContext();
+
   const [category, setCategory] = useState('Todos');
   const [search, setSearch] = useState('');
   const [notificationsVisible, setNotificationsVisible] = useState(false);
+
+  // estado del toast
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
   const notifications = useMemo(() => {
     const safeOrders = Array.isArray(orders) ? orders : [];
@@ -37,9 +51,7 @@ const InicioScreen = () => {
       const cuotas = Array.isArray(credit?.cuotas) ? credit.cuotas : [];
       return cuotas
         .map((cuota, index) => {
-          if (!cuota || cuota.estado === 'PAGADA') {
-            return null;
-          }
+          if (!cuota || cuota.estado === 'PAGADA') return null;
           const isOverdue = cuota.estado === 'VENCIDA';
           const creditId = credit?.id || 'CR';
           const cuotaId = cuota?.id || index + 1;
@@ -56,7 +68,10 @@ const InicioScreen = () => {
     return [...orderNotifications, ...creditNotifications];
   }, [orders, credits]);
 
-  const cuotaNotifications = useMemo(() => notifications.filter((n) => n.type === 'CUOTA'), [notifications]);
+  const cuotaNotifications = useMemo(
+    () => notifications.filter((n) => n.type === 'CUOTA'),
+    [notifications]
+  );
   const hasCuotaNotifications = cuotaNotifications.length > 0;
 
   const categories = useMemo(() => {
@@ -81,17 +96,33 @@ const InicioScreen = () => {
     (parentNav || navigation).navigate('Creditos');
   };
 
+  // cuando un producto se agrega al carrito
+  const handleProductAdded = (product) => {
+    setToastMessage(`${product.name} se añadió al carrito`);
+    setToastVisible(true);
+
+    // ocultar automáticamente después de 2 segundos
+    setTimeout(() => {
+      setToastVisible(false);
+    }, 2000);
+  };
+
   const renderHeader = () => (
     <View>
+      {/* HEADER ROJO DE BORDE A BORDE */}
       <View style={styles.headerCardWrapper}>
-        <GradientHeader
-          name="Cliente"
-          storeName="Supermercado El Ahorro"
-          style={styles.headerCard}
+        <ScreenHeader
+          greeting="Hola Cliente"
+          title="Bienvenido"
+          sectionLabel="Supermercado El Ahorro"
+          icon="notifications-outline"
           notificationsCount={notifications.length}
-          onNotificationsPress={() => setNotificationsVisible(true)}
+          onIconPress={() => setNotificationsVisible(true)}
+          style={styles.headerCard}
         />
+        {/* TODO BACKEND: reemplazar greeting/store por datos reales */}
       </View>
+
       <View style={styles.headerContent}>
         {hasCuotaNotifications && (
           <View style={styles.reminderBanner}>
@@ -104,8 +135,14 @@ const InicioScreen = () => {
             </TouchableOpacity>
           </View>
         )}
+
         <View style={searchContainerStyle}>
-          <Ionicons name="search-outline" size={20} color={colors.muted} style={{ marginHorizontal: 8 }} />
+          <Ionicons
+            name="search-outline"
+            size={20}
+            color={colors.muted}
+            style={{ marginHorizontal: 8 }}
+          />
           <TextInput
             style={[searchInputStyle, { flex: 1 }]}
             placeholder="Buscar productos..."
@@ -114,7 +151,12 @@ const InicioScreen = () => {
             onChangeText={setSearch}
           />
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.filterScroll}
+        >
           {categories.map((cat) => {
             const active = cat === category;
             return (
@@ -129,7 +171,9 @@ const InicioScreen = () => {
                   color={active ? colors.white : colors.primary}
                   style={styles.filterDot}
                 />
-                <Text style={[styles.filterText, active && styles.filterTextActive]}>{cat}</Text>
+                <Text style={[styles.filterText, active && styles.filterTextActive]}>
+                  {cat}
+                </Text>
               </TouchableOpacity>
             );
           })}
@@ -139,8 +183,9 @@ const InicioScreen = () => {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.screen}>
       <FlatList
+        style={styles.flatList}
         data={filtered}
         keyExtractor={(item) => item.id}
         numColumns={2}
@@ -152,33 +197,44 @@ const InicioScreen = () => {
           <ProductCard
             product={item}
             onPress={() => navigation.navigate('ProductDetail', { product: item })}
+            onAddToCart={handleProductAdded} // 👈 dispara el toast
           />
         )}
       />
+
       <NotificationsModal
         visible={notificationsVisible}
         onClose={() => setNotificationsVisible(false)}
         notifications={notifications}
       />
-    </SafeAreaView>
+
+      {/* Toast global para “producto añadido” */}
+      <GlobalToast visible={toastVisible} message={toastMessage} />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
+  screen: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  flatList: {
     flex: 1,
     backgroundColor: colors.background,
   },
   listContent: {
     paddingBottom: 160,
     paddingHorizontal: 16,
+    paddingTop: 0,
   },
+  // el header ignora el padding horizontal de la lista para ir de borde a borde
   headerCardWrapper: {
     marginHorizontal: -16,
   },
   headerCard: {
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
   },
   headerContent: {
     paddingTop: 16,
@@ -190,9 +246,10 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderWidth: 1,
     borderColor: colors.border,
-    ...sharedStyles.shadow,
+    ...(sharedStyles.shadow || {}), // 👈 sombra segura
     paddingVertical: 4,
     marginBottom: 12,
+    marginHorizontal: 16,
   },
   searchInput: {
     fontSize: 16,
@@ -202,6 +259,7 @@ const styles = StyleSheet.create({
   },
   filterScroll: {
     paddingVertical: 6,
+    paddingHorizontal: 16,
   },
   filterChip: {
     flexDirection: 'row',

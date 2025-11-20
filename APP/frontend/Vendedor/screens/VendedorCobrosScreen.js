@@ -14,8 +14,8 @@ import globalStyles from '../../theme/styles';
 import { useAppContext } from '../../context/AppContext';
 import PrimaryButton from '../../Cliente/components/PrimaryButton';
 import EmptyState from '../../Cliente/components/EmptyState';
-import VendedorHeader from '../components/VendedorHeader';
 import VendedorCobroCard from '../components/VendedorCobroCard';
+import ScreenHeader from '../../Cliente/components/ScreenHeader'; // ⬅️ nuevo header
 
 const CASH_STATES = ['PENDIENTE_COBRO', 'COBRADO_REPORTADO'];
 const INSTALLMENT_STATES = [
@@ -149,11 +149,17 @@ const VendedorCobrosScreen = () => {
             />
             <TouchableOpacity
               style={styles.secondaryButton}
-              onPress={() => Alert.alert('Adjuntar foto', 'Simulación // BACKEND: subir archivo')}
+              onPress={() =>
+                Alert.alert('Adjuntar foto', 'Simulación // BACKEND: subir archivo')
+              }
             >
               <Text style={styles.secondaryButtonText}>Adjuntar foto de factura</Text>
             </TouchableOpacity>
-            <PrimaryButton title="Confirmar cobro" onPress={handleConfirm} style={{ marginTop: 12 }} />
+            <PrimaryButton
+              title="Confirmar cobro"
+              onPress={handleConfirm}
+              style={{ marginTop: 12 }}
+            />
             <TouchableOpacity onPress={closeModal} style={styles.modalCancel}>
               <Text style={styles.modalCancelText}>Cancelar</Text>
             </TouchableOpacity>
@@ -187,18 +193,17 @@ const VendedorCobrosScreen = () => {
 
   return (
     <View style={styles.screen}>
-      <VendedorHeader
-        name={vendorUser?.name}
-        title="Bienvenido"
-        subtitle="Cobros"
-        notificationsCount={0}
-        onPressNotifications={() => {}}
-        style={styles.header}
+      {/* Header reutilizando el mismo estilo de CarritoScreen */}
+      <ScreenHeader
+        title="Cobros y Créditos"
+        subtitle="Gestiona pagos en efectivo y cuotas de tus clientes"
       />
+
       <View style={styles.tabRow}>
         {renderTabButton('PEDIDOS', 'Pedidos')}
         {renderTabButton('CUOTAS', 'Cuotas')}
       </View>
+
       <FlatList
         data={renderList}
         keyExtractor={(item) => item.id}
@@ -216,6 +221,7 @@ const VendedorCobrosScreen = () => {
         ListEmptyComponent={renderEmpty()}
         showsVerticalScrollIndicator={false}
       />
+
       {renderModal()}
     </View>
   );
@@ -226,8 +232,20 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  header: {
-    marginBottom: 12,
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: colors.white,
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: colors.white,
+    marginTop: 2,
   },
   tabRow: {
     flexDirection: 'row',

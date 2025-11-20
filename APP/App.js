@@ -32,6 +32,11 @@ import DetalleCreditoScreen from './frontend/Cliente/screens/DetalleCreditoScree
 import PagoCuotaScreen from './frontend/Cliente/screens/PagoCuotaScreen';
 import PedidoConfirmacionScreen from './frontend/Cliente/screens/PedidoConfirmacionScreen';
 import CreditoConfirmacionScreen from './frontend/Cliente/screens/CreditoConfirmacionScreen';
+import MetodosPagoScreen from './frontend/Cliente/screens/MetodosPagoScreen';
+import DatosPersonalesScreen from './frontend/Cliente/screens/DatosPersonalesScreen';
+import DireccionesScreen from './frontend/Cliente/screens/DireccionesScreen';
+import CambiarContrasenaScreen from './frontend/Cliente/screens/CambiarContrasenaScreen';
+import PreguntasFrecuentesScreen from './frontend/Cliente/screens/PreguntasFrecuentesScreen';
 import SupervisorTabNavigator from './frontend/Supervisor/navigation/SupervisorTabNavigator';
 import SupervisorPlaceholderScreen from './frontend/Supervisor/screens/SupervisorPlaceholderScreen';
 
@@ -146,6 +151,31 @@ const AppNavigator = () => {
         <RootStack.Screen name="PagoCuota" component={PagoCuotaScreen} options={{ title: 'Pago de cuota' }} />
         <RootStack.Screen name="PedidoConfirmacion" component={PedidoConfirmacionScreen} options={{ headerShown: false }} />
         <RootStack.Screen name="CreditoConfirmacion" component={CreditoConfirmacionScreen} options={{ headerShown: false }} />
+        <RootStack.Screen
+          name="MetodosPago"
+          component={MetodosPagoScreen}
+          options={{ title: 'Métodos de pago' }}
+        />
+        <RootStack.Screen
+          name="DatosPersonales"
+          component={DatosPersonalesScreen}
+          options={{ title: 'Datos personales' }}
+        />
+        <RootStack.Screen
+          name="Direcciones"
+          component={DireccionesScreen}
+          options={{ title: 'Direcciones' }}
+        />
+        <RootStack.Screen
+          name="CambiarContrasena"
+          component={CambiarContrasenaScreen}
+          options={{ title: 'Cambiar contraseña' }}
+        />
+        <RootStack.Screen
+          name="PreguntasFrecuentes"
+          component={PreguntasFrecuentesScreen}
+          options={{ title: 'Preguntas frecuentes' }}
+        />
         <RootStack.Screen name="VendedorModulo" component={VendedorTabNavigator} options={{ headerShown: false }} />
         <RootStack.Screen name="SupervisorModulo" component={SupervisorPlaceholderScreen} options={{ title: 'Modulo Supervisor' }} />
       </RootStack.Navigator>

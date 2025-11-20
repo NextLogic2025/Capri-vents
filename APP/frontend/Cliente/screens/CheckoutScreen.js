@@ -1,12 +1,20 @@
-import React, { useMemo, useState } from 'react';
-import { View, Text, TextInput, ScrollView, Modal, Pressable, StyleSheet, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useMemo, useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  ScrollView,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
+} from 'react-native';
 import colors from '../../theme/colors';
 import sharedStyles from '../../theme/styles';
 import SectionCard from '../components/SectionCard';
 import PaymentMethodCard from '../components/PaymentMethodCard';
 import PrimaryButton from '../components/PrimaryButton';
-import ScreenHeader from '../components/ScreenHeader';
 import { useAppContext } from '../../context/AppContext';
 
 const paymentOptions = [
@@ -17,18 +25,59 @@ const paymentOptions = [
 ];
 
 const CheckoutScreen = ({ navigation }) => {
-  const { user, cartTotals, createOrderFromCart } = useAppContext();
+  const {
+    user,
+    cartTotals,
+    createOrderFromCart,
+    addresses,
+    defaultAddress,
+    paymentCards,
+    defaultCard,
+  } = useAppContext();
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState(user.phone || '');
   const [notes, setNotes] = useState('');
   const [method, setMethod] = useState('TARJETA');
-  const [showCardModal, setShowCardModal] = useState(false);
-  const [cardData, setCardData] = useState({ number: '', expiry: '', cvv: '', name: '' });
+  const [selectedAddressId, setSelectedAddressId] = useState(defaultAddress?.id ?? '');
+  const [selectedCardId, setSelectedCardId] = useState(defaultCard?.id ?? null);
+  const [addressModalVisible, setAddressModalVisible] = useState(false);
+  const [cardSelectionVisible, setCardSelectionVisible] = useState(false);
 
   const creditAvailable = cartTotals.total <= (user.saldoCreditoDisponible || 0);
+  const formatAddressString = (addr) =>
+    addr ? `${addr.street} ${addr.number}, ${addr.city}, ${addr.province}` : '';
+  const selectedAddress =
+    addresses.find((addr) => addr.id === selectedAddressId) || defaultAddress || null;
+  const selectedCard =
+    paymentCards.find((card) => card.id === selectedCardId) || defaultCard || null;
+
+  useEffect(() => {
+    if (defaultAddress) {
+      setSelectedAddressId(defaultAddress.id);
+      setAddress(formatAddressString(defaultAddress));
+    }
+  }, [defaultAddress]);
+
+  useEffect(() => {
+    if (selectedAddress) {
+      setAddress(formatAddressString(selectedAddress));
+    }
+  }, [selectedAddress]);
+
+  useEffect(() => {
+    if (defaultCard?.id) {
+      setSelectedCardId(defaultCard.id);
+    }
+  }, [defaultCard?.id]);
 
   const handleCreateOrder = (paymentMethod) => {
-    const order = createOrderFromCart(paymentMethod, { address, phone, notes });
+    const order = createOrderFromCart(paymentMethod, {
+      address: address || formatAddressString(selectedAddress),
+      phone,
+      notes,
+      deliveryAddressId: selectedAddress?.id,
+      paymentCardId: selectedCard?.id,
+    });
     return order;
   };
 
@@ -38,10 +87,39 @@ const CheckoutScreen = ({ navigation }) => {
   };
 
   const handleConfirm = () => {
-    if (method === 'TARJETA') {
-      setShowCardModal(true);
+    if (!selectedAddress) {
+      Alert.alert('Dirección faltante', 'Selecciona una dirección antes de confirmar tu pedido.');
       return;
     }
+    if (!address.trim()) {
+      Alert.alert('Dirección inválida', 'Completa la dirección para la entrega.');
+      return;
+    }
+
+    if (method === 'TARJETA') {
+      if (!selectedCard) {
+        if (paymentCards.length) {
+          setCardSelectionVisible(true);
+        } else {
+          Alert.alert(
+            'Tarjeta faltante',
+            'Agrega una tarjeta en Métodos de pago antes de confirmar.',
+            [
+              { text: 'Cancelar', style: 'cancel' },
+              { text: 'Ir a métodos', onPress: () => navigation.navigate('MetodosPago') },
+            ]
+          );
+        }
+        return;
+      }
+      const order = handleCreateOrder('TARJETA');
+      goToConfirmation(order, {
+        title: 'Pago exitoso',
+        description: 'Tu pago con tarjeta se registró correctamente.',
+      });
+      return;
+    }
+
     if (method === 'TRANSFERENCIA') {
       const order = handleCreateOrder('TRANSFERENCIA');
       goToConfirmation(order, {
@@ -67,20 +145,6 @@ const CheckoutScreen = ({ navigation }) => {
     }
   };
 
-  const handlePayWithCard = () => {
-    if (!cardData.number || !cardData.expiry || !cardData.cvv || !cardData.name) {
-      Alert.alert('Datos incompletos', 'Completa todos los campos de la tarjeta.');
-      return;
-    }
-    setShowCardModal(false);
-    const order = handleCreateOrder('TARJETA');
-    goToConfirmation(order, {
-      title: 'Pago exitoso',
-      description: 'Tu pago con tarjeta se registro correctamente.',
-    });
-    setCardData({ number: '', expiry: '', cvv: '', name: '' });
-  };
-
   const renderPaymentMethod = (option) => {
     const disabled = option.key === 'CREDITO' && !creditAvailable;
     const description =
@@ -104,6 +168,27 @@ const CheckoutScreen = ({ navigation }) => {
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.content}>
         <SectionCard title="Datos de Entrega">
+          <View style={styles.selectionRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.fieldLabel}>Dirección elegida</Text>
+              <Text style={styles.addressValue}>
+                {selectedAddress
+                  ? `${selectedAddress.label} · ${formatAddressString(selectedAddress)}`
+                  : 'Selecciona una dirección para tu entrega.'}
+              </Text>
+            </View>
+            <TouchableOpacity onPress={() => setAddressModalVisible(true)}>
+              <Text style={styles.linkText}>
+                {selectedAddress ? 'Cambiar' : 'Seleccionar'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity
+            style={styles.inlineLink}
+            onPress={() => navigation.navigate('Direcciones')}
+          >
+            <Text style={styles.inlineLinkText}>Agregar o editar direcciones</Text>
+          </TouchableOpacity>
           <TextInput
             style={[sharedStyles.input, styles.inputSpacing]}
             placeholder="Direccion"
@@ -147,48 +232,127 @@ const CheckoutScreen = ({ navigation }) => {
 
         <SectionCard title="Metodo de Pago">
           {paymentOptions.map(renderPaymentMethod)}
+          {method === 'TARJETA' && (
+            <>
+              <View style={styles.selectionRow}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.fieldLabel}>Tarjeta seleccionada</Text>
+                  <Text style={styles.addressValue}>
+                    {selectedCard
+                      ? `${selectedCard.type} •••• ${selectedCard.number.slice(-4)}`
+                      : 'Selecciona una tarjeta'}
+                  </Text>
+                </View>
+                <TouchableOpacity onPress={() => setCardSelectionVisible(true)}>
+                  <Text style={styles.linkText}>
+                    {selectedCard ? 'Cambiar' : 'Seleccionar'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <TouchableOpacity
+                style={styles.inlineLink}
+                onPress={() => navigation.navigate('MetodosPago')}
+              >
+                <Text style={styles.inlineLinkText}>Agregar o administrar tarjetas</Text>
+              </TouchableOpacity>
+            </>
+          )}
         </SectionCard>
 
         <PrimaryButton title="Confirmar pedido" onPress={handleConfirm} />
       </ScrollView>
 
-      <Modal visible={showCardModal} animationType="slide" transparent>
+      <Modal visible={addressModalVisible} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
-          <SafeAreaView style={styles.modalSheet}>
-            <Text style={styles.modalTitle}>Datos de la tarjeta</Text>
-            <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
-              <TextInput
-                style={sharedStyles.input}
-                placeholder="Numero de tarjeta"
-                keyboardType="number-pad"
-                value={cardData.number}
-                onChangeText={(text) => setCardData((prev) => ({ ...prev, number: text }))}
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Seleccionar dirección</Text>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {addresses.map((addr) => (
+                <TouchableOpacity
+                  key={addr.id}
+                  style={[
+                    styles.modalItem,
+                    selectedAddress?.id === addr.id && styles.modalItemSelected,
+                  ]}
+                  onPress={() => {
+                    setSelectedAddressId(addr.id);
+                    setAddress(formatAddressString(addr));
+                    setAddressModalVisible(false);
+                  }}
+                >
+                  <View style={styles.modalItemHeader}>
+                    <Text style={styles.modalItemLabel}>{addr.label}</Text>
+                    {addr.isDefault && <Text style={styles.currentBadge}>Predeterminada</Text>}
+                  </View>
+                  <Text style={styles.modalItemText}>
+                    {addr.street} {addr.number}
+                  </Text>
+                  <Text style={styles.modalItemText}>
+                    {addr.city}, {addr.province} · CP {addr.zip}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+              <PrimaryButton
+                title="Agregar dirección"
+                onPress={() => {
+                  setAddressModalVisible(false);
+                  navigation.navigate('Direcciones');
+                }}
+                style={{ marginTop: 12 }}
               />
-              <TextInput
-                style={sharedStyles.input}
-                placeholder="Fecha vencimiento (MM/AA)"
-                value={cardData.expiry}
-                onChangeText={(text) => setCardData((prev) => ({ ...prev, expiry: text }))}
-              />
-              <TextInput
-                style={sharedStyles.input}
-                placeholder="CVV"
-                keyboardType="number-pad"
-                value={cardData.cvv}
-                onChangeText={(text) => setCardData((prev) => ({ ...prev, cvv: text }))}
-              />
-              <TextInput
-                style={sharedStyles.input}
-                placeholder="Nombre del titular"
-                value={cardData.name}
-                onChangeText={(text) => setCardData((prev) => ({ ...prev, name: text }))}
-              />
-              <PrimaryButton title="Pagar" onPress={handlePayWithCard} />
-              <Pressable onPress={() => setShowCardModal(false)} style={styles.modalClose}>
-                <Text style={{ color: colors.primary }}>Cancelar</Text>
+              <Pressable onPress={() => setAddressModalVisible(false)} style={styles.modalClose}>
+                <Text style={{ color: colors.primary }}>Cerrar</Text>
               </Pressable>
             </ScrollView>
-          </SafeAreaView>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal visible={cardSelectionVisible} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Selecciona una tarjeta</Text>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {paymentCards.length ? (
+                paymentCards.map((card) => (
+                  <TouchableOpacity
+                    key={card.id}
+                    style={[
+                      styles.cardItem,
+                      selectedCard?.id === card.id && styles.modalItemSelected,
+                    ]}
+                    onPress={() => {
+                      setSelectedCardId(card.id);
+                      setCardSelectionVisible(false);
+                    }}
+                  >
+                    <View style={styles.modalItemHeader}>
+                      <Text style={styles.modalItemLabel}>{card.type}</Text>
+                      <Text style={styles.modalItemText}>Válido hasta {card.expiry}</Text>
+                    </View>
+                    <Text style={styles.modalItemText}>
+                      {card.number} · {card.holder}
+                    </Text>
+                  </TouchableOpacity>
+                ))
+              ) : (
+                <Text style={styles.emptyTextModal}>
+                  Aún no tienes tarjetas registradas. Agrega una en Métodos de pago.
+                </Text>
+              )}
+              <PrimaryButton
+                title="Ir a Métodos de pago"
+                onPress={() => {
+                  setCardSelectionVisible(false);
+                  navigation.navigate('MetodosPago');
+                }}
+                style={{ marginTop: 12 }}
+              />
+              <Pressable onPress={() => setCardSelectionVisible(false)} style={styles.modalClose}>
+                <Text style={{ color: colors.primary }}>Cerrar</Text>
+              </Pressable>
+            </ScrollView>
+          </View>
         </View>
       </Modal>
     </View>
@@ -232,14 +396,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.35)',
     justifyContent: 'flex-end',
+    padding: 16,
   },
-  modalSheet: {
-    backgroundColor: colors.background,
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 24,
+  modalContent: {
+    backgroundColor: colors.white,
+    borderRadius: 20,
+    padding: 18,
+    maxHeight: '85%',
   },
   modalTitle: {
     fontSize: 18,
@@ -250,6 +413,74 @@ const styles = StyleSheet.create({
   modalClose: {
     marginTop: 12,
     alignItems: 'center',
+  },
+  selectionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  fieldLabel: {
+    fontSize: 12,
+    color: colors.textMuted,
+    marginBottom: 2,
+  },
+  addressValue: {
+    fontSize: 14,
+    color: colors.textDark,
+  },
+  linkText: {
+    color: colors.primary,
+    fontWeight: '600',
+  },
+  inlineLink: {
+    marginTop: 4,
+    marginBottom: 12,
+  },
+  inlineLinkText: {
+    color: colors.primary,
+    fontSize: 13,
+    textDecorationLine: 'underline',
+  },
+  modalItem: {
+    borderRadius: 16,
+    padding: 14,
+    backgroundColor: colors.surface,
+    marginBottom: 10,
+  },
+  modalItemSelected: {
+    borderWidth: 1,
+    borderColor: colors.primary,
+  },
+  modalItemHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  modalItemLabel: {
+    fontWeight: '700',
+    color: colors.textDark,
+  },
+  modalItemText: {
+    fontSize: 13,
+    color: colors.textMuted,
+  },
+  currentBadge: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.primary,
+  },
+  cardItem: {
+    borderRadius: 16,
+    padding: 14,
+    backgroundColor: colors.surface,
+    marginBottom: 10,
+  },
+  emptyTextModal: {
+    color: colors.textMuted,
+    fontSize: 13,
+    textAlign: 'center',
+    marginVertical: 12,
   },
 });
 

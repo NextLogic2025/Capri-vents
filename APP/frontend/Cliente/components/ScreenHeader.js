@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AppHeaderContainer from '../../components/AppHeaderContainer';
 import colors from '../../theme/colors';
 
 const ScreenHeader = ({
@@ -9,63 +10,50 @@ const ScreenHeader = ({
   subtitle,
   icon,
   onIconPress,
-  rounded = true,
   style,
   greeting,
   sectionLabel,
   notificationsCount = 0,
 }) => {
   const { top } = useSafeAreaInsets();
+  const infoLabel = sectionLabel || subtitle;
+  const badgeCount = Number(notificationsCount);
 
   return (
-    <View
-      style={[
-        styles.container,
-        rounded ? styles.rounded : styles.flat,
-        { paddingTop: top + 14 },
-        style,
-      ]}
-    >
-      <View>
-        {greeting ? <Text style={styles.greeting}>{greeting}</Text> : null}
-        <Text style={styles.title}>{title}</Text>
-        {sectionLabel ? (
-          <Text style={styles.sectionLabel}>{sectionLabel}</Text>
-        ) : subtitle ? (
-          <Text style={styles.subtitle}>{subtitle}</Text>
+    <AppHeaderContainer style={[styles.container, { paddingTop: top + 14 }, style]}>
+      <View style={styles.contentRow}>
+        <View>
+          {greeting ? <Text style={styles.greeting}>{greeting}</Text> : null}
+          <Text style={styles.title}>{title}</Text>
+          {infoLabel ? (
+            <Text style={styles.sectionLabel}>{infoLabel}</Text>
+          ) : null}
+        </View>
+        {icon ? (
+          <TouchableOpacity onPress={onIconPress} style={styles.iconButton} activeOpacity={0.8}>
+            <Ionicons name={icon} size={22} color={colors.primaryDark} />
+            {badgeCount > 0 && (
+              <View style={styles.notificationBadge}>
+                <Text style={styles.notificationBadgeText}>
+                  {badgeCount > 9 ? '9+' : badgeCount}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
         ) : null}
       </View>
-      {icon ? (
-        <TouchableOpacity onPress={onIconPress} style={styles.iconButton} activeOpacity={0.8}>
-          <Ionicons name={icon} size={22} color={colors.primaryDark} />
-          {notificationsCount > 0 && (
-            <View style={styles.notificationBadge}>
-              <Text style={styles.notificationBadgeText}>
-                {notificationsCount > 9 ? '9+' : notificationsCount}
-              </Text>
-            </View>
-          )}
-        </TouchableOpacity>
-      ) : null}
-    </View>
+    </AppHeaderContainer>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.primary,
-    borderRadius: 28,
     paddingVertical: 18,
-    paddingHorizontal: 20,
+  },
+  contentRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-  },
-  rounded: {
-    borderRadius: 28,
-  },
-  flat: {
-    borderRadius: 0,
   },
   greeting: {
     color: colors.white,
@@ -83,11 +71,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 4,
   },
-  subtitle: {
-    color: colors.white,
-    opacity: 0.9,
-    marginTop: 4,
-  },
   iconButton: {
     width: 52,
     height: 52,
@@ -95,6 +78,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,

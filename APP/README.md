@@ -1,8 +1,6 @@
 
-```
 APP
 ├─ .expo
-├─ App.js
 ├─ app.json
 ├─ babel.config.js
 ├─ frontend
@@ -17,7 +15,15 @@ APP
 │  │     └─ SplashScreen.js
 │  ├─ Cliente
 │  │  ├─ components
-│  │  │  └─ ProductCard.js
+│  │  │  ├─ CartItemCard.js
+│  │  │  ├─ EmptyState.js
+│  │  │  ├─ GradientHeader.js
+│  │  │  ├─ NotificationsModal.js
+│  │  │  ├─ PaymentMethodCard.js
+│  │  │  ├─ PrimaryButton.js
+│  │  │  ├─ ProductCard.js
+│  │  │  ├─ ScreenHeader.js
+│  │  │  └─ SectionCard.js
 │  │  └─ screens
 │  │     ├─ CarritoScreen.js
 │  │     ├─ CheckoutScreen.js
@@ -30,8 +36,11 @@ APP
 │  │     ├─ PedidoConfirmacionScreen.js
 │  │     ├─ PedidosScreen.js
 │  │     ├─ PerfilScreen.js
-│  │     └─ SeleccionPlanCreditoScreen.js
-│  ├─ Cliente.zip
+│  │     ├─ ProductDetailScreen.js
+│  │     ├─ SeleccionPlanCreditoScreen.js
+│  │     └─ SupportScreen.js
+│  ├─ components
+│  │  └─ AppHeaderContainer.js
 │  ├─ context
 │  │  └─ AppContext.js
 │  ├─ data
@@ -39,15 +48,41 @@ APP
 │  │  ├─ mockOrders.js
 │  │  └─ products.js
 │  ├─ Supervisor
+│  │  ├─ components
+│  │  │  ├─ SupervisorCreditCard.js
+│  │  │  ├─ SupervisorKpiCard.js
+│  │  │  ├─ SupervisorOrderCard.js
+│  │  │  ├─ SupervisorPaymentCard.js
+│  │  │  └─ SupervisorProductCard.js
+│  │  ├─ navigation
+│  │  │  └─ SupervisorTabNavigator.js
 │  │  └─ screens
-│  │     └─ SupervisorPlaceholderScreen.js
+│  │     ├─ SupervisorCobrosScreen.js
+│  │     ├─ SupervisorInicioScreen.js
+│  │     ├─ SupervisorPedidosScreen.js
+│  │     ├─ SupervisorPerfilScreen.js
+│  │     ├─ SupervisorPlaceholderScreen.js
+│  │     └─ SupervisorProductosScreen.js
 │  ├─ theme
 │  │  ├─ colors.js
 │  │  └─ styles.js
 │  └─ Vendedor
+│     ├─ components
+│     │  ├─ VendedorCobroCard.js
+│     │  └─ VendedorOrderCard.js
+│     ├─ navigation
+│     │  └─ VendedorTabNavigator.js
 │     └─ screens
-│        └─ VendedorPlaceholderScreen.js
+│        ├─ VendedorCobrosScreen.js
+│        ├─ VendedorPedidosScreen.js
+│        ├─ VendedorPerfilScreen.js
+│        ├─ VendedorPlaceholderScreen.js
+│        └─ VendedorProductosScreen.js
+├─ generate_submission.py
 ├─ package-lock.json
-└─ package.json
+├─ package.json
+├─ patch_prod.py
+├─ README.md
+└─ submission.txt
 
 ```

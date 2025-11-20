@@ -10,7 +10,7 @@ import {
   TextInput,
   ScrollView,
 } from 'react-native';
-import SupervisorHeader from '../components/SupervisorHeader';
+import ScreenHeader from '../../Cliente/components/ScreenHeader';
 import SupervisorPaymentCard from '../components/SupervisorPaymentCard';
 import SupervisorCreditCard from '../components/SupervisorCreditCard';
 import PrimaryButton from '../../Cliente/components/PrimaryButton';
@@ -27,6 +27,7 @@ const SupervisorCobrosScreen = () => {
     supervisorCredits,
     credits,
   } = useAppContext();
+
   const [activeSegment, setActiveSegment] = useState('pagos');
   const [paymentFilter, setPaymentFilter] = useState('Todos');
   const [selectedPayment, setSelectedPayment] = useState(null);
@@ -44,7 +45,10 @@ const SupervisorCobrosScreen = () => {
 
   const creditStats = useMemo(() => {
     const totalVigentes = supervisorCredits.length;
-    const deudaVencida = supervisorCredits.reduce((sum, credit) => sum + (credit.deudaTotal || 0), 0);
+    const deudaVencida = supervisorCredits.reduce(
+      (sum, credit) => sum + (credit.deudaTotal || 0),
+      0
+    );
     const enMoraCount = supervisorCredits.filter((credit) => credit.enMora).length;
     return { totalVigentes, deudaVencida, enMoraCount };
   }, [supervisorCredits]);
@@ -55,22 +59,24 @@ const SupervisorCobrosScreen = () => {
   };
 
   return (
-    <View style={globalStyles.screen}>
-      <SupervisorHeader
-        name={supervisorUser?.name}
-        title="Bienvenido"
-        subtitle="Cobros"
-        notificationsCount={0}
-        onPressNotifications={() => {
-          // BACKEND: notificaciones sobre validación de cobros pendientes.
-        }}
-      />
+    <View style={styles.screen}>
+      {/* Header rojo genérico solo con el título */}
+      <View style={styles.headerWrapper}>
+        <ScreenHeader
+          title="Cobros"
+          style={styles.headerCard}
+        />
+      </View>
 
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={[globalStyles.contentContainer, { paddingTop: 8 }]}
+        contentContainerStyle={[
+          globalStyles.contentContainer,
+          styles.contentContainer,
+        ]}
         showsVerticalScrollIndicator={false}
       >
+        {/* Segmento Pagos / Créditos */}
         <View style={styles.segmentRow}>
           {['pagos', 'creditos'].map((segment) => (
             <TouchableOpacity
@@ -95,6 +101,7 @@ const SupervisorCobrosScreen = () => {
 
         {activeSegment === 'pagos' ? (
           <>
+            {/* Filtro por tipo de pago */}
             <View style={styles.chipRow}>
               {PAYMENT_TYPES.map((type) => (
                 <TouchableOpacity
@@ -121,14 +128,20 @@ const SupervisorCobrosScreen = () => {
               data={filteredPayments}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
-                <SupervisorPaymentCard payment={item} onPress={() => setSelectedPayment(item)} />
+                <SupervisorPaymentCard
+                  payment={item}
+                  onPress={() => setSelectedPayment(item)}
+                />
               )}
-              ListEmptyComponent={<Text style={styles.emptyText}>No hay pagos pendientes.</Text>}
+              ListEmptyComponent={
+                <Text style={styles.emptyText}>No hay pagos pendientes.</Text>
+              }
               scrollEnabled={false}
             />
           </>
         ) : (
           <>
+            {/* Resumen de créditos */}
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Créditos vigentes</Text>
               <Text style={styles.summaryValue}>{creditStats.totalVigentes}</Text>
@@ -148,15 +161,21 @@ const SupervisorCobrosScreen = () => {
               data={supervisorCredits}
               keyExtractor={(item) => item.creditId || item.clienteNombre}
               renderItem={({ item }) => (
-                <SupervisorCreditCard creditSummary={item} onPress={() => openCreditDetail(item)} />
+                <SupervisorCreditCard
+                  creditSummary={item}
+                  onPress={() => openCreditDetail(item)}
+                />
               )}
-              ListEmptyComponent={<Text style={styles.emptyText}>No hay créditos registrados.</Text>}
+              ListEmptyComponent={
+                <Text style={styles.emptyText}>No hay créditos registrados.</Text>
+              }
               scrollEnabled={false}
             />
           </>
         )}
       </ScrollView>
 
+      {/* MODAL: Detalle de pago */}
       <Modal visible={!!selectedPayment} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -180,14 +199,14 @@ const SupervisorCobrosScreen = () => {
               title="Ver comprobante"
               onPress={() => {
                 // BACKEND: abrir imagen/PDF del comprobante.
-                Alert.alert('Certificado', 'Vista previa comprobante (mock).');
+                Alert.alert('Comprobante', 'Vista previa comprobante (mock).');
               }}
               style={{ marginTop: 8 }}
             />
             <PrimaryButton
               title="Aprobar pago"
               onPress={() => {
-                // BACKEND: actualizar estado del pago y acercar el pedido/credito.
+                // BACKEND: actualizar estado del pago y del pedido/crédito.
                 Alert.alert('Pago aprobado', 'Se actualizará el estado del pedido/cuota.');
                 setSelectedPayment(null);
                 setRejectionReason('');
@@ -199,7 +218,9 @@ const SupervisorCobrosScreen = () => {
               onPress={() => {
                 Alert.alert(
                   'Pago rechazado',
-                  `El cliente/vendedor será notificado. Motivo: ${rejectionReason || 'Sin motivo'}.`
+                  `El cliente/vendedor será notificado. Motivo: ${
+                    rejectionReason || 'Sin motivo'
+                  }.`
                 );
                 setSelectedPayment(null);
                 setRejectionReason('');
@@ -218,23 +239,38 @@ const SupervisorCobrosScreen = () => {
         </View>
       </Modal>
 
+      {/* MODAL: Detalle de crédito */}
       <Modal visible={!!selectedCredit} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { maxHeight: '90%' }]}>
             <Text style={styles.modalTitle}>Detalle de crédito</Text>
-            <Text style={styles.modalSubtitle}>{selectedCredit?.clientName || selectedCredit?.clienteNombre}</Text>
+            <Text style={styles.modalSubtitle}>
+              {selectedCredit?.clientName || selectedCredit?.clienteNombre}
+            </Text>
             <Text>Orden: {selectedCredit?.orderCode || selectedCredit?.id}</Text>
             <Text>
-              Deuda pendiente: $ {(selectedCredit?.saldoPendiente ?? selectedCredit?.total ?? 0).toFixed(2)}
+              Deuda pendiente: ${' '}
+              {(
+                selectedCredit?.saldoPendiente ?? selectedCredit?.total ?? 0
+              ).toFixed(2)}
             </Text>
             <Text>Estado: {selectedCredit?.status}</Text>
+
             <Text style={{ marginTop: 12, fontWeight: '700' }}>Cuotas</Text>
             {(selectedCredit?.installments || []).map((installment) => (
-              <View key={installment.id || installment.number} style={styles.installmentRow}>
+              <View
+                key={installment.id || installment.number}
+                style={styles.installmentRow}
+              >
                 <View>
-                  <Text style={styles.installmentTitle}>Cuota #{installment.number || installment.numero}</Text>
+                  <Text style={styles.installmentTitle}>
+                    Cuota #{installment.number || installment.numero}
+                  </Text>
                   <Text style={styles.installmentSubtitle}>
-                    {installment.status} · ${ (installment.amount ?? installment.monto ?? 0).toFixed(2) }
+                    {installment.status} · $
+                    {(
+                      installment.amount ?? installment.monto ?? 0
+                    ).toFixed(2)}
                   </Text>
                 </View>
                 <TouchableOpacity
@@ -247,6 +283,7 @@ const SupervisorCobrosScreen = () => {
                 </TouchableOpacity>
               </View>
             ))}
+
             <TextInput
               style={styles.input}
               placeholder="Nuevo cupo"
@@ -285,6 +322,22 @@ const SupervisorCobrosScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  headerWrapper: {
+    // sin padding para que el header ocupe todo el ancho
+  },
+  headerCard: {
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
+  },
+  contentContainer: {
+    paddingTop: 12,
+    paddingHorizontal: 16,
+    paddingBottom: 24,
+  },
   segmentRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -298,6 +351,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     marginHorizontal: 6,
     alignItems: 'center',
+    backgroundColor: colors.white,
   },
   segmentButtonActive: {
     backgroundColor: colors.primary,
@@ -324,6 +378,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     marginRight: 10,
     marginBottom: 10,
+    backgroundColor: colors.white,
   },
   chipActive: {
     borderColor: colors.primary,

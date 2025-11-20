@@ -10,7 +10,7 @@ import {
   Alert,
   FlatList,
 } from 'react-native';
-import SupervisorHeader from '../components/SupervisorHeader';
+import ScreenHeader from '../../Cliente/components/ScreenHeader';
 import SupervisorProductCard from '../components/SupervisorProductCard';
 import PrimaryButton from '../../Cliente/components/PrimaryButton';
 import globalStyles from '../../theme/styles';
@@ -65,20 +65,21 @@ const SupervisorProductosScreen = () => {
   };
 
   return (
-    <View style={globalStyles.screen}>
-      <SupervisorHeader
-        name={supervisorUser?.name}
-        title="Bienvenido"
-        subtitle="Productos & Stock"
-        notificationsCount={0}
-        onPressNotifications={() => {
-          // BACKEND: mostrar alertas o comunicados del inventario.
-        }}
-      />
+    <View style={styles.screen}>
+      {/* Header rojo genérico, solo título */}
+      <View style={styles.headerWrapper}>
+        <ScreenHeader
+          title="Productos & stock"
+          style={styles.headerCard}
+        />
+      </View>
 
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={[globalStyles.contentContainer, { paddingTop: 8 }]}
+        contentContainerStyle={[
+          globalStyles.contentContainer,
+          styles.contentContainer,
+        ]}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.filterRow}>
@@ -164,7 +165,9 @@ const SupervisorProductosScreen = () => {
             />
           )}
           scrollEnabled={false}
-          ListEmptyComponent={<Text style={styles.emptyText}>No hay productos disponibles.</Text>}
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>No hay productos disponibles.</Text>
+          }
         />
       </ScrollView>
 
@@ -219,7 +222,11 @@ const SupervisorProductosScreen = () => {
               style={{ marginTop: 8 }}
             />
 
-            <PrimaryButton title="Cerrar" onPress={closeProductModal} style={{ marginTop: 8 }} />
+            <PrimaryButton
+              title="Cerrar"
+              onPress={closeProductModal}
+              style={{ marginTop: 8 }}
+            />
           </View>
         </View>
       </Modal>
@@ -228,6 +235,22 @@ const SupervisorProductosScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  headerWrapper: {
+    // sin padding para que el header ocupe todo el ancho
+  },
+  headerCard: {
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
+  },
+  contentContainer: {
+    paddingTop: 12,
+    paddingHorizontal: 16,
+    paddingBottom: 24,
+  },
   filterRow: {
     marginBottom: 4,
   },
@@ -238,6 +261,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     marginRight: 10,
+    backgroundColor: colors.white,
   },
   filterChipActive: {
     borderColor: colors.primary,

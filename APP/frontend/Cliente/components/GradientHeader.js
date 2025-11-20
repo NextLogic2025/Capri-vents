@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AppHeaderContainer from '../../components/AppHeaderContainer';
 import colors from '../../theme/colors';
 
 const GradientHeader = ({
@@ -15,31 +16,31 @@ const GradientHeader = ({
   const hasNotifications = Number(notificationsCount) > 0;
 
   return (
-    <View style={[styles.container, { paddingTop: top + 6 }, style]}>
-      <View>
-        <Text style={styles.greeting}>Hola, {name}</Text>
-        <Text style={styles.title}>Bienvenido</Text>
-        <Text style={styles.store}>{storeName}</Text>
+    <AppHeaderContainer style={[styles.container, { paddingTop: top + 6 }, style]}>
+      <View style={styles.contentRow}>
+        <View>
+          <Text style={styles.greeting}>Hola, {name}</Text>
+          <Text style={styles.title}>Bienvenido</Text>
+          <Text style={styles.store}>{storeName}</Text>
+        </View>
+        <TouchableOpacity style={styles.bellButton} onPress={onNotificationsPress} activeOpacity={0.8}>
+          <Ionicons name="notifications-outline" size={22} color={colors.primary} />
+          {hasNotifications && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{notificationsCount}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.bellButton} onPress={onNotificationsPress} activeOpacity={0.8}>
-        <Ionicons name="notifications-outline" size={22} color={colors.primary} />
-        {hasNotifications && (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{notificationsCount}</Text>
-          </View>
-        )}
-      </TouchableOpacity>
-    </View>
+    </AppHeaderContainer>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.primary,
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
-    paddingHorizontal: 20,
-    paddingBottom: 24,
+    paddingBottom: 8,
+  },
+  contentRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

@@ -9,7 +9,7 @@ import {
   Alert,
   ScrollView,
 } from 'react-native';
-import SupervisorHeader from '../components/SupervisorHeader';
+import ScreenHeader from '../../Cliente/components/ScreenHeader';
 import SupervisorOrderCard from '../components/SupervisorOrderCard';
 import PrimaryButton from '../../Cliente/components/PrimaryButton';
 import globalStyles from '../../theme/styles';
@@ -19,7 +19,7 @@ import { useAppContext } from '../../context/AppContext';
 const STATUS_FILTERS = ['Todos', 'Sin asignar', 'En preparación', 'En ruta', 'Entregado'];
 
 const SupervisorPedidosScreen = () => {
-  const { supervisorUser, allOrders } = useAppContext();
+  const { allOrders } = useAppContext();
   const [statusFilter, setStatusFilter] = useState('Todos');
   const [zoneFilter, setZoneFilter] = useState('Todas');
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -44,13 +44,16 @@ const SupervisorPedidosScreen = () => {
       const status = (order.status || order.estadoPedido || '').toString().toLowerCase();
       const zoneValue = (order.zone || order.zona || 'General').toString();
       const isSinAsignar = !order.assignedVendorId && !order.assignedVendorName;
+
       const matchesStatus =
         statusFilter === 'Todos'
           ? true
           : statusFilter === 'Sin asignar'
           ? isSinAsignar
           : status.includes(statusFilter.toLowerCase());
+
       const matchesZone = zoneFilter === 'Todas' ? true : zoneValue === zoneFilter;
+
       return matchesStatus && matchesZone;
     });
   }, [allOrders, statusFilter, zoneFilter]);
@@ -83,22 +86,21 @@ const SupervisorPedidosScreen = () => {
   );
 
   return (
-    <View style={globalStyles.screen}>
-      <SupervisorHeader
-        name={supervisorUser?.name}
-        title="Bienvenido"
-        subtitle="Pedidos & Entregas"
-        notificationsCount={0}
-        onPressNotifications={() => {
-          // BACKEND: mostrar alertas logísticas o notificaciones prioritarias
-        }}
-      />
+    <View style={styles.screen}>
+      {/* HEADER tipo "hero" igual que Inicio, solo con título */}
+      <View style={styles.headerWrapper}>
+        <ScreenHeader
+          title="Pedidos y entregas"
+          style={styles.headerCard}
+        />
+      </View>
 
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={[globalStyles.contentContainer, { paddingTop: 8 }]}
+        contentContainerStyle={[globalStyles.contentContainer, styles.contentContainer]}
         showsVerticalScrollIndicator={false}
       >
+        {/* Filtros de estado y zona */}
         <View style={styles.filterSection}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {STATUS_FILTERS.map((status) => (
@@ -121,7 +123,12 @@ const SupervisorPedidosScreen = () => {
               </TouchableOpacity>
             ))}
           </ScrollView>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 8 }}>
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={{ marginTop: 8 }}
+          >
             {zones.map((zone) => (
               <TouchableOpacity
                 key={zone}
@@ -150,11 +157,14 @@ const SupervisorPedidosScreen = () => {
           renderItem={renderOrder}
           scrollEnabled={false}
           ListEmptyComponent={
-            <Text style={styles.emptyText}>No hay pedidos que coincidan con los filtros.</Text>
+            <Text style={styles.emptyText}>
+              No hay pedidos que coincidan con los filtros.
+            </Text>
           }
         />
       </ScrollView>
 
+      {/* MODAL: asignar vendedor */}
       <Modal visible={!!assignOrder} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -189,25 +199,43 @@ const SupervisorPedidosScreen = () => {
         </View>
       </Modal>
 
+      {/* MODAL: detalle de pedido */}
       <Modal visible={!!selectedOrder} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Detalle del pedido</Text>
             <Text style={styles.modalSubtitle}>{selectedOrder?.code}</Text>
-            <Text>N° Cliente: {selectedOrder?.clientName || selectedOrder?.clienteNombre}</Text>
+            <Text>
+              Cliente:{' '}
+              {selectedOrder?.clientName || selectedOrder?.clienteNombre}
+            </Text>
             <Text>Zona: {selectedOrder?.zone || selectedOrder?.zona}</Text>
             <Text>
-              Vendedor: {selectedOrder?.assignedVendorName || selectedOrder?.assignedVendor || 'Sin asignar'}
+              Vendedor:{' '}
+              {selectedOrder?.assignedVendorName ||
+                selectedOrder?.assignedVendor ||
+                'Sin asignar'}
             </Text>
-            <Text>Método pago: {selectedOrder?.paymentMethod || selectedOrder?.metodoPago}</Text>
-            <Text>Total: $ {(selectedOrder?.total ?? selectedOrder?.amount ?? 0).toFixed(2)}</Text>
-            <Text>Estado: {selectedOrder?.status || selectedOrder?.estadoPedido}</Text>
+            <Text>
+              Método pago:{' '}
+              {selectedOrder?.paymentMethod || selectedOrder?.metodoPago}
+            </Text>
+            <Text>
+              Total: ${' '}
+              {(selectedOrder?.total ?? selectedOrder?.amount ?? 0).toFixed(2)}
+            </Text>
+            <Text>
+              Estado: {selectedOrder?.status || selectedOrder?.estadoPedido}
+            </Text>
             <View style={{ marginTop: 12 }}>
               <PrimaryButton
                 title="Actualizar estado logística"
                 onPress={() => {
                   // BACKEND: actualizar estado logístico del pedido
-                  Alert.alert('Actualizado', 'Estado actualizado en el backend (mock).');
+                  Alert.alert(
+                    'Actualizado',
+                    'Estado actualizado en el backend (mock).'
+                  );
                 }}
               />
               <PrimaryButton
@@ -224,6 +252,22 @@ const SupervisorPedidosScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  headerWrapper: {
+    // sin padding lateral para que el header ocupe todo el ancho
+  },
+  headerCard: {
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
+  },
+  contentContainer: {
+    paddingTop: 12,
+    paddingHorizontal: 16,
+    paddingBottom: 24,
+  },
   filterSection: {
     marginBottom: 14,
   },
@@ -234,6 +278,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 6,
     marginRight: 10,
+    backgroundColor: colors.white,
   },
   filterChipActive: {
     borderColor: colors.primary,

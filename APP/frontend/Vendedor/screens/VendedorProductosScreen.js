@@ -14,16 +14,18 @@ import colors from '../../theme/colors';
 import globalStyles from '../../theme/styles';
 import { useAppContext } from '../../context/AppContext';
 import EmptyState from '../../Cliente/components/EmptyState';
-import VendedorHeader from '../components/VendedorHeader';
+import ScreenHeader from '../../Cliente/components/ScreenHeader';
 import LogoCafrilosa from '../../assets/images/logo-cafrilosa.png';
 
 const VendedorProductosScreen = () => {
-  const { products = [], vendorUser } = useAppContext();
+  const { products = [] } = useAppContext();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('Todos');
 
   const categories = useMemo(() => {
-    const unique = Array.from(new Set(products.map((product) => product.category).filter(Boolean)));
+    const unique = Array.from(
+      new Set(products.map((product) => product.category).filter(Boolean))
+    );
     return ['Todos', ...unique];
   }, [products]);
 
@@ -67,7 +69,12 @@ const VendedorProductosScreen = () => {
   const renderHeader = () => (
     <View style={styles.searchHeader}>
       <View style={styles.searchContainer}>
-        <Ionicons name="search-outline" size={20} color={colors.muted} style={{ marginHorizontal: 8 }} />
+        <Ionicons
+          name="search-outline"
+          size={20}
+          color={colors.muted}
+          style={{ marginHorizontal: 8 }}
+        />
         <TextInput
           placeholder="Buscar por nombre..."
           placeholderTextColor={colors.muted}
@@ -76,7 +83,11 @@ const VendedorProductosScreen = () => {
           onChangeText={setSearch}
         />
       </View>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.filterScroll}
+      >
         {categories.map((cat) => {
           const active = category === cat;
           return (
@@ -85,7 +96,9 @@ const VendedorProductosScreen = () => {
               style={[styles.chip, active && styles.chipActive]}
               onPress={() => setCategory(cat)}
             >
-              <Text style={[styles.chipText, active && styles.chipTextActive]}>{cat}</Text>
+              <Text style={[styles.chipText, active && styles.chipTextActive]}>
+                {cat}
+              </Text>
             </TouchableOpacity>
           );
         })}
@@ -95,14 +108,12 @@ const VendedorProductosScreen = () => {
 
   return (
     <View style={styles.screen}>
-      <VendedorHeader
-        name={vendorUser?.name}
-        title="Bienvenido"
-        subtitle="Productos"
-        notificationsCount={0}
-        onPressNotifications={() => {}}
-        style={styles.header}
+      {/* HEADER: solo título y subtítulo */}
+      <ScreenHeader
+        title="Productos"
+        sectionLabel="Catálogo de productos"
       />
+
       <FlatList
         data={filtered}
         keyExtractor={(item) => item.id}
@@ -114,7 +125,7 @@ const VendedorProductosScreen = () => {
         ListEmptyComponent={
           <EmptyState
             title="Sin productos"
-            subtitle="Aun no hay productos que coincidan con tu busqueda."
+            subtitle="Aún no hay productos que coincidan con tu búsqueda."
             iconName="pricetag-outline"
           />
         }
@@ -132,18 +143,6 @@ const styles = StyleSheet.create({
   listContent: {
     paddingBottom: 120,
     paddingHorizontal: 16,
-  },
-  header: {
-    marginBottom: 16,
-  },
-  screenTitle: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: colors.textDark,
-  },
-  screenSubtitle: {
-    color: colors.textLight,
-    marginTop: 4,
   },
   searchHeader: {
     marginBottom: 8,

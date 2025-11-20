@@ -18,7 +18,7 @@ import SectionCard from '../../Cliente/components/SectionCard';
 import PrimaryButton from '../../Cliente/components/PrimaryButton';
 import EmptyState from '../../Cliente/components/EmptyState';
 import VendedorOrderCard from '../components/VendedorOrderCard';
-import VendedorHeader from '../components/VendedorHeader';
+import ScreenHeader from '../../Cliente/components/ScreenHeader';
 
 const FILTERS = [
   { key: 'HOY', label: 'Hoy' },
@@ -278,9 +278,11 @@ const VendedorPedidosScreen = () => {
 
   return (
     <View style={styles.screen}>
-      <VendedorHeader
-        name={vendorUser?.name}
-        subtitle="Pedidos"
+      <ScreenHeader
+        greeting={`Hola, ${vendorUser?.name || 'Vendedor'}`}
+        title="Bienvenido"
+        sectionLabel="Pedidos"
+        icon="notifications-outline"
         notificationsCount={resumen.pendientes}
       />
       <FlatList

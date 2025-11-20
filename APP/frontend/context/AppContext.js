@@ -40,10 +40,54 @@ const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentRole, setCurrentRole] = useState('SUPERVISOR'); // BACKEND: este rol vendrá del token del usuario autenticado.
-  const [user, setUser] = useState(supervisorUser);
+  const [currentRole, setCurrentRole] = useState(null); // BACKEND: este rol vendrá del token del usuario autenticado.
+  const [user, setUser] = useState(null);
   const [cart, setCart] = useState([]);
   const [orders, setOrders] = useState(mockOrders);
+  const initialAddresses = [
+    {
+      id: 'dir-1',
+      label: 'Casa',
+      street: 'Av. Corrientes',
+      number: '1234',
+      city: 'Loja',
+      province: 'Loja',
+      zip: '110101',
+      references: 'Portón verde, timbre 5B',
+      isDefault: true,
+    },
+    {
+      id: 'dir-2',
+      label: 'Oficina',
+      street: 'Av. Universitaria',
+      number: '56',
+      city: 'Loja',
+      province: 'Loja',
+      zip: '110102',
+      references: 'Edificio Cafrilosa, piso 3',
+      isDefault: false,
+    },
+  ];
+  const initialCards = [
+    {
+      id: 'card-1',
+      type: 'CRÉDITO',
+      number: '**** **** **** 4532',
+      holder: 'Juan Pérez',
+      expiry: '12/25',
+      gradient: ['#1C6CFE', '#5C5BFC'],
+      defaultCard: true,
+    },
+    {
+      id: 'card-2',
+      type: 'DÉBITO',
+      number: '**** **** **** 8291',
+      holder: 'Juan Pérez',
+      expiry: '08/26',
+      gradient: ['#E53935', '#FF7043'],
+      defaultCard: false,
+    },
+  ];
   const normalizeCredits = (list) =>
     list.map((credit) => ({
       ...credit,
@@ -53,8 +97,67 @@ export const AppProvider = ({ children }) => {
 
   const [credits, setCredits] = useState(normalizeCredits(mockCredits));
   const [products] = useState(productsData);
+  const [addresses, setAddresses] = useState(initialAddresses);
+  const defaultAddress = useMemo(
+    () => addresses.find((addr) => addr.isDefault) ?? addresses[0] ?? null,
+    [addresses]
+  );
+  const [paymentCards, setPaymentCards] = useState(initialCards);
+  const defaultCard = useMemo(
+    () => paymentCards.find((card) => card.defaultCard) ?? paymentCards[0] ?? null,
+    [paymentCards]
+  );
   const [notifications, setNotifications] = useState({ pedidos: true, creditos: true });
   const matchProduct = (item, productId) => item.id === productId || item.productId === productId;
+  const addAddress = (address) => {
+    setAddresses((prev) => [
+      ...(prev || []),
+      {
+        id: `dir-${Date.now()}`,
+        ...address,
+        isDefault: prev.length === 0,
+      },
+    ]);
+  };
+
+  const updateAddress = (addressId, updates) => {
+    setAddresses((prev) =>
+      prev.map((addr) => (addr.id === addressId ? { ...addr, ...updates } : addr))
+    );
+  };
+
+  const setDefaultAddress = (addressId) => {
+    setAddresses((prev) =>
+      prev.map((addr) => ({ ...addr, isDefault: addr.id === addressId }))
+    );
+  };
+
+  const addPaymentCard = (card) => {
+    setPaymentCards((prev) => [
+      ...(prev || []).map((existing) => ({ ...existing, defaultCard: false })),
+      {
+        id: card.id || `card-${Date.now()}`,
+        ...card,
+        defaultCard: true,
+      },
+    ]);
+  };
+
+  const updatePaymentCard = (cardId, updates) => {
+    setPaymentCards((prev) =>
+      prev.map((card) => (card.id === cardId ? { ...card, ...updates } : card))
+    );
+  };
+
+  const removePaymentCard = (cardId) => {
+    setPaymentCards((prev) => prev.filter((card) => card.id !== cardId));
+  };
+
+  const setDefaultPaymentCard = (cardId) => {
+    setPaymentCards((prev) =>
+      prev.map((card) => ({ ...card, defaultCard: card.id === cardId }))
+    );
+  };
   const vendorAssignedOrders = useMemo(() => {
     const normalizedOrders = Array.isArray(orders) ? orders : [];
     return normalizedOrders
@@ -426,7 +529,7 @@ export const AppProvider = ({ children }) => {
     // BACKEND: invalidar el token de sesion.
     setIsLoggedIn(false);
     setCurrentRole(null);
-    setUser(clientUser);
+    setUser(null);
     clearCart();
   };
 
@@ -477,6 +580,17 @@ export const AppProvider = ({ children }) => {
     isLoggedIn,
     login,
     logout,
+    addresses,
+    defaultAddress,
+    addAddress,
+    updateAddress,
+    setDefaultAddress,
+    paymentCards,
+    defaultCard,
+    addPaymentCard,
+    updatePaymentCard,
+    removePaymentCard,
+    setDefaultPaymentCard,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

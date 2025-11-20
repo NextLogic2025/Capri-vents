@@ -60,7 +60,11 @@ const AuthInput = ({
       />
       {secure && (
         <TouchableOpacity style={styles.eyeButton} onPress={onTogglePassword}>
-          <Ionicons name={showPassword ? 'eye-outline' : 'eye-off-outline'} size={20} color={colors.muted} />
+          <Ionicons
+            name={showPassword ? 'eye-outline' : 'eye-off-outline'}
+            size={20}
+            color={colors.muted}
+          />
         </TouchableOpacity>
       )}
     </View>
@@ -78,7 +82,11 @@ const LoginScreen = ({ navigation }) => {
   const navigateByRole = (role) => {
     const parentNav = navigation.getParent?.() || navigation;
     const target =
-      role === 'vendedor' ? 'VendedorModulo' : role === 'supervisor' ? 'SupervisorModulo' : 'ClienteTabs';
+      role === 'vendedor'
+        ? 'VendedorModulo'
+        : role === 'supervisor'
+        ? 'SupervisorModulo'
+        : 'ClienteTabs';
     parentNav.reset({ index: 0, routes: [{ name: target }] });
   };
 
@@ -92,7 +100,8 @@ const LoginScreen = ({ navigation }) => {
     // BACKEND: aquí debe ir el POST /auth/login para obtener tokens y los datos del usuario.
     const matchedAccount = demoAccounts.find(
       (account) =>
-        account.email.toLowerCase() === email.trim().toLowerCase() && account.password === password.trim()
+        account.email.toLowerCase() === email.trim().toLowerCase() &&
+        account.password === password.trim()
     );
 
     if (!matchedAccount) {
@@ -105,7 +114,11 @@ const LoginScreen = ({ navigation }) => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      contentContainerStyle={styles.container}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+    >
       <Image source={LogoCafrilosa} style={styles.logo} />
 
       <View style={styles.card}>
@@ -113,11 +126,11 @@ const LoginScreen = ({ navigation }) => {
         <Text style={styles.subheading}>Ingresa a tu cuenta para continuar</Text>
 
         <AuthInput
-          label="Correo electrónico"
+          label="Correo Electrónico"
           icon="mail-outline"
           value={email}
           onChangeText={setEmail}
-          placeholder="tucorreo@cafrilosa.com"
+          placeholder="tucorreo@ejemplo.com"
           keyboardType="email-address"
         />
         <AuthInput
@@ -132,8 +145,15 @@ const LoginScreen = ({ navigation }) => {
         />
 
         <View style={styles.actionsRow}>
-          <TouchableOpacity style={styles.rememberRow} onPress={() => setRememberMe((prev) => !prev)}>
-            <Checkbox value={rememberMe} onValueChange={setRememberMe} color={colors.primaryRed} />
+          <TouchableOpacity
+            style={styles.rememberRow}
+            onPress={() => setRememberMe((prev) => !prev)}
+          >
+            <Checkbox
+              value={rememberMe}
+              onValueChange={setRememberMe}
+              color={rememberMe ? colors.primary : undefined}
+            />
             <Text style={styles.rememberText}>Recordarme</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
@@ -144,12 +164,12 @@ const LoginScreen = ({ navigation }) => {
         {!!errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
 
         <TouchableOpacity style={styles.primaryButton} onPress={handleLogin}>
-          <Text style={styles.primaryButtonText}>Iniciar sesión</Text>
+          <Text style={styles.primaryButtonText}>Iniciar Sesión</Text>
         </TouchableOpacity>
 
         <View style={styles.dividerRow}>
           <View style={styles.divider} />
-          <Text style={styles.dividerDot}>•</Text>
+          <Text style={styles.dividerDot}>o</Text>
           <View style={styles.divider} />
         </View>
 
@@ -169,40 +189,39 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: colors.background,
     paddingHorizontal: 24,
-    paddingBottom: 48,
+    paddingTop: 56,
+    paddingBottom: 40,
     alignItems: 'center',
   },
   logo: {
-    width: 180,
-    height: 110,
-    marginTop: 48,
+    width: 210,
+    height: 120,
     resizeMode: 'contain',
   },
   slogan: {
+    marginTop: 6,
+    marginBottom: 24,
+    fontSize: 16,
     color: colors.goldDark,
-    marginTop: 8,
-    marginBottom: 12,
     fontWeight: '600',
+    textAlign: 'center',
   },
   card: {
     width: '100%',
-    backgroundColor: colors.white,
-    borderRadius: 28,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 6,
+    // Sin fondo blanco ni sombra para parecerse más al mock
+    backgroundColor: 'transparent',
+    paddingTop: 8,
   },
   heading: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: '800',
     color: colors.darkText,
+    marginBottom: 4,
   },
   subheading: {
     color: colors.textLight,
     marginBottom: 24,
+    fontSize: 14,
   },
   fieldGroup: {
     marginBottom: 18,
@@ -211,23 +230,24 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.bodyText,
     marginBottom: 6,
+    fontSize: 13,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 16,
+    borderRadius: 22,
     paddingHorizontal: 14,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.inputBackground,
+    borderColor: colors.borderSoft,
+    backgroundColor: colors.white,
   },
   inputIcon: {
     marginRight: 8,
   },
   input: {
     flex: 1,
-    paddingVertical: 14,
-    fontSize: 16,
+    paddingVertical: 12,
+    fontSize: 15,
     color: colors.darkText,
   },
   eyeButton: {
@@ -237,6 +257,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginTop: 4,
     marginBottom: 12,
   },
   rememberRow: {
@@ -246,51 +267,35 @@ const styles = StyleSheet.create({
   rememberText: {
     marginLeft: 8,
     color: colors.bodyText,
+    fontSize: 13,
   },
   link: {
-    color: colors.primaryRed,
+    color: colors.primary,
     fontWeight: '700',
+    fontSize: 13,
   },
   errorText: {
     color: colors.danger,
-    marginBottom: 12,
+    marginBottom: 10,
+    fontSize: 13,
   },
   primaryButton: {
-    backgroundColor: colors.primaryRed,
-    borderRadius: 22,
+    backgroundColor: colors.primary,
+    borderRadius: 24,
     paddingVertical: 14,
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: 8,
   },
   primaryButtonText: {
     color: colors.white,
     fontWeight: '700',
     fontSize: 16,
   },
-  backendNote: {
-    marginTop: 16,
-    color: colors.textMuted,
-    fontSize: 13,
-  },
-  demoNoteContainer: {
-    marginTop: 10,
-    backgroundColor: colors.inputBackground,
-    borderRadius: 12,
-    padding: 12,
-  },
-  demoNoteLabel: {
-    fontSize: 12,
-    color: colors.textMuted,
-  },
-  demoNote: {
-    fontWeight: '600',
-    color: colors.bodyText,
-  },
   dividerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 12,
+    marginTop: 24,
+    marginBottom: 10,
   },
   divider: {
     flex: 1,
@@ -300,6 +305,7 @@ const styles = StyleSheet.create({
   dividerDot: {
     marginHorizontal: 8,
     color: colors.textMuted,
+    fontSize: 12,
   },
   footerRow: {
     flexDirection: 'row',
@@ -308,6 +314,7 @@ const styles = StyleSheet.create({
   subtleText: {
     color: colors.textMuted,
     marginRight: 4,
+    fontSize: 13,
   },
 });
 

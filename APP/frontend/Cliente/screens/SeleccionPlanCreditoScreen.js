@@ -21,6 +21,8 @@ const SeleccionPlanCreditoScreen = ({ route, navigation }) => {
 
   const plans = useMemo(() => plansConfig, []);
 
+  const formatMoney = (value) => `$${(Number(value) || 0).toFixed(2)}`;
+
   const generateInstallments = (plan) => {
     const amount = parseFloat((total / plan.dias.length).toFixed(2));
     return plan.dias.map((days, index) => {
@@ -55,34 +57,74 @@ const SeleccionPlanCreditoScreen = ({ route, navigation }) => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <ScreenHeader title="Credito comercial" subtitle="Elige tu plan" />
-      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 140 }}>
-        <SectionCard title="Elige tu plan">
-          <Text style={{ color: colors.textLight, marginBottom: 12 }}>
-            Total del pedido: ${total.toFixed(2)}
+    <View style={styles.screen}>
+
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <SectionCard title="Selecciona tu plan">
+          <Text style={styles.sectionDescription}>
+            Divide tu compra en cuotas fijas y mantén tus pagos bajo control.
           </Text>
+
+          <View style={styles.totalRow}>
+            <View>
+              <Text style={styles.totalLabel}>Total del pedido</Text>
+              <Text style={styles.totalHint}>Este monto se distribuirá entre tus cuotas.</Text>
+            </View>
+            <Text style={styles.totalValue}>{formatMoney(total)}</Text>
+          </View>
+
           {plans.map((plan) => {
             const selected = selectedPlan?.id === plan.id;
             const amount = (total / plan.dias.length).toFixed(2);
+
             return (
               <TouchableOpacity
                 key={plan.id}
                 onPress={() => setSelectedPlan(plan)}
-                style={[styles.planCard, selected && styles.planCardActive]}
+                activeOpacity={0.9}
+                style={[
+                  styles.planCard,
+                  selected && styles.planCardActive,
+                ]}
               >
                 <View style={styles.planHeader}>
-                  <Text style={styles.planTitle}>{plan.cuotas} cuota{plan.cuotas > 1 ? 's' : ''}</Text>
-                  <Text style={[styles.planBadge, selected && styles.planBadgeActive]}>
-                    ${amount} c/u
-                  </Text>
+                  <View>
+                    <Text style={styles.planTitle}>
+                      {plan.cuotas} cuota{plan.cuotas > 1 ? 's' : ''}
+                    </Text>
+                    <Text style={styles.planSubtitle}>
+                      Vence en {plan.dias.join(' y ')} días
+                    </Text>
+                  </View>
+
+                  <View
+                    style={[
+                      styles.planBadgeWrapper,
+                      selected && styles.planBadgeWrapperActive,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.planBadgeText,
+                        selected && styles.planBadgeTextActive,
+                      ]}
+                    >
+                      {formatMoney(amount)} c/u
+                    </Text>
+                  </View>
                 </View>
-                <Text style={styles.planDescription}>Vence en {plan.dias.join(' y ')} dias</Text>
+
                 <View style={styles.planInstallments}>
                   {plan.dias.map((day, idx) => (
-                    <Text key={day} style={styles.installmentText}>
-                      Cuota {idx + 1}: vence en {day} dias
-                    </Text>
+                    <View key={day} style={styles.installmentRow}>
+                      <View style={styles.installmentDot} />
+                      <Text style={styles.installmentText}>
+                        Cuota {idx + 1}: vence en {day} días
+                      </Text>
+                    </View>
                   ))}
                 </View>
               </TouchableOpacity>
@@ -90,14 +132,66 @@ const SeleccionPlanCreditoScreen = ({ route, navigation }) => {
           })}
         </SectionCard>
       </ScrollView>
+
       <View style={styles.bottomBar}>
-        <PrimaryButton title="Confirmar pedido con credito" onPress={handleConfirm} />
+        <PrimaryButton
+          title="Confirmar pedido con crédito"
+          onPress={handleConfirm}
+        />
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  headerWrapper: {
+    // el ScreenHeader ya maneja paddings y color de fondo
+  },
+  headerCard: {
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 140,
+  },
+  sectionDescription: {
+    color: colors.textLight,
+    marginBottom: 14,
+    fontSize: 13,
+  },
+  totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 18,
+    backgroundColor: colors.cardBackground,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    marginBottom: 16,
+  },
+  totalLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.textDark,
+  },
+  totalHint: {
+    fontSize: 11,
+    color: colors.textMuted,
+    marginTop: 2,
+  },
+  totalValue: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: colors.primary,
+  },
   planCard: {
     borderWidth: 1,
     borderColor: colors.borderSoft,
@@ -105,6 +199,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 12,
     backgroundColor: colors.cardBackground,
+    ...sharedStyles.shadow,
   },
   planCardActive: {
     borderColor: colors.primary,
@@ -120,24 +215,42 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.textDark,
   },
-  planBadge: {
+  planSubtitle: {
+    marginTop: 4,
+    fontSize: 12,
+    color: colors.textLight,
+  },
+  planBadgeWrapper: {
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 999,
     backgroundColor: colors.borderSoft,
-    color: colors.textLight,
-    fontWeight: '600',
   },
-  planBadgeActive: {
+  planBadgeWrapperActive: {
     backgroundColor: colors.primary,
-    color: '#fff',
   },
-  planDescription: {
-    marginTop: 6,
+  planBadgeText: {
+    fontSize: 12,
+    fontWeight: '600',
     color: colors.textLight,
+  },
+  planBadgeTextActive: {
+    color: colors.white,
   },
   planInstallments: {
-    marginTop: 8,
+    marginTop: 10,
+  },
+  installmentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  installmentDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.primary,
+    marginRight: 8,
   },
   installmentText: {
     color: colors.textLight,
