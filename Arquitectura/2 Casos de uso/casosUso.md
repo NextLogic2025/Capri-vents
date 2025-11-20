@@ -7,13 +7,10 @@
 Este documento resume y documenta los seis diagramas de casos de uso actualizados del sistema. Incluye: propósito del módulo, límite del sistema, actores, y la descripción de los casos de uso con sus relaciones <<include>>.
 
 ---
-
 ## ¿Qué es un diagrama de casos de uso?
 
 Un diagrama de casos de uso (UML) muestra qué hace el sistema desde la perspectiva de sus actores (personas o sistemas externos). Permite acordar el alcance, comunicar requisitos y priorizar funcionalidades sin entrar en la implementación.
-
 ---
-
 ## Elementos básicos
 
 * *Actor*: rol externo que interactúa con el sistema (persona o sistema).
@@ -24,9 +21,13 @@ Un diagrama de casos de uso (UML) muestra qué hace el sistema desde la perspect
 
 ---
 
-## 1) Módulo Gestión Cliente
+# 1) Módulo Gestión Cliente
+## Registro y Mantenimeinto
 
-<img width="1231" height="1734" alt="image" src="https://github.com/user-attachments/assets/1f0621b9-2006-488c-93ea-d2ec996f1f1c" />
+<img width="1231" height="1734" alt="image" src="https://github.com/user-attachments/assets/1ee1a08c-993f-4b37-8a4e-0f5599bb2079" />
+
+## Fidealizar Cliente
+<img width="1231" height="1734" alt="image" src="https://github.com/user-attachments/assets/77679e05-6c09-4634-b860-e6f67e85c6b9" />
 
 
 ### Propósito
@@ -49,10 +50,14 @@ Gestionar el ciclo de vida del cliente, desde la identificación de oportunidade
 
 ---
 
-## 2) Módulo Gestión de Pedidos
+# 2) Módulo Gestión de Pedidos
 
-<img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/fe8bd66b-e587-4ffb-8829-27154243dded" />
-
+# Recepcción de Pedidos
+<img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/038a5434-4f03-4bdf-9147-fa0bc53055ab" />
+# Coordinar Pedido con Logística
+<img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/3145718a-44d3-4aa0-bb63-008b32216530" />
+# Controlar Pedido
+<img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/80c8052d-e108-4516-9a67-e0b418c23f9d" />
 
 ### Propósito
 Controlar la toma de pedidos por diversos canales, coordinar su preparación con logística y realizar el seguimiento hasta el cierre administrativo.
@@ -75,10 +80,13 @@ Controlar la toma de pedidos por diversos canales, coordinar su preparación con
 
 ---
 
-## 3) Módulo Gestión de Entregas
-
-<img width="1254" height="1664" alt="image" src="https://github.com/user-attachments/assets/f474002d-f23f-4585-91f0-0607098edc59" />
-
+# 3) Módulo Gestión de Entregas
+## Preparar Pedido
+<img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/ae9621af-0793-4ef0-89da-c8a096c48c3b" />
+## Distribuir y entrgar pedido
+<img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/96e64844-bf2f-45d0-bc68-8d25147881d8" />
+## Gestionar Incidencias
+<img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/c1494208-dd02-4d15-95ee-3b6e5efca1ff" />
 
 ### Propósito
 Asegurar la correcta preparación, embalaje, transporte y entrega final de los productos, gestionando cualquier incidencia en el proceso.
@@ -100,9 +108,14 @@ Asegurar la correcta preparación, embalaje, transporte y entrega final de los p
 
 ---
 
-## 4) Módulo Gestión de Cobros y Créditos
+# 4) Módulo Gestión de Cobros y Créditos
 
-<img width="1282" height="1664" alt="image" src="https://github.com/user-attachments/assets/0ee6519f-8f07-46a2-9616-d12417bdceb0" />
+## Controlar Cuentas por cobrar 
+<img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/e997fd39-9e92-43f6-8372-b2e8b194b74a" />
+## Ejecutar Cobros
+<img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/3b6472aa-97e6-4126-9618-e2a0f1c1ea05" />
+## Gestionar Créditos comerciales
+<img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/3a34dd1e-c66f-4c50-8053-ad187de605e2" />
 
 
 ### Propósito
@@ -127,8 +140,13 @@ Administrar la cartera de clientes, ejecutar la cobranza de manera efectiva y ev
 
 ## 5) Módulo Postventa y Servicio al Cliente
 
-<img width="1098" height="1664" alt="image" src="https://github.com/user-attachments/assets/cfdb8065-ca52-42fa-a5c6-a623f4ef990c" />
 
+## Atender Reclamos
+<img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/d9ce87c7-bfd8-466d-837b-8ed869799400" />
+## Dar seguimiento a la Satisfacción
+<img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/2f3c9ef8-ae60-4cd7-bd22-add434d3a7ac" />
+## Fidealizar de Froma Continua
+<img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/8fbd5761-73ae-4544-8a52-7e04a3784187" />
 
 ### Propósito
 Atender reclamos de manera eficiente, medir la satisfacción del cliente y ejecutar acciones de fidelización continua.
@@ -152,7 +170,12 @@ Atender reclamos de manera eficiente, medir la satisfacción del cliente y ejecu
 
 ## 6) Módulo Control y Análisis Comercial
 
-<img width="1104" height="1664" alt="image" src="https://github.com/user-attachments/assets/d9a798a2-2f17-4ae8-bf59-e94a4a7b93b1" />
+## Medir desempeño Comercial
+<img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/88a904d8-b4f9-4115-af34-f1473afffc9d" />
+## Analizar Mercado y Promociones
+<img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/e6827c7f-a9b3-474d-a909-d7e4114969be" />
+## Reportar y Decidir Gerencialmente
+<img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/b80a4ade-dfcb-4381-9096-44420c75b7b9" />
 
 ### Propósito
 Proveer herramientas para la medición del desempeño de ventas, análisis de mercado y toma de decisiones estratégicas gerenciales.
@@ -179,8 +202,7 @@ Proveer herramientas para la medición del desempeño de ventas, análisis de me
 ## 7) Módulo Gestión de Productos
 
 ### Diagrama: Registro y Mantenimiento
-
-<img width="1591" height="1600" alt="image" src="https://github.com/user-attachments/assets/b972eae4-ba3c-43ce-a586-662e7bf295c9" />
+<img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/ad484122-8b2b-4416-a3ea-875c578251cc" />
 
 ### Propósito
 Proveer la funcionalidad para crear, modificar y gestionar el ciclo de vida de los productos en el catálogo del sistema.
@@ -200,7 +222,7 @@ Proveer la funcionalidad para crear, modificar y gestionar el ciclo de vida de l
 
 ### Diagrama: Control de Inventario y Monitoreo
 
-<img width="1600" height="1340" alt="image" src="https://github.com/user-attachments/assets/da961d5e-e8c6-4120-9a5a-0ae37a511af2" />
+<img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/da961d5e-e8c6-4120-9a5a-0ae37a511af2" />
 
 ### Propósito (Control de Inventario)
 Gestionar los movimientos de stock, actualizar los niveles de inventario en tiempo real y definir los umbrales de reabastecimiento.
@@ -219,7 +241,7 @@ Gestionar los movimientos de stock, actualizar los niveles de inventario en tiem
 
 ### Diagrama: Monitoreo de Alertas
 
-<img width="1503" height="1600" alt="image" src="https://github.com/user-attachments/assets/e2225f9f-e57e-4c68-9bc4-cf3802d24e43" />
+<img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/e2225f9f-e57e-4c68-9bc4-cf3802d24e43" />
 
 ### Propósito (Monitoreo y Alertas)
 Controlar la trazabilidad de los productos por lote, gestionar sus fechas de vencimiento, analizar la rotación y generar alertas automáticas.
