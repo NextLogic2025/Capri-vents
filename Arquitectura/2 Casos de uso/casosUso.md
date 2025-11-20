@@ -253,7 +253,7 @@ Administrar el catálogo maestro de productos asegurando la integridad de los da
 
 ### Diagrama: Control de Inventario y Monitoreo
 
-<img width="6120" height="6512" alt="image" src="https://github.com/user-attachments/assets/e846472e-b05b-4275-8564-62e8806feab9" />
+<img width="1503" height="1600" alt="image" src="https://github.com/user-attachments/assets/d0e0c183-3392-4c41-857b-e6c0475b6aea" />
 
 ### Propósito
 Mantener la precisión del stock mediante el registro riguroso de movimientos (entradas/salidas), asegurando la trazabilidad completa por lotes y permitiendo la toma de decisiones basada en el análisis de rotación y monitoreo en tiempo real.
@@ -272,7 +272,7 @@ Mantener la precisión del stock mediante el registro riguroso de movimientos (e
 
 ### Diagrama: Monitoreo de Alertas
 
-<img width="8168" height="6848" alt="image" src="https://github.com/user-attachments/assets/68df2512-4ed2-4e18-a58c-b1b575dad4d0" />
+<img width="1600" height="1340" alt="image" src="https://github.com/user-attachments/assets/8605bafc-6d58-4f5d-b72b-7f326ef46404" />
 
 ### Propósito
 Asegurar la disponibilidad óptima de productos y minimizar pérdidas por caducidad mediante el monitoreo en tiempo real de existencias, la gestión de lotes (FEFO) y un sistema automatizado de alertas escalables.
