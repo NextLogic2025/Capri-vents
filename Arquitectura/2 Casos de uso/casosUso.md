@@ -51,32 +51,33 @@ Gestionar el registro formal de clientes asegurando la integridad de datos fisca
 
 # 2) Módulo Gestión de Pedidos
 
-# Recepcción de Pedidos
+## Recepcción de Pedidos
 <img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/038a5434-4f03-4bdf-9147-fa0bc53055ab" />
-# Coordinar Pedido con Logística
+## Coordinar Pedido con Logística
 <img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/3145718a-44d3-4aa0-bb63-008b32216530" />
-# Controlar Pedido
+## Controlar Pedido
 <img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/80c8052d-e108-4516-9a67-e0b418c23f9d" />
 
 ### Propósito
-Controlar la toma de pedidos por diversos canales, coordinar su preparación con logística y realizar el seguimiento hasta el cierre administrativo.
+Centralizar la recepción de órdenes de compra desde distintos canales, validando en tiempo real las condiciones comerciales (crédito/stock) y coordinando la logística interna hasta el cierre administrativo de la venta.
 
 ### Actores
-* Personal, Supervisor de Ventas, Gerente de Almacén
-* Logística, Cliente, Almacén, Repartidor
+* **Internos:** Personal (Agrupación de: Supervisor de Ventas, Gerente de Almacén).
+* **Áreas de Soporte:** Logística, Almacén.
+* **Externos:** Cliente.
 
 ### Submódulos y Casos de Uso
 
-| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (<<include>>) |
+| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (`<<include>>`) |
 | :--- | :--- | :--- | :--- |
-| *Recibir Pedido* | *Tomar pedido durante visita o por canal digital* | Personal, Sup. Ventas, Gte. Almacén, Personal (recepción) | • Registrar productos y cantidades en sistema.<br>• Confirmar fechas de entrega disponibles. |
-| | *Validar condiciones comerciales* | Personal, Sup. Ventas, Gte. Almacén, Logística, Cliente | • Verificar precios vigentes y descuentos.<br>• Confirmar crédito disponible. |
-| *Coordinar Pedido* | *Enviar pedido a planta o almacén* | Cliente*, Almacén, Repartidor | • Priorizar pedidos según zona/urgencia.<br>• Validar disponibilidad de stock o capacidad. |
-| | *Confirmar fecha y modo de entrega* | Personal, Sup. Ventas, Gte. Almacén, Almacén, Repartidor, Cliente | • Programar reparto según ruta.<br>• Confirmar al cliente la fecha estimada. |
-| *Controlar Pedido* | *Realizar seguimiento del estado del pedido* | Personal, Sup. Ventas, Gte. Almacén, Almacén | • Verificar preparación, empaque y despacho.<br>• Informar retrasos o cambios al cliente. |
-| | *Ejecutar cierre administrativo del pedido* | Personal, Sup. Ventas, Gte. Almacén, Cliente | • Confirmar facturación y despacho finalizado.<br>• Registrar cierre del pedido en ERP/CRM. |
-(Nota: En el diagrama, "Cliente" inicia "Enviar pedido a planta", lo cual puede representar pedidos de autogestión).
+| **Recepción de Pedido** | *Tomar Pedido* | Personal (Sup. Ventas, Gte. Almacén), Logística | • Registrar productos, cantidades y condiciones de venta.<br>• Confirmar fechas de entrega disponibles según la programación logística. |
+| | *Validar Condiciones de Venta* | Personal (Sup. Ventas, Gte. Almacén), Cliente | • Verificación de Stock, Precios y Descuentos.<br>• Confirmar crédito disponible antes de aprobar el pedido. |
+| **Coordinar Pedido con Logística** | *Enviar pedido a planta o almacén* | Cliente*, Almacén | • Validar disponibilidad de stock o producción. |
+| | *Confirmar fecha y modo de entrega* | Personal (Sup. Ventas, Gte. Almacén), Logística | • Programar reparto según ruta establecida. |
+| **Controlar Pedido** | *Seguimiento del Status del Pedido* | Personal (Sup. Ventas, Gte. Almacén), Almacén | • Monitorear preparación, despacho y entrega.<br>• Informar retrasos o cambios al cliente o área comercial. |
+| | *Ejecutar cierre administrativo del pedido* | Personal (Sup. Ventas, Gte. Almacén), Cliente | • Confirmar facturación y despacho finalizado.<br>• Registrar cierre del pedido en el ERP y CRM. |
 
+*(Nota: El caso "Enviar pedido a planta" iniciado por el Cliente representa el flujo de autogestión o pedidos web que entran directo a la cola de almacén).*
 ---
 
 # 3) Módulo Gestión de Entregas
