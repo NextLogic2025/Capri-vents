@@ -232,55 +232,62 @@ Proveer inteligencia de negocio mediante la medición de KPIs, el análisis de t
 <img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/ad484122-8b2b-4416-a3ea-875c578251cc" />
 
 ### Propósito
-Proveer la funcionalidad para crear, modificar y gestionar el ciclo de vida de los productos en el catálogo del sistema.
+Administrar el catálogo maestro de productos asegurando la integridad de los datos (precios, condiciones de conservación), controlar los niveles de stock en tiempo real y gestionar la trazabilidad (lotes/vencimientos) para minimizar mermas.
 
 ### Actores
-* Supervisor
-* Almacen (Sistema)
+* **Internos:** Supervisor (Rol administrativo de producto).
+* **Operativos:** Almacén (Personal de bodega).
+* **Gerenciales:** Gerente (para escalamiento de alertas).
 
 ### Submódulos y Casos de Uso
 
-| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (<<include>>) |
+| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (`<<include>>`) |
 | :--- | :--- | :--- | :--- |
-| *Registro y Mantenimiento* | *Registrar Productos* | Supervisor | • Ingresar datos básicos del producto<br>• Asignar precio y categoría inicial<br>• Definir condiciones de conservación<br>• Validar unicidad de código y guardar en Cafrilosa |
-| | *Actualizar Productos* | Supervisor | • Modificar atributos existentes<br>• Propagar cambios a pedidos pendientes<br>• Registrar historial de modificaciones<br>• Notificar los cambios |
-| | *Desactivar Producto* | Supervisor | • Generar alerta desactivación<br>• Archivar para auditoría<br>• Bloquear nuevos pedidos<br>• Marcar como inactivo |
-
+| **Registro y Mantenimiento** | *Registrar Productos* | Supervisor, Almacén | • Ingresar datos básicos y asignar precio/categoría.<br>• Definir condiciones de conservación (frío, seco).<br>• Validar unicidad de código. |
+| | *Actualizar Productos* | Supervisor, Almacén | • Modificar atributos existentes.<br>• Propagar cambios a pedidos pendientes.<br>• Registrar historial y notificar cambios. |
+| | *Desactivar Producto* | Supervisor, Almacén | • Bloquear nuevos pedidos y marcar como inactivo.<br>• Archivar para auditoría. |
+| **Control de Inventario** | *Monitorear Niveles de Inventario* | Supervisor, Almacén | • Registrar entradas y salidas (Venta o Despacho).<br>• Definir umbrales mínimos/máximos. |
+| | *Verificar Fechas de Vencimiento* | Supervisor, Almacén | • Rastrear trazabilidad por Lote.<br>• Priorizar productos en promoción (FEFO).<br>• Bloquear despacho de vencidos. |
+| **Monitoreo y Alertas** | *Generar Alertas Automáticas* | Supervisor, Almacén, Gerente | • Generar alertas por stock bajo o vencimientos.<br>• Enviar notificaciones y registrar en log.<br>• Escalar a Gerente (si es crítico). |
+| | *Análisis de rotación* | Supervisor, Gerente | • Calcular índice de rotación.<br>• Identificar baja rotación y generar recomendaciones. |
 
 ### Diagrama: Control de Inventario y Monitoreo
 
-<img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/da961d5e-e8c6-4120-9a5a-0ae37a511af2" />
+<img width="6120" height="6512" alt="image" src="https://github.com/user-attachments/assets/e846472e-b05b-4275-8564-62e8806feab9" />
 
-### Propósito (Control de Inventario)
-Gestionar los movimientos de stock, actualizar los niveles de inventario en tiempo real y definir los umbrales de reabastecimiento.
+### Propósito
+Mantener la precisión del stock mediante el registro riguroso de movimientos (entradas/salidas), asegurando la trazabilidad completa por lotes y permitiendo la toma de decisiones basada en el análisis de rotación y monitoreo en tiempo real.
 
-### Actores (Control de Inventario)
-* Supervisor
+### Actores
+* **Principal:** Supervisor.
 
-### Submódulos y Casos de Uso (Control de Inventario)
+### Submódulos y Casos de Uso - Control de Inventario y Monitoreo
 
-| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (<<include>>) |
+| Submódulo | Caso de Uso Principal | Actores Principales | Relaciones (`<<include>>` / `<<extend>>`) |
 | :--- | :--- | :--- | :--- |
-| *Control de Inventario* | *Gestionar Movimientos de Stock*<br>(*Monitorear Niveles de Inventario*) | Supervisor | • Registrar Salida por Venta o Despacho<br>• Registrar Entrada de Productos |
-| | *Actualizar Inventario Tiempo Real* | Supervisor | • Monitoreo en Tiempo Real<br>• Definir Umbrales Mínimos/Máximos |
+| **Movimientos de Inventario** | *Monitorear Niveles de Inventario* | Supervisor | • **Incluye:** Registrar Salida por Venta o Despacho.<br>• **Extiende:** Registrar Entrada de Productos (que a su vez incluye: Calcular índice de rotación, Generar recomendaciones, Identificar baja rotación). |
+| **Gestión de Lotes y Caducidad** | *Verificar Fechas de Vencimiento* | Supervisor | • **Incluye:** Rastrear Trazabilidad por Lote.<br>• **Incluye:** Asociar Lotes a Pedidos Específicos.<br>• **Incluye:** Asignar Lote a Nuevos Ingresos.<br>• **Extiende:** Generar Reportes de Lotes Activos. |
+| **Actualización y Métricas** | *Actualizar Inventario Tiempo Real* | Supervisor | • **Incluye:** Monitorear en Tiempo Real.<br>• **Incluye:** Definir Umbrales Mínimos/Máximos.<br>• **Extiende:** Analizar Tendencias de Consumo.<br>• **Extiende:** Integrar con Alertas Automáticas. |
 
----
 
 ### Diagrama: Monitoreo de Alertas
 
-<img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/e2225f9f-e57e-4c68-9bc4-cf3802d24e43" />
+<img width="8168" height="6848" alt="image" src="https://github.com/user-attachments/assets/68df2512-4ed2-4e18-a58c-b1b575dad4d0" />
 
-### Propósito (Monitoreo y Alertas)
-Controlar la trazabilidad de los productos por lote, gestionar sus fechas de vencimiento, analizar la rotación y generar alertas automáticas.
+### Propósito
+Asegurar la disponibilidad óptima de productos y minimizar pérdidas por caducidad mediante el monitoreo en tiempo real de existencias, la gestión de lotes (FEFO) y un sistema automatizado de alertas escalables.
 
-### Actores (Monitoreo y Alertas)
-* Supervisor
+### Actores
+* **Internos:** Supervisor (Responsable del control).
+* **Operativos:** Almacén (Ejecuta la verificación física y recibe alertas).
+* **Gerenciales:** Gerente (Recibe escalamiento de problemas críticos).
 
-### Submódulos y Casos de Uso (Monitoreo y Alertas)
+### Submódulos y Casos de Uso - Monitoreo y Alertas
 
-| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (<<include>>) |
+| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (`<<include>>` / `<<extend>>`) |
 | :--- | :--- | :--- | :--- |
-| *Monitoreo y Alertas* | *Verificar Fechas de Vencimiento* | Supervisor | • Rastrear Trazabilidad por Lote<br>• Asociar Lotes a Pedidos Específicos<br>• Asignar Lote a Nuevos Ingresos |
-| | *Analizar Rotación de Inventario*<br>(*Incluido en Gestionar Movimientos*) | Supervisor | • Calcular indice de rotación<br>• Generar recomendaciones<br>• Identificar baja rotación |
-| | *Integrar Alertas Automáticas*<br>(*Extendido desde Actualizar Inventario*) | Supervisor | • Analizar Tendencias de Consumo<br>• (*Generar alertas de stock bajo/vencimiento*) |
+| **Control de Inventario** | *Monitorear Niveles de Inventario* | Supervisor, Almacén | • Monitorear en tiempo real.<br>• Definir umbrales mín/máx.<br>• **Análisis de rotación:** Calcular índice, identificar baja rotación y generar recomendaciones. |
+| | *Verificar Fechas de Vencimiento* | Supervisor, Almacén | • Registrar fecha de vencimiento por lote.<br>• Monitorear vencimientos próximos.<br>• Priorizar productos en promoción (salida rápida).<br>• Bloquear despacho de vencidos (Control de Calidad). |
+| **Gestión de Alertas** | *Generar Alertas Automáticas* | Supervisor, Almacén, Gerente | • Generar alertas por stock bajo o vencimiento inminente.<br>• Enviar notificaciones y registrar alertas en log.<br>• Escalar a Gerente (si la alerta es crítica). |
 
+---
