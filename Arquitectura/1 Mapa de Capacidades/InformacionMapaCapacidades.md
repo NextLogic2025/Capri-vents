@@ -49,7 +49,8 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 ## Descripción de los Módulos
 
 
-![alt text](<Planificacion Comercial Gestión de Clientes.jpg>)
+<img width="1911" height="2363" alt="image" src="https://github.com/user-attachments/assets/3a765e48-d908-401e-af70-29da1299b7f5" />
+
 
 ### 1. Planificación Comercial
 
@@ -87,7 +88,8 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 
 ---
-![alt text](<Gestión de Entregas Gestión de Pedidos.jpg>)
+<img width="1989" height="789" alt="image" src="https://github.com/user-attachments/assets/71f172f5-0299-4b15-85c1-8ddd67f3f3e8" />
+
 
 ### 3. Gestión de Entregas
 
@@ -124,7 +126,8 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 
 ---
-![alt text](<Gestión de Cobros y Créditos Postventa y Servicio al Cliente.jpg>)
+<img width="2169" height="789" alt="image" src="https://github.com/user-attachments/assets/62a19f98-233a-4fef-8b03-4f1140cd19a4" />
+
 
 ### 5. Gestión de Cobros y Créditos
 
@@ -160,7 +163,8 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 
 ---
-![WhatsApp Image 2025-11-11 at 9 45 51 PM](https://github.com/user-attachments/assets/16bce9f4-7e84-4cc8-ad26-52a7f671ca15)
+<img width="2181" height="1461" alt="image" src="https://github.com/user-attachments/assets/1187ca72-749d-4fc3-9579-b78cef19d5ce" />
+
 
 ### 7. Control y Análisis Comercial
 
