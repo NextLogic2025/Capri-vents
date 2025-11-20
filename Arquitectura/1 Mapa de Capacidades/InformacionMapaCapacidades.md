@@ -75,9 +75,6 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 **Capacidades:**
 
-* **Prospección de Clientes:**
-    * **Identificar Nuevos Clientes Potenciales** - Registrar prospectos obtenidos de diferentes fuentes (referidos, visitas en frío, ferias).
-    * **Evaluar Viabilidad Comercial** - Analizar el potencial de compra, capacidad de pago e historial crediticio del prospecto.
 * **Registro y Clasificación de Clientes:**
     * **Ingresar Datos del Cliente (razón social, dirección, contacto)** - Crear la ficha maestra del cliente en el sistema con su información fiscal, de contacto y de entrega.
     * **Clasificar según Canal, Tamaño y Frecuencia de Compra** - Segmentar clientes (ej. A, B, C; Mayorista, Minorista, HORECA) para priorizar esfuerzos y asignar condiciones.
