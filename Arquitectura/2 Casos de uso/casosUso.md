@@ -52,10 +52,15 @@ Gestionar el registro formal de clientes asegurando la integridad de datos fisca
 # 2) Módulo Gestión de Pedidos
 
 ## Recepcción de Pedidos
+
 <img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/038a5434-4f03-4bdf-9147-fa0bc53055ab" />
+
 ## Coordinar Pedido con Logística
+
 <img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/3145718a-44d3-4aa0-bb63-008b32216530" />
+
 ## Controlar Pedido
+
 <img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/80c8052d-e108-4516-9a67-e0b418c23f9d" />
 
 ### Propósito
@@ -81,31 +86,37 @@ Centralizar la recepción de órdenes de compra desde distintos canales, validan
 ---
 
 # 3) Módulo Gestión de Entregas
+
 ## Preparar Pedido
+
 <img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/ae9621af-0793-4ef0-89da-c8a096c48c3b" />
+
 ## Distribuir y entrgar pedido
+
 <img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/96e64844-bf2f-45d0-bc68-8d25147881d8" />
+
 ## Gestionar Incidencias
+
 <img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/c1494208-dd02-4d15-95ee-3b6e5efca1ff" />
 
 ### Propósito
-Asegurar la correcta preparación, embalaje, transporte y entrega final de los productos, gestionando cualquier incidencia en el proceso.
+Garantizar la integridad y puntualidad en el despacho de productos, asegurando la calidad (frescura/lote) desde la preparación hasta la entrega final y gestionando cualquier devolución o incidencia con el cliente.
 
 ### Actores
-* Personal, Supervisor de Ventas, Repartidor
-* Almacén, Cliente
+* **Internos:** Personal (Agrupación de: Supervisor de Ventas, Logística, Repartidor).
+* **Áreas de Soporte:** Almacén.
+* **Externos:** Cliente.
 
 ### Submódulos y Casos de Uso
 
-| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (<<include>>) |
+| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (`<<include>>`) |
 | :--- | :--- | :--- | :--- |
-| *Preparar Pedido* | *Verificar producto y lote* | Personal, Sup. Ventas, Repartidor, Almacén | • Confirmar frescura y fecha de vencimiento.<br>• Comprobar temperatura/condición. |
-| | *Embalar y documentar* | Personal, Sup. Ventas, Repartidor | • Generar guías de despacho.<br>• Etiquetar bultos por cliente o zona. |
-| *Distribuir y Entregar* | *Cargar y transportar productos* | Personal, Sup. Ventas, Repartidor, Personal (logística) | • Asignar vehículo y chofer según ruta.<br>• Respetar cadena de frío durante reparto. |
-| | *Confirmar entrega al cliente* | Personal, Sup. Ventas, Repartidor, Cliente | • Obtener firma o confirmación de recepción.<br>• Registrar observaciones o rechazos. |
-| *Gestionar Incidencias* | *Reportar problemas de entrega* | Personal, Sup. Ventas, Repartidor, Cliente | • Clasificar incidente.<br>• Registrar evidencia y datos en el sistema. |
-| | *Coordinar solución* | Personal, Sup. Ventas, Repartidor | • Generar nota de crédito o programar reposición.<br>• Escalar casos recurrentes a supervisión. |
-
+| **Preparar Pedido** | *Verificar producto y lote* | Personal (Sup. Ventas, Logística), Almacén | • Confirmar frescura y fecha de vencimiento. |
+| | *Embalar y documentar* | Personal (Sup. Ventas, Logística), Almacén | • Generar guías de despacho y etiquetas por Zona.<br>• Verificar Correspondencia entre Pedido y Carga. |
+| **Distribuir y Entregar Pedido** | *Cargar y transportar productos* | Personal (Sup. Ventas, Repartidor), Sup. Ventas | • Asignar chofer según ruta. |
+| | *Confirmar entrega al cliente* | Personal (Sup. Ventas, Repartidor), Cliente | • Obtener firma o confirmación de recepción.<br>• Registrar observaciones o rechazos parciales. |
+| **Gestionar Incidencias** | *Reportar problemas* | Personal (Sup. Ventas, Repartidor), Cliente | • Asignar tipo de incidencia.<br>• Registrar evidencia y datos del pedido. |
+| | *Coordinar solución* | Personal (Sup. Ventas, Repartidor), Cliente | • Emitir nota de crédito o Reposición.<br>• Analizar Causas Recurrentes y Mejorar el Proceso. |
 ---
 
 # 4) Módulo Gestión de Cobros y Créditos
