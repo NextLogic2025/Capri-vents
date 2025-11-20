@@ -122,30 +122,37 @@ Garantizar la integridad y puntualidad en el despacho de productos, asegurando l
 # 4) Módulo Gestión de Cobros y Créditos
 
 ## Controlar Cuentas por cobrar 
+
 <img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/e997fd39-9e92-43f6-8372-b2e8b194b74a" />
+
 ## Ejecutar Cobros
+
 <img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/3b6472aa-97e6-4126-9618-e2a0f1c1ea05" />
+
 ## Gestionar Créditos comerciales
+
 <img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/3a34dd1e-c66f-4c50-8053-ad187de605e2" />
 
 
 ### Propósito
-Administrar la cartera de clientes, ejecutar la cobranza de manera efectiva y evaluar el otorgamiento de créditos comerciales.
+Asegurar la liquidez de la empresa mediante el monitoreo de la cartera, la ejecución eficiente de rutas de cobranza y la evaluación rigurosa del riesgo crediticio para minimizar la incobrabilidad.
 
 ### Actores
-* Personal, Supervisor de Ventas, Vendedor
-* Gerente de Ventas, Logística, Cliente
+* **Internos:** Personal (Agrupación de: Supervisor de Ventas, Vendedor).
+* **Gerenciales:** Gerente de Ventas.
+* **Soporte:** Logística.
+* **Externos:** Cliente.
 
 ### Submódulos y Casos de Uso
 
-| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (<<include>>) |
+| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (`<<include>>`) |
 | :--- | :--- | :--- | :--- |
-| *Controlar Cuentas por Cobrar* | *Monitorear facturas pendientes* | Personal, Sup. Ventas, Personal (admin) | • Identificar facturas vencidas por rango.<br>• Evaluar riesgo de incobrabilidad. |
-| | *Clasificar clientes por estado de pago* | Personal, Sup. Ventas, Gte. Ventas | • Etiquetar cliente (Puntual, Atrasado, Moroso).<br>• Notificar estado al Ejecutivo de Cuentas. |
-| *Ejecutar Cobros* | *Coordinar rutas de cobranza* | Personal, Sup. Ventas, Vendedor, Logística | • Asignar cobros a vendedores por zona.<br>• Priorizar visitas por antigüedad de deuda. |
-| | *Registrar pagos recibidos* | Personal, Sup. Ventas, Vendedor, Cliente | • Validar montos, medio de pago y fecha.<br>• Emitir recibo oficial y actualizar cuenta. |
-| *Gestionar Créditos* | *Evaluar solicitud de crédito* | Supervisor de Ventas | • Verificar historial y capacidad de pago.<br>• Definir límite y plazo autorizado. |
-| | *Controlar cumplimiento de condiciones* | Supervisor de Ventas | • Revisar periodicidad de pagos.<br>• Actualizar límites según comportamiento. |
+| **Controlar Cuentas por Cobrar** | *Monitorear facturas pendientes* | Personal (Sup. Ventas), Gerente de Ventas | • Identificar facturas vencidas por rango de días.<br>• Evaluar riesgo de incobrabilidad. |
+| | *Clasificar clientes por estado de pago* | Personal (Sup. Ventas), Gerente de Ventas | • Etiquetar cliente como Puntual, Atrasado o Moroso.<br>• Notificar estado y acciones sugeridas al Ejecutivo de Cuentas. |
+| **Ejecutar Cobros** | *Coordinar rutas de cobranza* | Personal (Sup. Ventas, Vendedor), Logística | • Asignar cobros a vendedores o cobradores por zona.<br>• Priorizar visitas por antigüedad de deuda y riesgo. |
+| | *Registrar pagos recibidos* | Personal (Sup. Ventas, Vendedor), Cliente | • Validar montos, medio de pago y fecha de operación.<br>• Emitir recibo oficial y actualizar estado de cuenta. |
+| **Gestionar Créditos Comerciales** | *Evaluar solicitud de crédito* | Supervisor de Ventas | • Verificar historial y capacidad de pago.<br>• Definir límite y plazo autorizado según política. |
+| | *Controlar cumplimiento de condiciones* | Supervisor de Ventas | • Revisar periodicidad de pagos y comportamiento de cartera.<br>• Actualizar límites según comportamiento. |
 
 ---
 
@@ -153,59 +160,68 @@ Administrar la cartera de clientes, ejecutar la cobranza de manera efectiva y ev
 
 
 ## Atender Reclamos
+
 <img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/d9ce87c7-bfd8-466d-837b-8ed869799400" />
+
 ## Dar seguimiento a la Satisfacción
+
 <img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/2f3c9ef8-ae60-4cd7-bd22-add434d3a7ac" />
+
 ## Fidealizar de Froma Continua
+
 <img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/8fbd5761-73ae-4544-8a52-7e04a3784187" />
 
 ### Propósito
-Atender reclamos de manera eficiente, medir la satisfacción del cliente y ejecutar acciones de fidelización continua.
+Gestionar la resolución efectiva de reclamos para recuperar la confianza del cliente, medir sistemáticamente la satisfacción del servicio y ejecutar estrategias de retención para maximizar el ciclo de vida del cliente (LTV).
 
 ### Actores
-* Supervisor de Ventas
-* Vendedor, Cliente
+* **Internos:** Supervisor de Ventas, Vendedor.
+* **Externos:** Cliente.
 
 ### Submódulos y Casos de Uso
 
-| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (<<include>>) |
+| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (`<<include>>`) |
 | :--- | :--- | :--- | :--- |
-| *Atender Reclamos* | *Recibir reclamo por producto o servicio* | Sup. Ventas, Vendedor | • Identificar pedido y motivo del reclamo.<br>• Documentar evidencia del problema. |
-| | *Resolver reclamo* | Sup. Ventas | • Aprobar o rechazar devolución.<br>• Coordinar reposición o emitir nota de crédito. |
-| *Dar Seguimiento a la Satisfacción* | *Aplicar encuestas o llamadas* | Sup. Ventas, Cliente | • Programar envíos/llamadas en CRM.<br>• Recopilar respuestas (NPS/CSAT) y comentarios. |
-| | *Analizar resultados y retroalimentar* | Sup. Ventas | • Consolidar métricas y detectar causas raíz.<br>• Comunicar hallazgos y proponer correctivos. |
-| *Fidelizar de Forma Continua* | *Implementar programas de retención* | Sup. Ventas, Cliente | • Definir criterios de elegibilidad.<br>• Asignar beneficios y notificar al cliente. |
-| | *Ofertar beneficios y promociones* | Sup. Ventas | • Aplicar descuentos o beneficios por volumen.<br>• Lanzar promociones periódicas y medir performance. |
+| **Atender Reclamos** | *Recibir reclamo por producto o servicio* | Supervisor de Ventas, Vendedor | • Identificar pedido y motivo del reclamo.<br>• Documentar evidencia del problema. |
+| | *Resolver reclamo* | Supervisor de Ventas | • Aprobar o rechazar la devolución conforme a política y evidencia. |
+| **Dar Seguimiento a la Satisfacción** | *Aplicar encuestas o llamadas de seguimiento* | Supervisor de Ventas, Cliente | • Programar envíos/llamadas en CRM.<br>• Recopilar respuestas (NPS/CSAT) y comentarios abiertos. |
+| | *Analizar resultados y retroalimentar al equipo* | Supervisor de Ventas | • Consolidar métricas y detectar causas raíz de insatisfacción.<br>• Comunicar hallazgos y proponer acciones correctivas a Comercial/Operaciones. |
+| **Fidelizar de Forma Continua** | *Implementar programas de retención* | Supervisor de Ventas, Cliente | • Definir criterios de elegibilidad.<br>• Asignar beneficios y notificar al cliente. |
+| | *Ofertar beneficios y promociones para clientes activos* | Supervisor de Ventas, Cliente | • Aplicar descuentos o beneficios por volumen.<br>• Lanzar promociones periódicas segmentadas y medir su performance. |
 
 ---
 
 ## 6) Módulo Control y Análisis Comercial
 
 ## Medir desempeño Comercial
+
 <img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/88a904d8-b4f9-4115-af34-f1473afffc9d" />
+
 ## Analizar Mercado y Promociones
+
 <img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/e6827c7f-a9b3-474d-a909-d7e4114969be" />
+
 ## Reportar y Decidir Gerencialmente
+
 <img width="1231" height="1778" alt="image" src="https://github.com/user-attachments/assets/b80a4ade-dfcb-4381-9096-44420c75b7b9" />
 
 ### Propósito
-Proveer herramientas para la medición del desempeño de ventas, análisis de mercado y toma de decisiones estratégicas gerenciales.
+Proveer inteligencia de negocio mediante la medición de KPIs, el análisis de tendencias de mercado y la generación de reportes gerenciales que fundamenten la toma de decisiones estratégicas y la mejora continua.
 
 ### Actores
-* Supervisor de Ventas
-* Gerente
+* **Internos:** Supervisor de Ventas.
+* **Gerenciales:** Gerente.
 
 ### Submódulos y Casos de Uso
 
-| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (<<include>>) |
+| Submódulo | Caso de Uso Principal | Actores Principales | Incluye (`<<include>>`) |
 | :--- | :--- | :--- | :--- |
-| *Medir Desempeño Comercial* | *Evaluar cumplimiento de metas* | Sup. Ventas, Gerente | • Comparar ventas reales vs. objetivos.<br>• Medir rentabilidad por canal o producto. |
-| | *Monitorear actividad de ventas* | Sup. Ventas, Gerente | • Seguimiento de visitas y pedidos por vendedor.<br>• Controlar frecuencia de cobro y detectar desvíos. |
-| *Analizar Mercado y Promociones* | *Identificar tendencias de consumo* | Sup. Ventas, Gerente | • Evaluar demanda de nuevos productos.<br>• Monitorear movimientos de competencia. |
-| | *Analizar eficiencia de promociones* | Sup. Ventas, Gerente | • Medir impacto en ventas.<br>• Ajustar estrategias comerciales. |
-| *Reportar y Decidir Gerencialmente* | *Elaborar informes de resultados* | Sup. Ventas, Gerente | • Generar reporte de ventas por zona/canal.<br>• Analizar clientes inactivos y proponer reactivación. |
-| | *Tomar decisiones estratégicas* | Sup. Ventas, Gerente | • Redefinir metas o políticas de precio.<br>• Planificar nuevas campañas y asignar responsables. |
-
+| **Medir Desempeño Comercial** | *Evaluar cumplimiento de metas* | Supervisor de Ventas, Gerente | • Comparar ventas reales vs. objetivos por zona/canal/producto.<br>• Medir rentabilidad por canal o producto. |
+| | *Monitorear actividad de ventas* | Supervisor de Ventas, Gerente | • Seguimiento de visitas y pedidos por vendedor.<br>• Controlar la frecuencia de cobro y detectar desvíos. |
+| **Analizar Mercado y Promociones** | *Identificar tendencias de consumo* | Supervisor de Ventas, Gerente | • Evaluar demanda de nuevos productos por segmento/canal.<br>• Monitorear movimientos de competencia. |
+| | *Analizar eficiencia de promociones* | Supervisor de Ventas, Gerente | • Medir impacto en ventas.<br>• Ajustar estrategias comerciales. |
+| **Reportar y Decidir Gerencialmente** | *Elaborar informes de resultados* | Supervisor de Ventas, Gerente | • Generar reporte de ventas por zona o canal.<br>• Analizar clientes inactivos y proponer acciones de reactivación. |
+| | *Tomar decisiones estratégicas* | Supervisor de Ventas, Gerente | • Redefinir metas o políticas de precio según desempeño y mercado.<br>• Planificar nuevas campañas comerciales y asignar responsables/fechas. |
 
 ---
 
