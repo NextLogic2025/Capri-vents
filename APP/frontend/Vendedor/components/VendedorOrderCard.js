@@ -113,9 +113,17 @@ const VendedorOrderCard = ({ order, onPress }) => {
 
 const styles = StyleSheet.create({
   card: {
-    ...globalStyles.card,
+    backgroundColor: colors.white,
+    borderRadius: 24,
+    padding: 20,
     marginBottom: 16,
-    padding: 18,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.03)',
   },
   rowBetween: {
     flexDirection: 'row',
@@ -160,9 +168,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 14,
-    backgroundColor: '#FFF4F0',
-    alignItems: 'center',
-    justifyContent: 'center',
     marginRight: 10,
   },
   methodLabel: {

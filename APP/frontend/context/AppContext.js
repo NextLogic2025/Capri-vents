@@ -3,6 +3,254 @@ import productsData from '../data/products';
 import mockOrders from '../data/mockOrders';
 import mockCredits from '../data/mockCredits';
 
+// --- MOCK DATA EXTENDIDA PARA VENDEDOR ---
+const today = new Date().toISOString().split('T')[0];
+const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+
+const extendedMockOrders = [
+  // 1. Pedido de HOY - Pendiente
+  {
+    id: 'ORD-001',
+    code: 'ORD-001',
+    clientName: 'Juan Pérez',
+    clientPhone: '0991234567',
+    clientAddress: 'Av. Amazonas y Naciones Unidas',
+    clientAddressDetail: 'Edificio La Previsora, Piso 5, Oficina 502. Referencia: Frente al parque La Carolina.',
+    date: today,
+    status: 'PENDIENTE',
+    paymentStatus: 'PENDIENTE',
+    paymentMethod: 'EFECTIVO',
+    total: 45.50,
+    items: [
+      { name: 'Salchicha Viena', presentation: 'Paquete 500g', quantity: 10, price: 2.50 },
+      { name: 'Chorizo Parrillero', presentation: 'Paquete 1kg', quantity: 1, price: 20.50 },
+    ],
+  },
+  // 2. Pedido de HOY - En Preparación
+  {
+    id: 'ORD-002',
+    code: 'ORD-002',
+    clientName: 'María López',
+    clientPhone: '0987654321',
+    clientAddress: 'Calle La Ronda 123',
+    clientAddressDetail: 'Casa de dos pisos color blanco, puerta de madera. Referencia: Junto a la panadería "El Trigo".',
+    date: today,
+    status: 'EN_PREPARACION',
+    paymentStatus: 'PENDIENTE',
+    paymentMethod: 'TRANSFERENCIA',
+    total: 120.00,
+    items: [
+      { name: 'Jamón Espalda', presentation: 'Bloque 2kg', quantity: 5, price: 12.00 },
+      { name: 'Mortadela Boloña', presentation: 'Barra 1kg', quantity: 6, price: 10.00 },
+    ],
+  },
+  // 3. Pedido de HOY - En Ruta
+  {
+    id: 'ORD-003',
+    code: 'ORD-003',
+    clientName: 'Tienda El Vecino',
+    clientPhone: '0998877665',
+    clientAddress: 'Sector El Condado, Calle A',
+    clientAddressDetail: 'Manzana 4, Villa 12. Referencia: Detrás del colegio Einstein.',
+    date: today,
+    status: 'EN_RUTA',
+    paymentStatus: 'PENDIENTE',
+    paymentMethod: 'EFECTIVO',
+    total: 15.75,
+    items: [
+      { name: 'Salchicha Cocktail', presentation: 'Paquete 250g', quantity: 15, price: 1.05 },
+    ],
+  },
+  // 4. Pedido de AYER - Entregado
+  {
+    id: 'ORD-004',
+    code: 'ORD-004',
+    clientName: 'Restaurante Sabor Latino',
+    clientPhone: '022345678',
+    clientAddress: 'Av. 10 de Agosto y Colón',
+    clientAddressDetail: 'Local esquinero con letrero rojo. Referencia: Parada del Trolebús Colón.',
+    date: yesterday,
+    status: 'ENTREGADO',
+    paymentStatus: 'PAGADO',
+    paymentMethod: 'EFECTIVO',
+    total: 250.00,
+    items: [
+      { name: 'Chuleta Ahumada', presentation: 'Kg', quantity: 20, price: 8.00 },
+      { name: 'Tocino Ahumado', presentation: 'Paquete 500g', quantity: 18, price: 5.00 },
+    ],
+  },
+  // 5. Pedido de AYER - Cancelado
+  {
+    id: 'ORD-005',
+    code: 'ORD-005',
+    clientName: 'Carlos Ruiz',
+    clientPhone: '0991122334',
+    clientAddress: 'Carcelén Industrial',
+    clientAddressDetail: 'Galpón 3, Bodega 5. Referencia: Entrada principal del parque industrial.',
+    date: yesterday,
+    status: 'CANCELADO',
+    paymentStatus: 'ANULADO',
+    paymentMethod: 'CREDITO',
+    total: 80.00,
+    items: [
+      { name: 'Salchichón Cervecero', presentation: 'Barra 500g', quantity: 40, price: 2.00 },
+    ],
+  },
+  // 6. Pedido PENDIENTE (Fecha anterior)
+  {
+    id: 'ORD-006',
+    code: 'ORD-006',
+    clientName: 'Panadería La Espiga',
+    clientPhone: '0982233445',
+    clientAddress: 'Villa Flora, Calle B',
+    clientAddressDetail: 'Local comercial #4. Referencia: Frente a la farmacia Fybeca.',
+    date: '2023-10-20',
+    status: 'PENDIENTE',
+    paymentStatus: 'PENDIENTE',
+    paymentMethod: 'CREDITO',
+    total: 300.50,
+    items: [
+      { name: 'Jamón de Pollo', presentation: 'Bloque 2kg', quantity: 15, price: 12.00 },
+      { name: 'Queso de Chancho', presentation: 'Barra 1kg', quantity: 10, price: 12.05 },
+    ],
+  },
+  // 7. Pedido EN RUTA (Urgente)
+  {
+    id: 'ORD-007',
+    code: 'ORD-007',
+    clientName: 'Minimarket Express',
+    clientPhone: '0995566778',
+    clientAddress: 'Cumbayá, Plaza Central',
+    clientAddressDetail: 'Centro Comercial Plaza Cumbayá, Local 12. Referencia: Junto al banco Pichincha.',
+    date: today,
+    status: 'EN_RUTA',
+    paymentStatus: 'PENDIENTE',
+    paymentMethod: 'TRANSFERENCIA',
+    total: 500.00,
+    items: [
+      { name: 'Salami Italiano', presentation: 'Barra 2kg', quantity: 10, price: 25.00 },
+      { name: 'Pepperoni', presentation: 'Paquete 1kg', quantity: 10, price: 25.00 },
+    ],
+  },
+  // 8. Pedido ENTREGADO (Pago pendiente validación)
+  {
+    id: 'ORD-008',
+    code: 'ORD-008',
+    clientName: 'Licorería Don Pepe',
+    clientPhone: '0989988776',
+    clientAddress: 'La Mariscal, Foch y Reina Victoria',
+    clientAddressDetail: 'Edificio Foch, Planta Baja. Referencia: Zona rosa.',
+    date: yesterday,
+    status: 'ENTREGADO',
+    paymentStatus: 'PAGO_PENDIENTE_VALIDACION',
+    paymentMethod: 'TRANSFERENCIA',
+    total: 150.00,
+    items: [
+      { name: 'Chorizo Español', presentation: 'Paquete 500g', quantity: 15, price: 10.00 },
+    ],
+  },
+  // 9. Pedido EN PREPARACIÓN (Crédito)
+  {
+    id: 'ORD-009',
+    code: 'ORD-009',
+    clientName: 'Comedor Doña Flor',
+    clientPhone: '0994433221',
+    clientAddress: 'Mercado Central, Puesto 45',
+    clientAddressDetail: 'Sección de Comidas, Puesto #45. Referencia: Entrada por la calle Pichincha.',
+    date: today,
+    status: 'EN_PREPARACION',
+    paymentStatus: 'PENDIENTE',
+    paymentMethod: 'CREDITO',
+    total: 65.25,
+    items: [
+      { name: 'Longaniza', presentation: 'Paquete 1kg', quantity: 5, price: 8.00 },
+      { name: 'Morcilla', presentation: 'Paquete 500g', quantity: 10, price: 2.52 },
+    ],
+  },
+];
+
+const extendedMockCredits = [
+  ...mockCredits,
+  {
+    id: 'cred-vend-001',
+    orderId: 'ORD-009',
+    orderCode: 'ORD-009',
+    clientName: 'Comedor Doña Flor',
+    total: 65.25,
+    saldoPendiente: 65.25,
+    status: 'En curso',
+    installments: [
+      { id: 'inst-1', number: 1, amount: 32.62, dueDate: '2024-11-30', status: 'PENDIENTE' },
+      { id: 'inst-2', number: 2, amount: 32.63, dueDate: '2024-12-15', status: 'PENDIENTE' },
+    ],
+  },
+  {
+    id: 'cred-vend-002',
+    orderId: 'ORD-006',
+    orderCode: 'ORD-006',
+    clientName: 'Panadería La Espiga',
+    total: 300.50,
+    saldoPendiente: 150.25,
+    status: 'En curso',
+    installments: [
+      { id: 'inst-old-1', number: 1, amount: 150.25, dueDate: '2023-11-15', status: 'VENCIDA' },
+      { id: 'inst-old-2', number: 2, amount: 150.25, dueDate: '2023-12-15', status: 'PENDIENTE' },
+    ],
+  },
+];
+
+// --- MOCK DATA TICKETS ---
+const mockTickets = [
+  {
+    id: 'TICK-001',
+    type: 'CLIENTE',
+    user: 'Juan Pérez',
+    subject: 'Producto dañado en entrega',
+    description: 'El cliente reporta que el paquete de salchichas llegó abierto.',
+    orderId: 'ORD-004',
+    orderCode: 'ORD-004',
+    status: 'ABIERTO',
+    date: '2024-11-20',
+    evidence: null,
+  },
+  {
+    id: 'TICK-002',
+    type: 'CLIENTE',
+    user: 'María López',
+    subject: 'Solicitud de cambio de fecha',
+    description: 'El cliente pide recibir el pedido mañana por la tarde.',
+    orderId: 'ORD-007',
+    orderCode: 'ORD-007',
+    status: 'CERRADO',
+    date: '2024-11-18',
+    evidence: null,
+  },
+  {
+    id: 'TICK-003',
+    type: 'VENDEDOR',
+    user: 'Vendedor Demo',
+    subject: 'Cliente no estaba en domicilio',
+    description: 'Se intentó entregar el pedido #ORD-009 pero no hubo respuesta.',
+    orderId: 'ORD-009',
+    orderCode: 'ORD-009',
+    status: 'EN_PROCESO',
+    date: '2024-11-22',
+    evidence: null,
+  },
+  {
+    id: 'TICK-004',
+    type: 'VENDEDOR',
+    user: 'Vendedor Demo',
+    subject: 'Error en facturación',
+    description: 'La factura salió con el RUC incorrecto, solicito anulación.',
+    orderId: 'ORD-012',
+    orderCode: 'ORD-012',
+    status: 'ABIERTO',
+    date: '2024-11-23',
+    evidence: null,
+  },
+];
+
 const TAX_RATE = 0.12;
 
 const clientUser = {
@@ -41,9 +289,10 @@ const AppContext = createContext();
 export const AppProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentRole, setCurrentRole] = useState(null); // BACKEND: este rol vendrá del token del usuario autenticado.
+  const [sessionVersion, setSessionVersion] = useState(0); // Fuerza remonte de navegacion en login/logout.
   const [user, setUser] = useState(null);
   const [cart, setCart] = useState([]);
-  const [orders, setOrders] = useState(mockOrders);
+  const [orders, setOrders] = useState(extendedMockOrders);
   const initialAddresses = [
     {
       id: 'dir-1',
@@ -95,7 +344,7 @@ export const AppProvider = ({ children }) => {
       installments: credit.installments || credit.cuotas || [],
     }));
 
-  const [credits, setCredits] = useState(normalizeCredits(mockCredits));
+  const [credits, setCredits] = useState(normalizeCredits(extendedMockCredits));
   const [products] = useState(productsData);
   const [addresses, setAddresses] = useState(initialAddresses);
   const defaultAddress = useMemo(
@@ -107,7 +356,43 @@ export const AppProvider = ({ children }) => {
     () => paymentCards.find((card) => card.defaultCard) ?? paymentCards[0] ?? null,
     [paymentCards]
   );
-  const [notifications, setNotifications] = useState({ pedidos: true, creditos: true });
+  const [notifications, setNotifications] = useState({
+    pedidos: true,
+    productos: true,
+    recordatorios: true,
+    creditos: true,
+  });
+
+  // Soporte Tickets
+  const [tickets, setTickets] = useState(mockTickets);
+
+  const addTicket = (ticketData) => {
+    const newTicket = {
+      id: `TICK-${Date.now()}`,
+      status: 'ABIERTO',
+      date: new Date().toISOString().split('T')[0],
+      type: currentRole === 'vendedor' ? 'VENDEDOR' : 'CLIENTE', // Auto-detectar tipo
+      user: user?.name || 'Usuario',
+      ...ticketData,
+    };
+    setTickets((prev) => [newTicket, ...prev]);
+    return newTicket;
+  };
+
+  const updateTicketStatus = (ticketId, newStatus, response) => {
+    setTickets((prev) =>
+      prev.map((t) =>
+        t.id === ticketId ? { ...t, status: newStatus, response } : t
+      )
+    );
+  };
+
+  const normalizeKey = (value = '') =>
+    value
+      .toString()
+      .trim()
+      .toUpperCase()
+      .replace(/\s+/g, '_');
   const matchProduct = (item, productId) => item.id === productId || item.productId === productId;
   const addAddress = (address) => {
     setAddresses((prev) => [
@@ -169,17 +454,23 @@ export const AppProvider = ({ children }) => {
         const code = order.code || order.id || `PED-${index + 1}`;
         const paymentMethod = order.paymentMethod || order.metodoPago || 'Transferencia';
         const paymentStatus = order.paymentStatus || order.estadoPago || 'Pendiente';
-        const status = order.status || order.estadoPedido || 'PENDIENTE_ENTREGA';
+        const status = order.status || order.estadoPedido || 'Pendiente entrega';
+
         return {
           ...order,
           code,
           assignedVendorId: order.assignedVendorId || vendorUser.id,
+          assignedVendorName: order.assignedVendorName || vendorUser.name,
           clientName: order.clientName || order.clienteNombre || `Cliente ${index + 1}`,
           clientPhone: order.clientPhone || '+593 98 765 4321',
           clientAddress: order.clientAddress || order.address || 'Av. Principal y 10 de Agosto',
+          sector: order.sector || order.zone || 'Zona Norte',
           paymentMethod,
+          paymentMethodKey: normalizeKey(paymentMethod),
           paymentStatus,
+          paymentStatusKey: normalizeKey(paymentStatus),
           status,
+          statusKey: normalizeKey(status),
         };
       });
   }, [orders]);
@@ -188,21 +479,27 @@ export const AppProvider = ({ children }) => {
     const normalizedCredits = Array.isArray(credits) ? credits : [];
     return normalizedCredits
       .filter(() => {
-        // BACKEND: filtrar créditos que correspondan a pedidos del vendorUser
+        // BACKEND: filtrar creditos que correspondan a pedidos del vendorUser
         return true;
       })
       .map((credit, index) => {
-        const installments = (credit.installments || credit.cuotas || []).map((installment, position) => ({
-          ...installment,
-          amount: installment.amount ?? installment.monto ?? 0,
-          dueDate: installment.dueDate || installment.fechaVencimiento || installment.due_date,
-          status: installment.status || installment.estado || 'Pendiente',
-          number: installment.number || installment.numero || position + 1,
-        }));
+        const installments = (credit.installments || credit.cuotas || []).map((installment, position) => {
+          const status = installment.status || installment.estado || 'Pendiente';
+          return {
+            ...installment,
+            amount: installment.amount ?? installment.monto ?? 0,
+            dueDate: installment.dueDate || installment.fechaVencimiento || installment.due_date,
+            status,
+            statusKey: normalizeKey(status),
+            number: installment.number || installment.numero || position + 1,
+          };
+        });
+        const creditStatus = credit.status || 'En curso';
         return {
           ...credit,
-          clientName: credit.clientName || `Cliente crédito ${index + 1}`,
+          clientName: credit.clientName || credit.clienteNombre || `Cliente credito ${index + 1}`,
           orderCode: credit.orderCode || credit.code || credit.id,
+          statusKey: normalizeKey(creditStatus),
           installments,
         };
       });
@@ -428,16 +725,22 @@ export const AppProvider = ({ children }) => {
     return newOrder;
   };
 
-  const createCreditPlanFromOrder = (orderId, planConfig = { cuotas: [] }) => {
+  const createCreditPlanFromOrder = (order, planConfig = { cuotas: [] }) => {
     // BACKEND: POST /credits para generar el plan de cuotas asociado a un pedido.
-    const order = orders.find((item) => item.id === orderId);
-    if (!order || !planConfig?.cuotas?.length) return null;
+    // Recibimos el objeto order completo para evitar problemas de estado asíncrono
+    console.log('🔵 [DEBUG] createCreditPlanFromOrder llamado con:', { order, planConfig });
+
+    if (!order || !planConfig?.cuotas?.length) {
+      console.log('❌ [DEBUG] createCreditPlanFromOrder retornó null - orden o cuotas inválidas');
+      return null;
+    }
+
     const creditId = `CRED-${Date.now()}`;
     const installments = planConfig.cuotas.map((cuota, index) => ({
       id: `${creditId}-${index}`,
       number: cuota.numero || index + 1,
       amount: cuota.monto,
-      dueDate: cuota.fecha,
+      dueDate: cuota.fecha || cuota.dueDate, // Asegurar que tomamos la fecha correcta
       status: 'Pendiente',
       paymentMethod: null,
     }));
@@ -450,17 +753,36 @@ export const AppProvider = ({ children }) => {
       saldoPendiente: order.total,
       status: 'En curso',
       installments,
+      // Campos adicionales para visualización correcta
+      fechaInicio: new Date().toISOString(),
+      plazo: `${planConfig.cuotas.length} meses`,
+      nextPaymentDate: installments[0].dueDate,
     };
 
-    setCredits((prev) => [newCredit, ...prev]);
+    console.log('✅ [DEBUG] Nuevo crédito creado:', newCredit);
+
+    setCredits((prev) => {
+      console.log('📝 [DEBUG] Credits ANTES:', prev);
+      const updated = [newCredit, ...prev];
+      console.log('📝 [DEBUG] Credits DESPUÉS:', updated);
+      return updated;
+    });
+
+    // Actualizar saldo y deuda del usuario
     setUser((prev) => {
-      const newDebt = (prev.deudaActual ?? prev.deudaTotal ?? 0) + order.total;
-      return {
+      const currentDebt = prev.deudaActual ?? prev.deudaTotal ?? 0;
+      const newDebt = currentDebt + order.total;
+      const currentAvailable = prev.saldoCreditoDisponible ?? 0;
+      console.log('💰 [DEBUG] User ANTES - Disponible:', currentAvailable, 'Deuda:', currentDebt);
+      // El disponible disminuye, la deuda aumenta
+      const updatedUser = {
         ...prev,
-        saldoCreditoDisponible: Math.max(prev.saldoCreditoDisponible - order.total, 0),
+        saldoCreditoDisponible: Math.max(currentAvailable - order.total, 0),
         deudaActual: newDebt,
         deudaTotal: newDebt,
       };
+      console.log('💰 [DEBUG] User DESPUÉS - Disponible:', updatedUser.saldoCreditoDisponible, 'Deuda:', updatedUser.deudaActual);
+      return updatedUser;
     });
 
     return newCredit;
@@ -514,6 +836,7 @@ export const AppProvider = ({ children }) => {
 
   const login = (roleKey = 'cliente') => {
     // BACKEND: POST /auth/login para obtener tokens e informacion del usuario.
+    console.log('[AUTH] login llamado', roleKey);
     if (roleKey === 'vendedor') {
       setUser(vendorUser);
     } else if (roleKey === 'supervisor') {
@@ -521,12 +844,27 @@ export const AppProvider = ({ children }) => {
     } else {
       setUser(clientUser);
     }
+    setSessionVersion(Date.now());
     setCurrentRole(roleKey);
     setIsLoggedIn(true);
   };
 
   const logout = () => {
     // BACKEND: invalidar el token de sesion.
+    console.log('[AUTH] logout ejecutado - limpiando estado');
+    setSessionVersion(Date.now());
+    setCart([]);
+    setOrders(extendedMockOrders);
+    setCredits(normalizeCredits(extendedMockCredits));
+    setAddresses(initialAddresses);
+    setPaymentCards(initialCards);
+    setNotifications({
+      pedidos: true,
+      productos: true,
+      recordatorios: true,
+      creditos: true,
+    });
+    setTickets(mockTickets);
     setIsLoggedIn(false);
     setCurrentRole(null);
     setUser(null);
@@ -542,6 +880,13 @@ export const AppProvider = ({ children }) => {
     // BACKEND: compatibilidad - el supervisor marcaria la cuota como pagada.
     registerInstallmentPayment(creditId, installmentId, 'TARJETA');
   };
+
+
+
+
+
+
+
 
   const value = {
     products,
@@ -578,6 +923,7 @@ export const AppProvider = ({ children }) => {
     claims,
     supervisorUser,
     isLoggedIn,
+    sessionVersion,
     login,
     logout,
     addresses,
@@ -591,9 +937,14 @@ export const AppProvider = ({ children }) => {
     updatePaymentCard,
     removePaymentCard,
     setDefaultPaymentCard,
+    // Soporte
+    tickets,
+    addTicket,
+    updateTicketStatus,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
 
 export const useAppContext = () => useContext(AppContext);
+

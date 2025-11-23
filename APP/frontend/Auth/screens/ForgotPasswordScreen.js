@@ -8,6 +8,8 @@ import {
   Alert,
   ScrollView,
   Image,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../../theme/colors';
@@ -44,53 +46,75 @@ const ForgotPasswordScreen = ({ navigation }) => {
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.container}
-      keyboardShouldPersistTaps="handled"
-      showsVerticalScrollIndicator={false}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Ionicons name="chevron-back" size={26} color={colors.darkText} />
-      </TouchableOpacity>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.headerBackground} />
 
-      <Image source={LogoCafrilosa} style={styles.logo} />
+        <View style={styles.contentWrapper}>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <Ionicons name="chevron-back" size={24} color={colors.white} />
+          </TouchableOpacity>
 
-      <View style={styles.form}>
-        <Text style={styles.heading}>¿Olvidaste tu contraseña?</Text>
-        <Text style={styles.description}>
-          Ingresa tu correo electrónico y te enviaremos un código para que puedas crear
-          una nueva contraseña.
-        </Text>
+          <View style={styles.logoContainer}>
+            <Image source={LogoCafrilosa} style={styles.logo} />
+          </View>
 
-        <Text style={styles.fieldLabel}>Correo electrónico</Text>
-        <View style={styles.inputWrapper}>
-          <Ionicons name="mail-outline" size={20} color={colors.muted} style={styles.inputIcon} />
-          <TextInput
-            value={email}
-            onChangeText={setEmail}
-            placeholder="tucorreo@cafrilosa.com"
-            placeholderTextColor={colors.textMuted}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            style={styles.input}
-          />
+          <View style={styles.card}>
+            <Text style={styles.heading}>¿Olvidaste tu contraseña?</Text>
+            <Text style={styles.subheading}>
+              Ingresa tu correo electrónico y te enviaremos un código para restablecerla.
+            </Text>
+
+            <View style={styles.fieldGroup}>
+              <Text style={styles.fieldLabel}>Correo electrónico</Text>
+              <View style={[styles.inputWrapper, email ? styles.inputWrapperActive : null]}>
+                <Ionicons
+                  name="mail-outline"
+                  size={20}
+                  color={email ? colors.primary : colors.textMuted}
+                  style={styles.inputIcon}
+                />
+                <TextInput
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="tucorreo@cafrilosa.com"
+                  placeholderTextColor={colors.textMuted}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  style={styles.input}
+                />
+              </View>
+            </View>
+            {!!error && (
+              <View style={styles.errorContainer}>
+                <Ionicons name="alert-circle" size={20} color={colors.danger} />
+                <Text style={styles.errorText}>{error}</Text>
+              </View>
+            )}
+
+            <TouchableOpacity style={styles.primaryButton} onPress={handleSubmit}>
+              <Text style={styles.primaryButtonText}>ENVIAR CÓDIGO</Text>
+              <Ionicons name="paper-plane-outline" size={20} color={colors.white} />
+            </TouchableOpacity>
+
+            <Text style={styles.helperText}>
+              Revisa tu bandeja de entrada (y también la carpeta de spam).
+            </Text>
+
+            <TouchableOpacity onPress={handleResend} style={styles.resendButton}>
+              <Text style={styles.helperLink}>Reenviar correo electrónico</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        {!!error && <Text style={styles.errorText}>{error}</Text>}
-
-        <TouchableOpacity style={styles.primaryButton} onPress={handleSubmit}>
-          <Text style={styles.primaryButtonText}>Enviar código</Text>
-        </TouchableOpacity>
-
-        <Text style={styles.helperText}>
-          Revisa tu bandeja de entrada (y también la carpeta de spam). Usa el código para
-          verificar tu identidad y restablecer tu contraseña.
-        </Text>
-
-        <TouchableOpacity onPress={handleResend}>
-          <Text style={styles.helperLink}>Reenviar correo electrónico</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -98,92 +122,158 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: colors.background,
+  },
+  headerBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '40%',
+    backgroundColor: colors.primary,
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
+  },
+  contentWrapper: {
+    flex: 1,
     paddingHorizontal: 24,
+    paddingTop: 40,
     paddingBottom: 40,
-    paddingTop: 32,
+    alignItems: 'center',
   },
   backButton: {
-    width: 40,
-    height: 40,
+    alignSelf: 'flex-start',
+    marginBottom: 20,
+    padding: 8,
+    backgroundColor: 'rgba(255,255,255,0.2)',
     borderRadius: 12,
+  },
+  logoContainer: {
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.white,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 3,
+    marginBottom: 30,
   },
   logo: {
-    width: 170,
-    height: 100,
+    width: 220,
+    height: 120,
     resizeMode: 'contain',
-    alignSelf: 'center',
-    marginBottom: 24,
   },
-  form: {
+  slogan: {
+    marginTop: 8,
+    fontSize: 16,
+    color: colors.gold,
+    fontWeight: '700',
+    fontStyle: 'italic',
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+  },
+  card: {
     width: '100%',
+    backgroundColor: colors.white,
+    borderRadius: 24,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 10,
   },
   heading: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '800',
     color: colors.darkText,
+    marginBottom: 8,
+    textAlign: 'center',
   },
-  description: {
-    color: colors.textLight,
-    marginTop: 6,
+  subheading: {
+    color: colors.textSecondary,
     marginBottom: 24,
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  fieldGroup: {
+    marginBottom: 20,
   },
   fieldLabel: {
-    fontWeight: '700',
-    color: colors.bodyText,
-    marginBottom: 6,
+    fontWeight: '600',
+    color: colors.darkText,
+    marginBottom: 8,
+    fontSize: 14,
+    marginLeft: 4,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: 14,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    borderWidth: 1.5,
+    borderColor: colors.borderSoft,
+    backgroundColor: colors.inputBackground,
+    height: 56,
+  },
+  inputWrapperActive: {
+    borderColor: colors.primary,
     backgroundColor: colors.white,
   },
   inputIcon: {
-    marginRight: 8,
+    marginRight: 12,
   },
   input: {
     flex: 1,
-    paddingVertical: 12,
     fontSize: 16,
     color: colors.darkText,
+    height: '100%',
+  },
+  errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFEBEE',
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 20,
   },
   errorText: {
     color: colors.danger,
-    marginTop: 8,
+    marginLeft: 8,
+    fontSize: 13,
+    flex: 1,
   },
   primaryButton: {
-    backgroundColor: colors.primaryRed,
-    borderRadius: 22,
-    paddingVertical: 14,
+    backgroundColor: colors.primary,
+    borderRadius: 16,
+    paddingVertical: 16,
+    flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 22,
+    justifyContent: 'center',
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+    marginBottom: 24,
   },
   primaryButtonText: {
     color: colors.white,
-    fontWeight: '700',
+    fontWeight: '800',
     fontSize: 16,
+    marginRight: 8,
+    letterSpacing: 0.5,
   },
   helperText: {
-    marginTop: 18,
-    color: colors.textMuted,
-    lineHeight: 20,
+    color: colors.textSecondary,
+    fontSize: 13,
+    textAlign: 'center',
+    marginBottom: 16,
+    lineHeight: 18,
+  },
+  resendButton: {
+    alignSelf: 'center',
+    padding: 8,
   },
   helperLink: {
-    marginTop: 8,
-    color: colors.primaryRed,
+    color: colors.primary,
     fontWeight: '700',
+    fontSize: 14,
   },
 });
 

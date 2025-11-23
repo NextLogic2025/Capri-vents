@@ -1,360 +1,234 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  ScrollView,
-  Modal,
-  Pressable,
-  StyleSheet,
-  Alert,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, TextInput, StatusBar } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useAppContext } from '../../context/AppContext';
 import colors from '../../theme/colors';
 import sharedStyles from '../../theme/styles';
 import SectionCard from '../components/SectionCard';
-import PaymentMethodCard from '../components/PaymentMethodCard';
 import PrimaryButton from '../components/PrimaryButton';
-import { useAppContext } from '../../context/AppContext';
+import ScreenHeader from '../components/ScreenHeader';
 
-const paymentOptions = [
-  { key: 'TARJETA', label: 'Tarjeta Credito/Debito', description: 'Pago inmediato y seguro', icon: 'card-outline' },
-  { key: 'TRANSFERENCIA', label: 'Transferencia bancaria', description: 'Validacion en 24-48h', icon: 'swap-horizontal' },
-  { key: 'EFECTIVO', label: 'Efectivo contra entrega', description: 'Paga al recibir tu pedido', icon: 'cash-outline' },
-  { key: 'CREDITO', label: 'Credito comercial', description: 'Usa tu cupo disponible', icon: 'calendar-outline' },
+const PAYMENT_METHODS = [
+  { id: 'EFECTIVO', label: 'Efectivo', icon: 'cash-outline', description: 'Paga al recibir tu pedido' },
+  { id: 'TARJETA', label: 'Tarjeta', icon: 'card-outline', description: 'Crédito o Débito' },
+  { id: 'TRANSFERENCIA', label: 'Transferencia', icon: 'phone-portrait-outline', description: 'Sube tu comprobante después' },
+  { id: 'CREDITO', label: 'Crédito Directo', icon: 'wallet-outline', description: 'Paga en cuotas (sujeto a aprobación)' },
 ];
 
 const CheckoutScreen = ({ navigation }) => {
-  const {
-    user,
-    cartTotals,
-    createOrderFromCart,
-    addresses,
-    defaultAddress,
-    paymentCards,
-    defaultCard,
-  } = useAppContext();
-  const [address, setAddress] = useState('');
-  const [phone, setPhone] = useState(user.phone || '');
+  const { cart, cartTotals, user, createOrderFromCart, paymentCards } = useAppContext();
+  const [selectedAddress, setSelectedAddress] = useState(user?.address || '');
+  const [selectedPayment, setSelectedPayment] = useState(null);
+  const [selectedCard, setSelectedCard] = useState(null);
   const [notes, setNotes] = useState('');
-  const [method, setMethod] = useState('TARJETA');
-  const [selectedAddressId, setSelectedAddressId] = useState(defaultAddress?.id ?? '');
-  const [selectedCardId, setSelectedCardId] = useState(defaultCard?.id ?? null);
-  const [addressModalVisible, setAddressModalVisible] = useState(false);
-  const [cardSelectionVisible, setCardSelectionVisible] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState(user?.phone || '');
 
-  const creditAvailable = cartTotals.total <= (user.saldoCreditoDisponible || 0);
-  const formatAddressString = (addr) =>
-    addr ? `${addr.street} ${addr.number}, ${addr.city}, ${addr.province}` : '';
-  const selectedAddress =
-    addresses.find((addr) => addr.id === selectedAddressId) || defaultAddress || null;
-  const selectedCard =
-    paymentCards.find((card) => card.id === selectedCardId) || defaultCard || null;
-
+  // Sincronizar dirección si el usuario la cambia en otra pantalla
   useEffect(() => {
-    if (defaultAddress) {
-      setSelectedAddressId(defaultAddress.id);
-      setAddress(formatAddressString(defaultAddress));
+    if (user?.address) {
+      setSelectedAddress(user.address);
     }
-  }, [defaultAddress]);
+  }, [user?.address]);
 
-  useEffect(() => {
-    if (selectedAddress) {
-      setAddress(formatAddressString(selectedAddress));
-    }
-  }, [selectedAddress]);
-
-  useEffect(() => {
-    if (defaultCard?.id) {
-      setSelectedCardId(defaultCard.id);
-    }
-  }, [defaultCard?.id]);
-
-  const handleCreateOrder = (paymentMethod) => {
-    const order = createOrderFromCart(paymentMethod, {
-      address: address || formatAddressString(selectedAddress),
-      phone,
-      notes,
-      deliveryAddressId: selectedAddress?.id,
-      paymentCardId: selectedCard?.id,
-    });
-    return order;
-  };
-
-  const goToConfirmation = (order, extraParams = {}) => {
-    if (!order) return;
-    navigation.navigate('PedidoConfirmacion', { code: order.code, total: order.total, ...extraParams });
-  };
-
-  const handleConfirm = () => {
+  const handleConfirmOrder = () => {
     if (!selectedAddress) {
-      Alert.alert('Dirección faltante', 'Selecciona una dirección antes de confirmar tu pedido.');
+      Alert.alert('Falta dirección', 'Por favor ingresa una dirección de entrega.');
       return;
     }
-    if (!address.trim()) {
-      Alert.alert('Dirección inválida', 'Completa la dirección para la entrega.');
+    if (!phoneNumber) {
+      Alert.alert('Falta teléfono', 'Por favor ingresa un número de contacto.');
       return;
     }
-
-    if (method === 'TARJETA') {
-      if (!selectedCard) {
-        if (paymentCards.length) {
-          setCardSelectionVisible(true);
-        } else {
-          Alert.alert(
-            'Tarjeta faltante',
-            'Agrega una tarjeta en Métodos de pago antes de confirmar.',
-            [
-              { text: 'Cancelar', style: 'cancel' },
-              { text: 'Ir a métodos', onPress: () => navigation.navigate('MetodosPago') },
-            ]
-          );
-        }
-        return;
-      }
-      const order = handleCreateOrder('TARJETA');
-      goToConfirmation(order, {
-        title: 'Pago exitoso',
-        description: 'Tu pago con tarjeta se registró correctamente.',
-      });
+    if (!selectedPayment) {
+      Alert.alert('Método de pago', 'Selecciona cómo deseas pagar.');
       return;
     }
 
-    if (method === 'TRANSFERENCIA') {
-      const order = handleCreateOrder('TRANSFERENCIA');
-      goToConfirmation(order, {
-        title: 'Pedido en revision',
-        description: 'Hemos registrado tu transferencia, validaremos el pago en 24-48h.',
-      });
+    if (selectedPayment === 'TARJETA' && !selectedCard) {
+      Alert.alert('Tarjeta requerida', 'Por favor selecciona o agrega una tarjeta.');
       return;
     }
-    if (method === 'EFECTIVO') {
-      const order = handleCreateOrder('EFECTIVO');
-      goToConfirmation(order, {
-        title: 'Pedido registrado',
-        description: 'Paga en efectivo cuando recibas tu pedido.',
-      });
-      return;
-    }
-    if (method === 'CREDITO') {
-      if (!creditAvailable) {
-        Alert.alert('Sin credito suficiente', 'Tu credito disponible no cubre este pedido.');
-        return;
-      }
+
+    if (selectedPayment === 'CREDITO') {
+      // Navegar a selección de plan
       navigation.navigate('SeleccionPlanCredito', { total: cartTotals.total });
+      return;
+    }
+
+    // Crear orden directa
+    const orderData = {
+      address: selectedAddress,
+      notes,
+      phone: phoneNumber,
+      cardId: selectedPayment === 'TARJETA' ? selectedCard.id : null,
+    };
+
+    const order = createOrderFromCart(selectedPayment, orderData);
+    if (order) {
+      navigation.navigate('PedidoConfirmacion', { orderCode: order.code });
     }
   };
 
-  const renderPaymentMethod = (option) => {
-    const disabled = option.key === 'CREDITO' && !creditAvailable;
-    const description =
-      option.key === 'CREDITO' && !creditAvailable
-        ? 'Tu credito disponible no cubre este pedido'
-        : option.description;
-    return (
-      <PaymentMethodCard
-        key={option.key}
-        label={option.label}
-        description={description}
-        icon={option.icon}
-        selected={method === option.key}
-        disabled={disabled}
-        onPress={() => !disabled && setMethod(option.key)}
-      />
-    );
+  const handleAddressEdit = () => {
+    navigation.navigate('Direcciones');
   };
+
+  if (cart.length === 0) {
+    return (
+      <View style={[styles.screen, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Text style={{ color: colors.textLight }}>Tu carrito está vacío</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: 20 }}>
+          <Text style={{ color: colors.primary, fontWeight: 'bold' }}>Volver a comprar</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <SectionCard title="Datos de Entrega">
-          <View style={styles.selectionRow}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.fieldLabel}>Dirección elegida</Text>
-              <Text style={styles.addressValue}>
-                {selectedAddress
-                  ? `${selectedAddress.label} · ${formatAddressString(selectedAddress)}`
-                  : 'Selecciona una dirección para tu entrega.'}
-              </Text>
-            </View>
-            <TouchableOpacity onPress={() => setAddressModalVisible(true)}>
-              <Text style={styles.linkText}>
-                {selectedAddress ? 'Cambiar' : 'Seleccionar'}
-              </Text>
+      <StatusBar backgroundColor={colors.white} barStyle="dark-content" />
+      <ScreenHeader title="Checkout" subtitle="Finaliza tu compra" showBack />
+
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+
+        {/* Dirección de Entrega */}
+        <SectionCard title="Información de Entrega">
+          <View style={styles.addressContainer}>
+            <Ionicons name="location-outline" size={24} color={colors.primary} style={styles.addressIcon} />
+            <TextInput
+              style={styles.addressInput}
+              placeholder="Ingresa tu dirección completa"
+              value={selectedAddress}
+              onChangeText={setSelectedAddress}
+              multiline
+            />
+            <TouchableOpacity style={styles.editButton} onPress={handleAddressEdit}>
+              <Ionicons name="pencil" size={20} color={colors.primary} />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            style={styles.inlineLink}
-            onPress={() => navigation.navigate('Direcciones')}
-          >
-            <Text style={styles.inlineLinkText}>Agregar o editar direcciones</Text>
-          </TouchableOpacity>
+
+          <View style={styles.phoneContainer}>
+            <Ionicons name="call-outline" size={20} color={colors.textMuted} style={styles.inputIcon} />
+            <TextInput
+              style={styles.phoneInput}
+              placeholder="Teléfono de contacto"
+              value={phoneNumber}
+              onChangeText={setPhoneNumber}
+              keyboardType="phone-pad"
+            />
+          </View>
+
           <TextInput
-            style={[sharedStyles.input, styles.inputSpacing]}
-            placeholder="Direccion"
-            value={address}
-            onChangeText={setAddress}
-          />
-          <TextInput
-            style={[sharedStyles.input, styles.inputSpacing]}
-            placeholder="Numero de telefono"
-            keyboardType="phone-pad"
-            value={phone}
-            onChangeText={setPhone}
-          />
-          <TextInput
-            style={[sharedStyles.input, styles.textarea]}
-            placeholder="Observaciones"
+            style={styles.notesInput}
+            placeholder="Añadir notas de entrega (opcional)"
             value={notes}
             onChangeText={setNotes}
-            multiline
-            numberOfLines={4}
           />
         </SectionCard>
 
-        <SectionCard title="Resumen">
-          <View style={styles.rowBetween}>
-            <Text>Subtotal</Text>
-            <Text>${cartTotals.subtotal.toFixed(2)}</Text>
-          </View>
-          <View style={styles.rowBetween}>
-            <Text>Impuestos</Text>
-            <Text>${cartTotals.taxes.toFixed(2)}</Text>
-          </View>
-          <View style={styles.rowBetween}>
-            <Text style={styles.totalLabel}>Total</Text>
+        {/* Resumen del Pedido */}
+        <SectionCard title="Resumen del pedido">
+          {cart.map((item) => (
+            <View key={item.id} style={styles.cartItem}>
+              <View style={styles.cartItemInfo}>
+                <Text style={styles.cartItemName}>{item.name}</Text>
+                <Text style={styles.cartItemQuantity}>x{item.quantity}</Text>
+              </View>
+              <Text style={styles.cartItemPrice}>${(item.price * item.quantity).toFixed(2)}</Text>
+            </View>
+          ))}
+          <View style={styles.divider} />
+          <View style={styles.totalRow}>
+            <Text style={styles.totalLabel}>Total a pagar</Text>
             <Text style={styles.totalValue}>${cartTotals.total.toFixed(2)}</Text>
           </View>
-          {user.tieneCredito && (
-            <Text style={styles.creditText}>Credito disponible: ${user.saldoCreditoDisponible?.toFixed(2)}</Text>
-          )}
         </SectionCard>
 
-        <SectionCard title="Metodo de Pago">
-          {paymentOptions.map(renderPaymentMethod)}
-          {method === 'TARJETA' && (
-            <>
-              <View style={styles.selectionRow}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.fieldLabel}>Tarjeta seleccionada</Text>
-                  <Text style={styles.addressValue}>
-                    {selectedCard
-                      ? `${selectedCard.type} •••• ${selectedCard.number.slice(-4)}`
-                      : 'Selecciona una tarjeta'}
-                  </Text>
-                </View>
-                <TouchableOpacity onPress={() => setCardSelectionVisible(true)}>
-                  <Text style={styles.linkText}>
-                    {selectedCard ? 'Cambiar' : 'Seleccionar'}
-                  </Text>
+        {/* Método de Pago */}
+        <SectionCard title="Método de pago">
+          {PAYMENT_METHODS.map((method) => {
+            const isSelected = selectedPayment === method.id;
+            return (
+              <View key={method.id}>
+                <TouchableOpacity
+                  style={[styles.paymentOption, isSelected && styles.paymentOptionSelected]}
+                  onPress={() => setSelectedPayment(method.id)}
+                  activeOpacity={0.8}
+                >
+                  <View style={[styles.paymentIconContainer, isSelected && styles.paymentIconSelected]}>
+                    <Ionicons
+                      name={method.icon}
+                      size={24}
+                      color={isSelected ? colors.white : colors.textLight}
+                    />
+                  </View>
+                  <View style={styles.paymentInfo}>
+                    <Text style={[styles.paymentLabel, isSelected && styles.paymentLabelSelected]}>
+                      {method.label}
+                    </Text>
+                    <Text style={styles.paymentDescription}>{method.description}</Text>
+                  </View>
+                  <View style={[styles.radioCircle, isSelected && styles.radioCircleSelected]}>
+                    {isSelected && <View style={styles.radioDot} />}
+                  </View>
                 </TouchableOpacity>
+
+                {/* Selector de Tarjetas si se elige TARJETA */}
+                {isSelected && method.id === 'TARJETA' && (
+                  <View style={styles.cardsContainer}>
+                    {paymentCards.length > 0 ? (
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.cardsScroll}>
+                        {paymentCards.map((card) => (
+                          <TouchableOpacity
+                            key={card.id}
+                            style={[
+                              styles.miniCard,
+                              selectedCard?.id === card.id && styles.miniCardSelected
+                            ]}
+                            onPress={() => setSelectedCard(card)}
+                          >
+                            <Text style={[styles.miniCardText, selectedCard?.id === card.id && styles.miniCardTextSelected]}>
+                              {card.type} •••• {card.number.slice(-4)}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                        <TouchableOpacity
+                          style={styles.addMiniCard}
+                          onPress={() => navigation.navigate('MetodosPago')}
+                        >
+                          <Ionicons name="add" size={20} color={colors.primary} />
+                          <Text style={styles.addMiniCardText}>Nueva</Text>
+                        </TouchableOpacity>
+                      </ScrollView>
+                    ) : (
+                      <TouchableOpacity
+                        style={styles.addCardButton}
+                        onPress={() => navigation.navigate('MetodosPago')}
+                      >
+                        <Text style={styles.addCardButtonText}>+ Agregar una tarjeta</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                )}
               </View>
-              <TouchableOpacity
-                style={styles.inlineLink}
-                onPress={() => navigation.navigate('MetodosPago')}
-              >
-                <Text style={styles.inlineLinkText}>Agregar o administrar tarjetas</Text>
-              </TouchableOpacity>
-            </>
-          )}
+            );
+          })}
         </SectionCard>
 
-        <PrimaryButton title="Confirmar pedido" onPress={handleConfirm} />
       </ScrollView>
 
-      <Modal visible={addressModalVisible} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Seleccionar dirección</Text>
-            <ScrollView showsVerticalScrollIndicator={false}>
-              {addresses.map((addr) => (
-                <TouchableOpacity
-                  key={addr.id}
-                  style={[
-                    styles.modalItem,
-                    selectedAddress?.id === addr.id && styles.modalItemSelected,
-                  ]}
-                  onPress={() => {
-                    setSelectedAddressId(addr.id);
-                    setAddress(formatAddressString(addr));
-                    setAddressModalVisible(false);
-                  }}
-                >
-                  <View style={styles.modalItemHeader}>
-                    <Text style={styles.modalItemLabel}>{addr.label}</Text>
-                    {addr.isDefault && <Text style={styles.currentBadge}>Predeterminada</Text>}
-                  </View>
-                  <Text style={styles.modalItemText}>
-                    {addr.street} {addr.number}
-                  </Text>
-                  <Text style={styles.modalItemText}>
-                    {addr.city}, {addr.province} · CP {addr.zip}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-              <PrimaryButton
-                title="Agregar dirección"
-                onPress={() => {
-                  setAddressModalVisible(false);
-                  navigation.navigate('Direcciones');
-                }}
-                style={{ marginTop: 12 }}
-              />
-              <Pressable onPress={() => setAddressModalVisible(false)} style={styles.modalClose}>
-                <Text style={{ color: colors.primary }}>Cerrar</Text>
-              </Pressable>
-            </ScrollView>
-          </View>
+      {/* Barra Inferior */}
+      <View style={styles.bottomBar}>
+        <View style={styles.bottomTotal}>
+          <Text style={styles.bottomTotalLabel}>Total</Text>
+          <Text style={styles.bottomTotalValue}>${cartTotals.total.toFixed(2)}</Text>
         </View>
-      </Modal>
-
-      <Modal visible={cardSelectionVisible} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Selecciona una tarjeta</Text>
-            <ScrollView showsVerticalScrollIndicator={false}>
-              {paymentCards.length ? (
-                paymentCards.map((card) => (
-                  <TouchableOpacity
-                    key={card.id}
-                    style={[
-                      styles.cardItem,
-                      selectedCard?.id === card.id && styles.modalItemSelected,
-                    ]}
-                    onPress={() => {
-                      setSelectedCardId(card.id);
-                      setCardSelectionVisible(false);
-                    }}
-                  >
-                    <View style={styles.modalItemHeader}>
-                      <Text style={styles.modalItemLabel}>{card.type}</Text>
-                      <Text style={styles.modalItemText}>Válido hasta {card.expiry}</Text>
-                    </View>
-                    <Text style={styles.modalItemText}>
-                      {card.number} · {card.holder}
-                    </Text>
-                  </TouchableOpacity>
-                ))
-              ) : (
-                <Text style={styles.emptyTextModal}>
-                  Aún no tienes tarjetas registradas. Agrega una en Métodos de pago.
-                </Text>
-              )}
-              <PrimaryButton
-                title="Ir a Métodos de pago"
-                onPress={() => {
-                  setCardSelectionVisible(false);
-                  navigation.navigate('MetodosPago');
-                }}
-                style={{ marginTop: 12 }}
-              />
-              <Pressable onPress={() => setCardSelectionVisible(false)} style={styles.modalClose}>
-                <Text style={{ color: colors.primary }}>Cerrar</Text>
-              </Pressable>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
+        <PrimaryButton
+          title="Confirmar Pedido"
+          onPress={handleConfirmOrder}
+          style={styles.confirmButton}
+        />
+      </View>
     </View>
   );
 };
@@ -364,123 +238,248 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  content: {
-    padding: 16,
-    paddingBottom: 160,
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 120, // Increased padding for bottom bar
   },
-  inputSpacing: {
+  addressContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
+    padding: 12,
     marginBottom: 12,
   },
-  textarea: {
-    height: 120,
-    textAlignVertical: 'top',
+  addressIcon: {
+    marginRight: 12,
   },
-  rowBetween: {
+  addressInput: {
+    flex: 1,
+    fontSize: 14,
+    color: colors.darkText,
+  },
+  editButton: {
+    padding: 8,
+  },
+  phoneContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    marginBottom: 12,
+  },
+  inputIcon: {
+    marginRight: 10,
+  },
+  phoneInput: {
+    flex: 1,
+    paddingVertical: 12,
+    fontSize: 14,
+    color: colors.darkText,
+  },
+  notesInput: {
+    fontSize: 14,
+    color: colors.darkText,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderSoft,
+    paddingVertical: 8,
+  },
+  cartItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 6,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  cartItemInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  cartItemName: {
+    fontSize: 14,
+    color: colors.textDark,
+    marginRight: 8,
+  },
+  cartItemQuantity: {
+    fontSize: 12,
+    color: colors.textLight,
+    fontWeight: '700',
+  },
+  cartItemPrice: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.textDark,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: colors.borderSoft,
+    marginVertical: 12,
+  },
+  totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   totalLabel: {
+    fontSize: 16,
     fontWeight: '700',
     color: colors.textDark,
   },
   totalValue: {
+    fontSize: 20,
     fontWeight: '800',
     color: colors.primary,
   },
-  creditText: {
-    marginTop: 10,
-    color: colors.textLight,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.35)',
-    justifyContent: 'flex-end',
-    padding: 16,
-  },
-  modalContent: {
-    backgroundColor: colors.white,
-    borderRadius: 20,
-    padding: 18,
-    maxHeight: '85%',
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 12,
-    color: colors.textDark,
-  },
-  modalClose: {
-    marginTop: 12,
-    alignItems: 'center',
-  },
-  selectionRow: {
+  paymentOption: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6,
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    marginBottom: 12,
+    backgroundColor: colors.white,
   },
-  fieldLabel: {
-    fontSize: 12,
-    color: colors.textMuted,
-    marginBottom: 2,
+  paymentOptionSelected: {
+    borderColor: colors.primary,
+    backgroundColor: '#FFF5F2',
   },
-  addressValue: {
-    fontSize: 14,
+  paymentIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#F5F5F5',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  paymentIconSelected: {
+    backgroundColor: colors.primary,
+  },
+  paymentInfo: {
+    flex: 1,
+  },
+  paymentLabel: {
+    fontSize: 16,
+    fontWeight: '700',
     color: colors.textDark,
   },
-  linkText: {
+  paymentLabelSelected: {
     color: colors.primary,
-    fontWeight: '600',
   },
-  inlineLink: {
-    marginTop: 4,
-    marginBottom: 12,
+  paymentDescription: {
+    fontSize: 12,
+    color: colors.textLight,
+    marginTop: 2,
   },
-  inlineLinkText: {
-    color: colors.primary,
-    fontSize: 13,
-    textDecorationLine: 'underline',
+  radioCircle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: colors.borderSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  modalItem: {
-    borderRadius: 16,
-    padding: 14,
-    backgroundColor: colors.surface,
-    marginBottom: 10,
-  },
-  modalItemSelected: {
-    borderWidth: 1,
+  radioCircleSelected: {
     borderColor: colors.primary,
   },
-  modalItemHeader: {
+  radioDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: colors.primary,
+  },
+  cardsContainer: {
+    marginLeft: 16,
+    marginBottom: 16,
+  },
+  cardsScroll: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 6,
   },
-  modalItemLabel: {
-    fontWeight: '700',
+  miniCard: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: '#F5F5F5',
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  miniCardSelected: {
+    backgroundColor: colors.primary + '10', // 10% opacity
+    borderColor: colors.primary,
+  },
+  miniCardText: {
+    fontSize: 12,
     color: colors.textDark,
-  },
-  modalItemText: {
-    fontSize: 13,
-    color: colors.textMuted,
-  },
-  currentBadge: {
-    fontSize: 11,
     fontWeight: '600',
+  },
+  miniCardTextSelected: {
     color: colors.primary,
   },
-  cardItem: {
-    borderRadius: 16,
-    padding: 14,
-    backgroundColor: colors.surface,
-    marginBottom: 10,
+  addMiniCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderStyle: 'dashed',
   },
-  emptyTextModal: {
-    color: colors.textMuted,
-    fontSize: 13,
-    textAlign: 'center',
-    marginVertical: 12,
+  addMiniCardText: {
+    fontSize: 12,
+    color: colors.primary,
+    fontWeight: '600',
+    marginLeft: 4,
+  },
+  addCardButton: {
+    padding: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderStyle: 'dashed',
+    borderRadius: 12,
+  },
+  addCardButtonText: {
+    color: colors.primary,
+    fontWeight: '600',
+  },
+  bottomBar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: colors.white,
+    padding: 20,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  bottomTotal: {
+    flex: 1,
+  },
+  bottomTotalLabel: {
+    fontSize: 12,
+    color: colors.textLight,
+  },
+  bottomTotalValue: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: colors.textDark,
+  },
+  confirmButton: {
+    flex: 1.5,
+    marginLeft: 20,
   },
 });
 

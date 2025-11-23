@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Clipboard from 'expo-clipboard';
+import { Ionicons } from '@expo/vector-icons';
 import globalStyles from '../../theme/styles';
 import colors from '../../theme/colors';
 import { useAppContext } from '../../context/AppContext';
@@ -56,7 +57,6 @@ const mockTransfers = [
     reference: '987654321',
     bank: 'Banco Internacional - CAFRILOSA.EMBUTIDOS',
   },
-  // BACKEND: la lista de transferencias debe venir de la API de pagos, con filtros por estado.
 ];
 
 const mockBankAccounts = [
@@ -76,7 +76,6 @@ const mockBankAccounts = [
     accountType: 'Cuenta Corriente',
     holder: 'Cafrilosa S.A.',
   },
-  // BACKEND: estas cuentas bancarias deben venir desde la configuración del backend.
 ];
 
 const MetodosPagoScreen = ({ navigation }) => {
@@ -177,7 +176,6 @@ const MetodosPagoScreen = ({ navigation }) => {
 
   const handleCopy = async (value, label) => {
     await Clipboard.setStringAsync(value);
-    // BACKEND: mostrar toast o snackbar indicando que se copió el CBU o Alias.
     console.log(`${label} copiado: ${value}`);
   };
 
@@ -186,6 +184,7 @@ const MetodosPagoScreen = ({ navigation }) => {
 
   return (
     <View style={styles.screen}>
+
       <ScrollView
         contentContainerStyle={[globalStyles.contentContainer, styles.scrollContent]}
         showsVerticalScrollIndicator={false}
@@ -217,12 +216,13 @@ const MetodosPagoScreen = ({ navigation }) => {
                 onDelete={() => handleDeleteCard(card.id)}
               />
             ))}
-          <View style={[styles.infoBox, globalStyles.shadow]}>
-            <Text style={styles.infoTitle}>Seguridad:</Text>
-            <Text style={styles.infoText}>
-              Tus datos se transmiten con cifrado bancario y el CVV solo se usa momentáneamente para tokenizar la tarjeta.
-            </Text>
-          </View>
+            <View style={[styles.infoBox, globalStyles.shadow]}>
+              <Ionicons name="shield-checkmark-outline" size={24} color={colors.primary} style={{ marginBottom: 8 }} />
+              <Text style={styles.infoTitle}>Tu seguridad es nuestra prioridad</Text>
+              <Text style={styles.infoText}>
+                Tus datos se transmiten con cifrado bancario de 256 bits. Nunca almacenamos tu código de seguridad (CVV).
+              </Text>
+            </View>
           </View>
         )}
 
@@ -250,7 +250,6 @@ const MetodosPagoScreen = ({ navigation }) => {
                   reference={transfer.reference}
                   bank={transfer.bank}
                   onViewMore={() => {
-                    // BACKEND: "Ver más" debería abrir un detalle de la transferencia (comprobante, estado, etc.).
                     console.log('Abrir detalle', transfer.id);
                   }}
                 />
@@ -315,7 +314,7 @@ const MetodosPagoScreen = ({ navigation }) => {
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>{modalTitle}</Text>
                 <TouchableOpacity onPress={handleCancelAddCard}>
-                  <Text style={styles.modalCancel}>Cancelar</Text>
+                  <Ionicons name="close" size={24} color={colors.textDark} />
                 </TouchableOpacity>
               </View>
               <Text style={styles.modalSubtitle}>
@@ -402,9 +401,6 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 32,
   },
-  header: {
-    marginBottom: 10,
-  },
   tabContent: {
     marginBottom: 24,
   },
@@ -413,18 +409,17 @@ const styles = StyleSheet.create({
   },
   infoBox: {
     marginTop: 16,
-    backgroundColor: colors.surface,
+    backgroundColor: '#F0F7FF',
     borderRadius: 20,
-    padding: 14,
+    padding: 20,
     borderWidth: 1,
-    borderColor: colors.borderSoft,
-    ...globalStyles.shadow,
+    borderColor: '#BAE3FF',
   },
   infoTitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '700',
     color: colors.primaryDark,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   infoText: {
     fontSize: 14,
@@ -517,7 +512,7 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.25)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'flex-end',
   },
   modalBackdrop: {
@@ -529,17 +524,17 @@ const styles = StyleSheet.create({
   modalCard: {
     backgroundColor: colors.white,
     borderRadius: 24,
-    padding: 20,
+    padding: 24,
     ...globalStyles.shadow,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 12,
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
     color: colors.textDark,
   },
@@ -551,18 +546,18 @@ const styles = StyleSheet.create({
   modalSubtitle: {
     fontSize: 14,
     color: colors.textMuted,
-    marginBottom: 12,
+    marginBottom: 20,
   },
   cardTypeRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: 20,
   },
   cardTypePill: {
     flex: 1,
     marginHorizontal: 4,
-    paddingVertical: 10,
-    borderRadius: 20,
+    paddingVertical: 12,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: colors.borderSoft,
     alignItems: 'center',
@@ -574,7 +569,7 @@ const styles = StyleSheet.create({
     borderColor: colors.primary,
   },
   cardTypeLabel: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '600',
     color: colors.textMuted,
   },
@@ -582,31 +577,31 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
   input: {
-    backgroundColor: colors.lightBackground,
-    borderRadius: 16,
+    backgroundColor: '#F9F9F9',
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: colors.borderSoft,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     fontSize: 16,
     color: colors.textDark,
-    marginBottom: 12,
+    marginBottom: 16,
   },
   formRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   halfInput: {
     flex: 1,
-    marginRight: 8,
+    marginRight: 12,
     marginBottom: 0,
   },
   lastInput: {
     marginRight: 0,
   },
   modalButton: {
-    marginTop: 4,
+    marginTop: 8,
   },
 });
 

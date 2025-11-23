@@ -14,7 +14,7 @@ import globalStyles from '../../theme/styles';
 import { useAppContext } from '../../context/AppContext';
 import LogoCafrilosa from '../../assets/images/logo-cafrilosa.png';
 
-const ProductCard = ({ product, onAddToCart, onPress }) => {
+const ProductCard = ({ product, onAddToCart, onPress, showCartButton = true }) => {
   const { addToCart } = useAppContext();
   const { name, presentation, price, stockActual = 0, stockMax = 0, image } = product;
 
@@ -76,20 +76,22 @@ const ProductCard = ({ product, onAddToCart, onPress }) => {
         <View style={styles.footer}>
           <Text style={styles.price}>${price.toFixed(2)}</Text>
 
-          <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-            <TouchableOpacity
-              style={[styles.cartButton, isSoldOut && styles.cartButtonDisabled]}
-              disabled={isSoldOut}
-              onPress={handleAdd}
-              activeOpacity={0.85}
-            >
-              <Ionicons
-                name="cart-outline"
-                size={18}
-                color={isSoldOut ? colors.muted : colors.primary}
-              />
-            </TouchableOpacity>
-          </Animated.View>
+          {showCartButton && (
+            <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+              <TouchableOpacity
+                style={[styles.cartButton, isSoldOut && styles.cartButtonDisabled]}
+                disabled={isSoldOut}
+                onPress={handleAdd}
+                activeOpacity={0.85}
+              >
+                <Ionicons
+                  name="cart-outline"
+                  size={18}
+                  color={isSoldOut ? colors.muted : colors.primary}
+                />
+              </TouchableOpacity>
+            </Animated.View>
+          )}
         </View>
       </View>
     </TouchableOpacity>

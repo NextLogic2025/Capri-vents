@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import colors from '../../theme/colors';
 import PrimaryButton from '../components/PrimaryButton';
 import { useAppContext } from '../../context/AppContext';
 
 const ProductDetailScreen = () => {
   const route = useRoute();
+  const navigation = useNavigation();
   const { product } = route.params || {};
   const { addToCart } = useAppContext();
   const [quantity, setQuantity] = useState(1);
@@ -27,6 +29,9 @@ const ProductDetailScreen = () => {
 
   return (
     <View style={styles.screen}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Ionicons name="arrow-back" size={22} color={colors.darkText} />
+      </TouchableOpacity>
       <Image
         source={product.image}
         defaultSource={require('../../assets/images/logo-cafrilosa.png')}
@@ -153,6 +158,23 @@ const styles = StyleSheet.create({
   },
   addButton: {
     flex: 1,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 36,
+    left: 16,
+    zIndex: 10,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.8)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 4,
   },
   empty: {
     flex: 1,

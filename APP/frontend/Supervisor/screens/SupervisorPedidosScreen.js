@@ -8,11 +8,12 @@ import {
   Modal,
   Alert,
   ScrollView,
+  StatusBar,
 } from 'react-native';
-import ScreenHeader from '../../Cliente/components/ScreenHeader';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import SupervisorOrderCard from '../components/SupervisorOrderCard';
-import PrimaryButton from '../../Cliente/components/PrimaryButton';
-import globalStyles from '../../theme/styles';
+import PrimaryButton from '../../components/PrimaryButton';
 import colors from '../../theme/colors';
 import { useAppContext } from '../../context/AppContext';
 
@@ -49,8 +50,8 @@ const SupervisorPedidosScreen = () => {
         statusFilter === 'Todos'
           ? true
           : statusFilter === 'Sin asignar'
-          ? isSinAsignar
-          : status.includes(statusFilter.toLowerCase());
+            ? isSinAsignar
+            : status.includes(statusFilter.toLowerCase());
 
       const matchesZone = zoneFilter === 'Todas' ? true : zoneValue === zoneFilter;
 
@@ -87,162 +88,227 @@ const SupervisorPedidosScreen = () => {
 
   return (
     <View style={styles.screen}>
-      {/* HEADER tipo "hero" igual que Inicio, solo con título */}
-      <View style={styles.headerWrapper}>
-        <ScreenHeader
-          title="Pedidos y entregas"
-          style={styles.headerCard}
-        />
-      </View>
+      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+
+      {/* Header con Gradiente */}
+      <LinearGradient
+        colors={[colors.primary, colors.primaryDark || '#8B0000']}
+        style={styles.headerGradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <View style={styles.headerContent}>
+          <View>
+            <Text style={styles.headerTitle}>Pedidos y Entregas</Text>
+            <Text style={styles.headerSubtitle}>
+              {filteredOrders.length} pedido{filteredOrders.length !== 1 ? 's' : ''}
+              {statusFilter !== 'Todos' && ` · ${statusFilter}`}
+            </Text>
+          </View>
+          <View style={styles.headerIcon}>
+            <Ionicons name="cube" size={32} color={colors.white} />
+          </View>
+        </View>
+      </LinearGradient>
 
       <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={[globalStyles.contentContainer, styles.contentContainer]}
+        style={styles.scrollView}
+        contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
-        {/* Filtros de estado y zona */}
+        {/* Filtros de Estado */}
         <View style={styles.filterSection}>
+          <Text style={styles.filterLabel}>
+            <Ionicons name="funnel-outline" size={14} color={colors.textMuted} /> Estado
+          </Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {STATUS_FILTERS.map((status) => (
-              <TouchableOpacity
-                key={status}
-                style={[
-                  styles.filterChip,
-                  statusFilter === status && styles.filterChipActive,
-                ]}
-                onPress={() => setStatusFilter(status)}
-              >
-                <Text
-                  style={[
-                    styles.filterText,
-                    statusFilter === status && styles.filterTextActive,
-                  ]}
+            {STATUS_FILTERS.map((status) => {
+              const isActive = statusFilter === status;
+              return (
+                <TouchableOpacity
+                  key={status}
+                  style={[styles.filterChip, isActive && styles.filterChipActive]}
+                  onPress={() => setStatusFilter(status)}
                 >
-                  {status}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={{ marginTop: 8 }}
-          >
-            {zones.map((zone) => (
-              <TouchableOpacity
-                key={zone}
-                style={[
-                  styles.filterChip,
-                  zoneFilter === zone && styles.filterChipActive,
-                ]}
-                onPress={() => setZoneFilter(zone)}
-              >
-                <Text
-                  style={[
-                    styles.filterText,
-                    zoneFilter === zone && styles.filterTextActive,
-                  ]}
-                >
-                  {zone}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                  <Text style={[styles.filterText, isActive && styles.filterTextActive]}>
+                    {status}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </ScrollView>
         </View>
 
+        {/* Filtros de Zona */}
+        <View style={styles.filterSection}>
+          <Text style={styles.filterLabel}>
+            <Ionicons name="location-outline" size={14} color={colors.textMuted} /> Zona
+          </Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {zones.map((zone) => {
+              const isActive = zoneFilter === zone;
+              return (
+                <TouchableOpacity
+                  key={zone}
+                  style={[styles.filterChip, isActive && styles.filterChipActive]}
+                  onPress={() => setZoneFilter(zone)}
+                >
+                  <Text style={[styles.filterText, isActive && styles.filterTextActive]}>
+                    {zone}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </View>
+
+        {/* Lista de Pedidos */}
         <FlatList
           data={filteredOrders}
           keyExtractor={(item) => item.id || item.code || JSON.stringify(item)}
           renderItem={renderOrder}
           scrollEnabled={false}
           ListEmptyComponent={
-            <Text style={styles.emptyText}>
-              No hay pedidos que coincidan con los filtros.
-            </Text>
+            <View style={styles.emptyContainer}>
+              <Ionicons name="cube-outline" size={64} color={colors.textMuted} />
+              <Text style={styles.emptyTitle}>No hay pedidos</Text>
+              <Text style={styles.emptyText}>
+                No se encontraron pedidos que coincidan con los filtros seleccionados.
+              </Text>
+            </View>
           }
         />
       </ScrollView>
 
-      {/* MODAL: asignar vendedor */}
+      {/* MODAL: Asignar Vendedor */}
       <Modal visible={!!assignOrder} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Asignar vendedor</Text>
+            <View style={styles.modalHeader}>
+              <Ionicons name="people" size={28} color={colors.primary} />
+              <Text style={styles.modalTitle}>Asignar Vendedor</Text>
+            </View>
             <Text style={styles.modalSubtitle}>
-              Zona: {assignOrder?.zone || assignOrder?.zona || 'General'}
+              Pedido: {assignOrder?.code} · Zona: {assignOrder?.zone || assignOrder?.zona || 'General'}
             </Text>
-            {vendorMocks.map((vendor) => (
+
+            <View style={styles.vendorList}>
+              {vendorMocks.map((vendor) => {
+                const isSelected = selectedVendor?.id === vendor.id;
+                return (
+                  <TouchableOpacity
+                    key={vendor.id}
+                    style={[styles.vendorRow, isSelected && styles.vendorRowSelected]}
+                    onPress={() => setSelectedVendor(vendor)}
+                  >
+                    <View style={[
+                      styles.vendorAvatar,
+                      { backgroundColor: isSelected ? colors.primary : colors.primary + '20' }
+                    ]}>
+                      <Ionicons
+                        name="person"
+                        size={20}
+                        color={isSelected ? colors.white : colors.primary}
+                      />
+                    </View>
+                    <View style={styles.vendorInfo}>
+                      <Text style={styles.vendorName}>{vendor.name}</Text>
+                      <Text style={styles.vendorMeta}>
+                        Zona {vendor.zone} · {vendor.pedidosHoy} pedidos hoy
+                      </Text>
+                    </View>
+                    {isSelected && (
+                      <Ionicons name="checkmark-circle" size={24} color={colors.primary} />
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            <View style={styles.modalActions}>
               <TouchableOpacity
-                key={vendor.id}
-                style={[
-                  styles.vendorRow,
-                  selectedVendor?.id === vendor.id && styles.vendorRowSelected,
-                ]}
-                onPress={() => setSelectedVendor(vendor)}
+                style={[styles.modalButton, styles.modalButtonPrimary]}
+                onPress={confirmAssignment}
               >
-                <View>
-                  <Text style={styles.vendorName}>{vendor.name}</Text>
-                  <Text style={styles.vendorMeta}>
-                    Zona {vendor.zone} · {vendor.pedidosHoy} pedidos hoy
-                  </Text>
-                </View>
+                <Ionicons name="checkmark" size={20} color={colors.white} />
+                <Text style={styles.modalButtonTextPrimary}>Confirmar</Text>
               </TouchableOpacity>
-            ))}
-            <PrimaryButton title="Confirmar asignación" onPress={confirmAssignment} />
-            <PrimaryButton
-              title="Cerrar"
-              onPress={() => setAssignOrder(null)}
-              style={{ marginTop: 8 }}
-            />
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonSecondary]}
+                onPress={() => setAssignOrder(null)}
+              >
+                <Text style={styles.modalButtonTextSecondary}>Cancelar</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
 
-      {/* MODAL: detalle de pedido */}
+      {/* MODAL: Detalle de Pedido */}
       <Modal visible={!!selectedOrder} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Detalle del pedido</Text>
+            <View style={styles.modalHeader}>
+              <Ionicons name="receipt" size={28} color={colors.primary} />
+              <Text style={styles.modalTitle}>Detalle del Pedido</Text>
+            </View>
             <Text style={styles.modalSubtitle}>{selectedOrder?.code}</Text>
-            <Text>
-              Cliente:{' '}
-              {selectedOrder?.clientName || selectedOrder?.clienteNombre}
-            </Text>
-            <Text>Zona: {selectedOrder?.zone || selectedOrder?.zona}</Text>
-            <Text>
-              Vendedor:{' '}
-              {selectedOrder?.assignedVendorName ||
-                selectedOrder?.assignedVendor ||
-                'Sin asignar'}
-            </Text>
-            <Text>
-              Método pago:{' '}
-              {selectedOrder?.paymentMethod || selectedOrder?.metodoPago}
-            </Text>
-            <Text>
-              Total: ${' '}
-              {(selectedOrder?.total ?? selectedOrder?.amount ?? 0).toFixed(2)}
-            </Text>
-            <Text>
-              Estado: {selectedOrder?.status || selectedOrder?.estadoPedido}
-            </Text>
-            <View style={{ marginTop: 12 }}>
-              <PrimaryButton
-                title="Actualizar estado logística"
+
+            <View style={styles.detailGrid}>
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>Cliente</Text>
+                <Text style={styles.detailValue}>
+                  {selectedOrder?.clientName || selectedOrder?.clienteNombre}
+                </Text>
+              </View>
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>Zona</Text>
+                <Text style={styles.detailValue}>
+                  {selectedOrder?.zone || selectedOrder?.zona}
+                </Text>
+              </View>
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>Vendedor</Text>
+                <Text style={styles.detailValue}>
+                  {selectedOrder?.assignedVendorName || selectedOrder?.assignedVendor || 'Sin asignar'}
+                </Text>
+              </View>
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>Método de pago</Text>
+                <Text style={styles.detailValue}>
+                  {selectedOrder?.paymentMethod || selectedOrder?.metodoPago}
+                </Text>
+              </View>
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>Total</Text>
+                <Text style={[styles.detailValue, styles.detailTotal]}>
+                  ${(selectedOrder?.total ?? selectedOrder?.amount ?? 0).toFixed(2)}
+                </Text>
+              </View>
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>Estado</Text>
+                <Text style={styles.detailValue}>
+                  {selectedOrder?.status || selectedOrder?.estadoPedido}
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonPrimary]}
                 onPress={() => {
-                  // BACKEND: actualizar estado logístico del pedido
-                  Alert.alert(
-                    'Actualizado',
-                    'Estado actualizado en el backend (mock).'
-                  );
+                  Alert.alert('Actualizado', 'Estado actualizado en el backend (mock).');
                 }}
-              />
-              <PrimaryButton
-                title="Cerrar"
+              >
+                <Ionicons name="sync" size={20} color={colors.white} />
+                <Text style={styles.modalButtonTextPrimary}>Actualizar Estado</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonSecondary]}
                 onPress={() => setSelectedOrder(null)}
-                style={{ marginTop: 8 }}
-              />
+              >
+                <Text style={styles.modalButtonTextSecondary}>Cerrar</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -256,87 +322,240 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  headerWrapper: {
-    // sin padding lateral para que el header ocupe todo el ancho
+  headerGradient: {
+    paddingTop: 50,
+    paddingBottom: 24,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
   },
-  headerCard: {
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 28,
+    color: colors.white,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.8)',
+    fontWeight: '600',
+    marginTop: 4,
+  },
+  headerIcon: {
+    width: 56,
+    height: 56,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scrollView: {
+    flex: 1,
   },
   contentContainer: {
-    paddingTop: 12,
-    paddingHorizontal: 16,
-    paddingBottom: 24,
+    paddingTop: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 100,
   },
   filterSection: {
-    marginBottom: 14,
+    marginBottom: 16,
+  },
+  filterLabel: {
+    fontSize: 13,
+    color: colors.textMuted,
+    fontWeight: '700',
+    marginBottom: 10,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   filterChip: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 6,
+    borderWidth: 1.5,
+    borderColor: colors.borderSoft,
+    borderRadius: 25,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
     marginRight: 10,
     backgroundColor: colors.white,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   filterChipActive: {
     borderColor: colors.primary,
     backgroundColor: colors.primary,
+    shadowColor: colors.primary,
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   filterText: {
     fontSize: 14,
     color: colors.textDark,
+    fontWeight: '600',
   },
   filterTextActive: {
     color: colors.white,
   },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.textDark,
+    marginTop: 16,
+    marginBottom: 8,
+  },
   emptyText: {
-    marginTop: 20,
+    fontSize: 14,
     color: colors.textMuted,
     textAlign: 'center',
+    maxWidth: 280,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.6)',
     justifyContent: 'center',
     padding: 20,
   },
   modalContent: {
     backgroundColor: colors.white,
-    borderRadius: 16,
-    padding: 18,
-    maxHeight: '90%',
+    borderRadius: 24,
+    padding: 24,
+    maxHeight: '85%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 8,
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 8,
+    fontSize: 22,
+    fontWeight: '800',
+    color: colors.darkText,
   },
   modalSubtitle: {
     fontSize: 14,
     color: colors.textMuted,
-    marginBottom: 12,
+    marginBottom: 20,
+    fontWeight: '600',
+  },
+  vendorList: {
+    maxHeight: 300,
+    marginBottom: 20,
   },
   vendorRow: {
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: colors.borderSoft,
+    marginBottom: 12,
+    backgroundColor: colors.white,
   },
   vendorRowSelected: {
     borderColor: colors.primary,
-    backgroundColor: colors.primary + '11',
+    backgroundColor: colors.primary + '08',
+  },
+  vendorAvatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  vendorInfo: {
+    flex: 1,
   },
   vendorName: {
     fontWeight: '700',
-    color: colors.textDark,
+    color: colors.darkText,
+    fontSize: 15,
+    marginBottom: 2,
   },
   vendorMeta: {
     fontSize: 12,
     color: colors.textMuted,
+    fontWeight: '600',
+  },
+  detailGrid: {
+    marginBottom: 20,
+  },
+  detailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderSoft,
+  },
+  detailLabel: {
+    fontSize: 14,
+    color: colors.textMuted,
+    fontWeight: '600',
+  },
+  detailValue: {
+    fontSize: 14,
+    color: colors.darkText,
+    fontWeight: '700',
+    maxWidth: '60%',
+    textAlign: 'right',
+  },
+  detailTotal: {
+    fontSize: 18,
+    color: colors.primary,
+  },
+  modalActions: {
+    gap: 10,
+  },
+  modalButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 16,
+  },
+  modalButtonPrimary: {
+    backgroundColor: colors.primary,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  modalButtonSecondary: {
+    backgroundColor: colors.background,
+    borderWidth: 1.5,
+    borderColor: colors.borderSoft,
+  },
+  modalButtonTextPrimary: {
+    color: colors.white,
+    fontWeight: '800',
+    fontSize: 16,
+    letterSpacing: 0.5,
+  },
+  modalButtonTextSecondary: {
+    color: colors.textDark,
+    fontWeight: '700',
+    fontSize: 16,
   },
 });
 

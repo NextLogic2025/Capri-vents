@@ -8,11 +8,13 @@ import {
   StyleSheet,
   Alert,
   Pressable,
+  TouchableOpacity,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import colors from '../../theme/colors';
 import sharedStyles from '../../theme/styles';
 import SectionCard from '../components/SectionCard';
-import PaymentMethodCard from '../components/PaymentMethodCard';
+import ScreenHeader from '../components/ScreenHeader';
 import PrimaryButton from '../components/PrimaryButton';
 import { useAppContext } from '../../context/AppContext';
 
@@ -24,18 +26,19 @@ const methods = [
 
 const PagoCuotaScreen = ({ route, navigation }) => {
   const { creditId, installmentId } = route.params || {};
-  const { credits, registerInstallmentPayment } = useAppContext();
+  const {
+    credits,
+    registerInstallmentPayment,
+    paymentCards,
+    defaultCard,
+  } = useAppContext();
   const [method, setMethod] = useState('TARJETA');
-  const [showCardModal, setShowCardModal] = useState(false);
-  const [cardData, setCardData] = useState({
-    number: '',
-    expiry: '',
-    cvv: '',
-    name: '',
-  });
+  const [selectedCard, setSelectedCard] = useState(defaultCard || null);
+  const [transferModalVisible, setTransferModalVisible] = useState(false);
+  const [transferReference, setTransferReference] = useState('');
 
   const credit = credits.find((item) => item.id === creditId);
-  const installment = credit?.installments?.find((item) => item.id === installmentId);
+  const installment = credit?.installments?.find((item) => item.id === installmentId || item.numero === installmentId);
 
   const subtotalText = useMemo(() => {
     if (!installment) return '';
@@ -54,32 +57,52 @@ const PagoCuotaScreen = ({ route, navigation }) => {
   const handleConfirm = () => {
     if (!installment) return;
     if (method === 'TARJETA') {
-      setShowCardModal(true);
+      if (!selectedCard && paymentCards.length === 0) {
+        Alert.alert(
+          'Tarjeta faltante',
+          'Agrega una tarjeta desde Métodos de pago antes de proceder.',
+          [
+            { text: 'Cancelar', style: 'cancel' },
+            { text: 'Ir a métodos', onPress: () => navigation.navigate('MetodosPago') },
+          ]
+        );
+        return;
+      }
+      if (!selectedCard) {
+        Alert.alert('Selecciona una tarjeta', 'Por favor selecciona una tarjeta para continuar.');
+        return;
+      }
+      handleRegisterPayment('TARJETA', { cardId: selectedCard.id });
       return;
     }
-    handleRegisterPayment(method, { notes: 'Pago registrado desde app' });
-  };
 
-  const handlePayWithCard = () => {
-    if (!cardData.number || !cardData.expiry || !cardData.cvv || !cardData.name) {
-      Alert.alert('Datos incompletos', 'Completa los datos de tarjeta.');
+    if (method === 'TRANSFERENCIA') {
+      if (!transferReference.trim()) {
+        setTransferModalVisible(true);
+        return;
+      }
+      handleRegisterPayment('TRANSFERENCIA', { transferReference });
       return;
     }
-    setShowCardModal(false);
-    // BACKEND: esto deberia registrarse en el servidor y validarse con la pasarela.
-    handleRegisterPayment('TARJETA', { ...cardData });
+
+    handleRegisterPayment(method, { notes: 'Pago registrado desde app' });
   };
 
   if (!credit || !installment) {
     return (
       <View style={sharedStyles.centeredScreen}>
         <Text>No encontramos la informacion de la cuota.</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Text style={{ color: colors.primary, marginTop: 10 }}>Volver</Text>
+        </TouchableOpacity>
       </View>
     );
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={styles.screen}>
+      <ScreenHeader title="Pago de Cuota" subtitle={`Cuota ${installment.number}`} showBack />
+
       <ScrollView
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
@@ -105,16 +128,90 @@ const PagoCuotaScreen = ({ route, navigation }) => {
 
         {/* Método de pago */}
         <SectionCard title="Método de pago">
-          {methods.map((option) => (
-            <PaymentMethodCard
-              key={option.key}
-              label={option.label}
-              description={option.description}
-              icon={option.icon}
-              selected={method === option.key}
-              onPress={() => setMethod(option.key)}
-            />
-          ))}
+          {methods.map((option) => {
+            const isSelected = method === option.key;
+            return (
+              <View key={option.key}>
+                <TouchableOpacity
+                  style={[styles.paymentOption, isSelected && styles.paymentOptionSelected]}
+                  onPress={() => setMethod(option.key)}
+                  activeOpacity={0.8}
+                >
+                  <View style={[styles.paymentIconContainer, isSelected && styles.paymentIconSelected]}>
+                    <Ionicons
+                      name={option.icon}
+                      size={24}
+                      color={isSelected ? colors.white : colors.textLight}
+                    />
+                  </View>
+                  <View style={styles.paymentInfo}>
+                    <Text style={[styles.paymentLabel, isSelected && styles.paymentLabelSelected]}>
+                      {option.label}
+                    </Text>
+                    <Text style={styles.paymentDescription}>{option.description}</Text>
+                  </View>
+                  <View style={[styles.radioCircle, isSelected && styles.radioCircleSelected]}>
+                    {isSelected && <View style={styles.radioDot} />}
+                  </View>
+                </TouchableOpacity>
+
+                {/* Selector de Tarjetas si se elige TARJETA */}
+                {isSelected && option.key === 'TARJETA' && (
+                  <View style={styles.cardsContainer}>
+                    {paymentCards.length > 0 ? (
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.cardsScroll}>
+                        {paymentCards.map((card) => (
+                          <TouchableOpacity
+                            key={card.id}
+                            style={[
+                              styles.miniCard,
+                              selectedCard?.id === card.id && styles.miniCardSelected
+                            ]}
+                            onPress={() => setSelectedCard(card)}
+                          >
+                            <Text style={[styles.miniCardText, selectedCard?.id === card.id && styles.miniCardTextSelected]}>
+                              {card.type} •••• {card.number.slice(-4)}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                        <TouchableOpacity
+                          style={styles.addMiniCard}
+                          onPress={() => navigation.navigate('MetodosPago')}
+                        >
+                          <Ionicons name="add" size={20} color={colors.primary} />
+                          <Text style={styles.addMiniCardText}>Nueva</Text>
+                        </TouchableOpacity>
+                      </ScrollView>
+                    ) : (
+                      <TouchableOpacity
+                        style={styles.addCardButton}
+                        onPress={() => navigation.navigate('MetodosPago')}
+                      >
+                        <Text style={styles.addCardButtonText}>+ Agregar una tarjeta</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                )}
+
+                {/* Comprobante si se elige TRANSFERENCIA */}
+                {isSelected && option.key === 'TRANSFERENCIA' && (
+                  <View style={styles.transferContainer}>
+                    <Text style={styles.fieldLabel}>Comprobante</Text>
+                    <View style={styles.transferRow}>
+                      <Text style={styles.cardDetail}>
+                        {transferReference ? transferReference : 'Pendiente de adjuntar'}
+                      </Text>
+                      <TouchableOpacity onPress={() => setTransferModalVisible(true)}>
+                        <Text style={styles.linkText}>
+                          {transferReference ? 'Actualizar' : 'Subir'}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
+              </View>
+            );
+          })}
         </SectionCard>
 
         {/* Cuentas bancarias */}
@@ -126,59 +223,38 @@ const PagoCuotaScreen = ({ route, navigation }) => {
           </View>
         </SectionCard>
 
-        {/* Botón rojo principal (se mantiene igual) */}
+      </ScrollView>
+
+      {/* Barra Inferior */}
+      <View style={styles.bottomBar}>
         <PrimaryButton
           title="Confirmar pago de cuota"
           onPress={handleConfirm}
-          style={styles.confirmButton}
         />
-      </ScrollView>
+      </View>
 
-      {/* Modal para datos de tarjeta */}
-      <Modal visible={showCardModal} transparent animationType="slide">
+      {/* Modal de comprobante de transferencia */}
+      <Modal visible={transferModalVisible} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Datos de la tarjeta</Text>
+            <Text style={styles.modalTitle}>Comprobante de transferencia</Text>
             <TextInput
               style={sharedStyles.input}
-              placeholder="Numero de tarjeta"
-              keyboardType="number-pad"
-              value={cardData.number}
-              onChangeText={(text) =>
-                setCardData((prev) => ({ ...prev, number: text }))
-              }
+              placeholder="Número de referencia o archivo"
+              value={transferReference}
+              onChangeText={setTransferReference}
             />
-            <TextInput
-              style={sharedStyles.input}
-              placeholder="Fecha vencimiento (MM/AA)"
-              value={cardData.expiry}
-              onChangeText={(text) =>
-                setCardData((prev) => ({ ...prev, expiry: text }))
-              }
+            <PrimaryButton
+              title="Guardar comprobante"
+              onPress={() => {
+                // BACKEND: adjuntar comprobante para validación en el servidor
+                Alert.alert('Comprobante guardado', 'Se tomará en cuenta para validar tu pago.');
+                setTransferModalVisible(false);
+              }}
+              style={{ marginTop: 8 }}
             />
-            <TextInput
-              style={sharedStyles.input}
-              placeholder="CVV"
-              keyboardType="number-pad"
-              value={cardData.cvv}
-              onChangeText={(text) =>
-                setCardData((prev) => ({ ...prev, cvv: text }))
-              }
-            />
-            <TextInput
-              style={sharedStyles.input}
-              placeholder="Nombre del titular"
-              value={cardData.name}
-              onChangeText={(text) =>
-                setCardData((prev) => ({ ...prev, name: text }))
-              }
-            />
-            <PrimaryButton title="Pagar" onPress={handlePayWithCard} />
-            <Pressable
-              onPress={() => setShowCardModal(false)}
-              style={styles.modalClose}
-            >
-              <Text style={{ color: colors.primary }}>Cancelar</Text>
+            <Pressable onPress={() => setTransferModalVisible(false)} style={styles.modalClose}>
+              <Text style={{ color: colors.primary }}>Cerrar</Text>
             </Pressable>
           </View>
         </View>
@@ -188,9 +264,13 @@ const PagoCuotaScreen = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
   contentContainer: {
     padding: 16,
-    paddingBottom: 160,
+    paddingBottom: 100,
   },
   summaryRow: {
     flexDirection: 'row',
@@ -222,6 +302,149 @@ const styles = StyleSheet.create({
     color: colors.textDark,
     fontWeight: '600',
   },
+  paymentOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    marginBottom: 12,
+    backgroundColor: colors.white,
+  },
+  paymentOptionSelected: {
+    borderColor: colors.primary,
+    backgroundColor: '#FFF5F2',
+  },
+  paymentIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#F5F5F5',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  paymentIconSelected: {
+    backgroundColor: colors.primary,
+  },
+  paymentInfo: {
+    flex: 1,
+  },
+  paymentLabel: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.textDark,
+  },
+  paymentLabelSelected: {
+    color: colors.primary,
+  },
+  paymentDescription: {
+    fontSize: 12,
+    color: colors.textLight,
+    marginTop: 2,
+  },
+  radioCircle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: colors.borderSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radioCircleSelected: {
+    borderColor: colors.primary,
+  },
+  radioDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: colors.primary,
+  },
+  cardsContainer: {
+    marginLeft: 16,
+    marginBottom: 16,
+  },
+  cardsScroll: {
+    flexDirection: 'row',
+  },
+  miniCard: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: '#F5F5F5',
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  miniCardSelected: {
+    backgroundColor: colors.primary + '10', // 10% opacity
+    borderColor: colors.primary,
+  },
+  miniCardText: {
+    fontSize: 12,
+    color: colors.textDark,
+    fontWeight: '600',
+  },
+  miniCardTextSelected: {
+    color: colors.primary,
+  },
+  addMiniCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderStyle: 'dashed',
+  },
+  addMiniCardText: {
+    fontSize: 12,
+    color: colors.primary,
+    fontWeight: '600',
+    marginLeft: 4,
+  },
+  addCardButton: {
+    padding: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderStyle: 'dashed',
+    borderRadius: 12,
+  },
+  addCardButtonText: {
+    color: colors.primary,
+    fontWeight: '600',
+  },
+  transferContainer: {
+    marginLeft: 16,
+    marginBottom: 16,
+    padding: 12,
+    backgroundColor: '#F9F9F9',
+    borderRadius: 12,
+  },
+  transferRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  fieldLabel: {
+    fontSize: 12,
+    color: colors.textMuted,
+  },
+  cardDetail: {
+    color: colors.textDark,
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  linkText: {
+    color: colors.primary,
+    fontWeight: '600',
+  },
   bankCard: {
     borderRadius: 18,
     padding: 14,
@@ -239,8 +462,20 @@ const styles = StyleSheet.create({
     color: colors.textDark,
     marginBottom: 4,
   },
-  confirmButton: {
-    marginTop: 12,
+  bottomBar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: colors.white,
+    padding: 20,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 20,
   },
   modalOverlay: {
     flex: 1,

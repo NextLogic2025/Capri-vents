@@ -8,32 +8,53 @@ import {
   Image,
   TouchableOpacity,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import colors from '../../theme/colors';
 import globalStyles from '../../theme/styles';
 import { useAppContext } from '../../context/AppContext';
-import LogoCafrilosa from '../../assets/images/logo-cafrilosa.png';
-import PrimaryButton from '../components/PrimaryButton';
+import PrimaryButton from '../../components/PrimaryButton';
 
-const DatosPersonalesScreen = () => {
-  const { clientUser } = useAppContext() || {};
+const DatosPersonalesScreen = ({ navigation }) => {
+  const { user } = useAppContext() || {};
 
   const [firstNameInitial, lastNameInitial] = useMemo(() => {
-    const fullName = clientUser?.name || '';
+    const fullName = user?.name || '';
     const parts = fullName.trim().split(' ');
     if (!parts.length) return ['', ''];
     if (parts.length === 1) return [parts[0], ''];
     return [parts.slice(0, -1).join(' '), parts[parts.length - 1]];
-  }, [clientUser?.name]);
+  }, [user?.name]);
 
   const [firstName, setFirstName] = useState(firstNameInitial);
   const [lastName, setLastName] = useState(lastNameInitial);
-  const [email, setEmail] = useState(clientUser?.email || 'cliente@cafrilosa.com');
-  const [phone, setPhone] = useState(clientUser?.phone || '+593 99 123 4567');
+  const [email, setEmail] = useState(user?.email || 'usuario@cafrilosa.com');
+  const [phone, setPhone] = useState(user?.phone || '+593 99 123 4567');
 
-  const handleChangePhoto = () => {
-    Alert.alert('Foto de perfil', 'Aquí se abriría el selector de imágenes (mock).');
+  const [avatar, setAvatar] = useState(user?.avatar || null);
+
+  const avatarInitial = (firstName || 'U').charAt(0).toUpperCase();
+
+  const handleChangePhoto = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permiso denegado', 'Necesitamos acceso a tu cámara para tomar la foto.');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+    });
+
+    if (!result.canceled) {
+      setAvatar(result.assets[0].uri);
+    }
   };
 
   const handleSave = () => {
@@ -43,69 +64,86 @@ const DatosPersonalesScreen = () => {
     }
 
     Alert.alert('Perfil actualizado', 'Tus datos se han guardado correctamente (mock).');
+    navigation.goBack();
     // BACKEND: llamar PUT /cliente/perfil con los datos actualizados
   };
 
   return (
-    <ScrollView
-      style={styles.screen}
-      contentContainerStyle={styles.contentContainer}
-      showsVerticalScrollIndicator={false}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <View style={styles.avatarContainer}>
-        <Image
-          source={clientUser?.avatar ? { uri: clientUser.avatar } : LogoCafrilosa}
-          style={styles.avatar}
-        />
-        <TouchableOpacity style={styles.cameraButton} onPress={handleChangePhoto}>
-          <Ionicons name="camera" size={20} color={colors.white} />
-        </TouchableOpacity>
-      </View>
+      <ScrollView
+        style={styles.screen}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.headerContainer}>
+          <View style={styles.avatarWrapper}>
+            {avatar ? (
+              <Image source={{ uri: avatar }} style={styles.avatar} />
+            ) : (
+              <View style={styles.avatarPlaceholder}>
+                <Text style={styles.avatarText}>{avatarInitial}</Text>
+              </View>
+            )}
+            <TouchableOpacity style={styles.cameraButton} onPress={handleChangePhoto}>
+              <Ionicons name="camera" size={20} color={colors.white} />
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.headerTitle}>Edita tu perfil</Text>
+          <Text style={styles.headerSubtitle}>Mantén tus datos actualizados</Text>
+        </View>
 
-      <View style={styles.sectionHeaderRow}>
-        <Ionicons name="person-outline" size={18} color={colors.primary} />
-        <Text style={styles.sectionHeaderText}>Datos personales</Text>
-      </View>
+        <View style={styles.formCard}>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="person-circle-outline" size={22} color={colors.primary} />
+            <Text style={styles.sectionTitle}>Información Personal</Text>
+          </View>
 
-      <View style={styles.card}>
-        <LabeledInput
-          label="Nombre"
-          value={firstName}
-          onChangeText={setFirstName}
-          placeholder="Nombre"
-        />
-        <LabeledInput
-          label="Apellido"
-          value={lastName}
-          onChangeText={setLastName}
-          placeholder="Apellido"
-        />
-      </View>
+          <LabeledInput
+            label="Nombre"
+            value={firstName}
+            onChangeText={setFirstName}
+            placeholder="Tu nombre"
+            icon="text-outline"
+          />
+          <LabeledInput
+            label="Apellido"
+            value={lastName}
+            onChangeText={setLastName}
+            placeholder="Tu apellido"
+            icon="text-outline"
+          />
 
-      <View style={[styles.sectionHeaderRow, { marginTop: 20 }]}>
-        <Ionicons name="mail-outline" size={18} color={colors.primary} />
-        <Text style={styles.sectionHeaderText}>Información de contacto</Text>
-      </View>
+          <View style={[styles.sectionHeader, { marginTop: 24 }]}>
+            <Ionicons name="call-outline" size={22} color={colors.primary} />
+            <Text style={styles.sectionTitle}>Contacto</Text>
+          </View>
 
-      <View style={styles.card}>
-        <LabeledInput
-          label="Correo electrónico"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          placeholder="tucorreo@ejemplo.com"
-        />
-        <LabeledInput
-          label="Teléfono"
-          value={phone}
-          onChangeText={setPhone}
-          keyboardType="phone-pad"
-          placeholder="+593 99 123 4567"
-        />
-      </View>
+          <LabeledInput
+            label="Correo electrónico"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            placeholder="tucorreo@ejemplo.com"
+            icon="mail-outline"
+          />
+          <LabeledInput
+            label="Teléfono"
+            value={phone}
+            onChangeText={setPhone}
+            keyboardType="phone-pad"
+            placeholder="+593 99 123 4567"
+            icon="call-outline"
+          />
+        </View>
 
-      <PrimaryButton title="Guardar cambios" onPress={handleSave} style={styles.saveButton} />
-    </ScrollView>
+        <View style={styles.footer}>
+          <PrimaryButton title="GUARDAR CAMBIOS" onPress={handleSave} />
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -115,17 +153,21 @@ const LabeledInput = ({
   onChangeText,
   placeholder,
   keyboardType = 'default',
+  icon,
 }) => (
   <View style={styles.fieldGroup}>
     <Text style={styles.fieldLabel}>{label}</Text>
-    <TextInput
-      style={styles.input}
-      value={value}
-      onChangeText={onChangeText}
-      placeholder={placeholder}
-      placeholderTextColor={colors.textMuted}
-      keyboardType={keyboardType}
-    />
+    <View style={styles.inputWrapper}>
+      {icon && <Ionicons name={icon} size={20} color={colors.textMuted} style={{ marginRight: 10 }} />}
+      <TextInput
+        style={styles.input}
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+        placeholderTextColor={colors.textMuted}
+        keyboardType={keyboardType}
+      />
+    </View>
   </View>
 );
 
@@ -135,66 +177,114 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   contentContainer: {
-    paddingHorizontal: 20,
-    paddingTop: 24,
-    paddingBottom: 32,
+    paddingBottom: 40,
   },
-  avatarContainer: {
+  headerContainer: {
     alignItems: 'center',
+    paddingVertical: 32,
+    backgroundColor: colors.white,
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    elevation: 4,
     marginBottom: 24,
   },
+  avatarWrapper: {
+    position: 'relative',
+    marginBottom: 16,
+  },
   avatar: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    borderWidth: 3,
-    borderColor: colors.white,
-    backgroundColor: colors.cardBackground || colors.white,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 4,
+    borderColor: colors.background,
+  },
+  avatarPlaceholder: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#FFEBEE',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 4,
+    borderColor: colors.background,
+  },
+  avatarText: {
+    fontSize: 48,
+    color: colors.primary,
+    fontWeight: '800',
   },
   cameraButton: {
     position: 'absolute',
-    right: 28,
+    right: 0,
     bottom: 0,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2,
+    borderWidth: 3,
     borderColor: colors.white,
+    elevation: 4,
   },
-  sectionHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 6,
-  },
-  sectionHeaderText: {
-    marginLeft: 8,
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.textDark,
-  },
-  card: {
-    ...globalStyles.card,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  fieldGroup: {
-    marginBottom: 12,
-  },
-  fieldLabel: {
-    fontSize: 12,
-    color: colors.textMuted,
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: colors.darkText,
     marginBottom: 4,
   },
-  input: {
-    ...globalStyles.input,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+  headerSubtitle: {
+    fontSize: 14,
+    color: colors.textLight,
   },
-  saveButton: {
-    marginTop: 24,
+  formCard: {
+    paddingHorizontal: 24,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.darkText,
+    marginLeft: 8,
+  },
+  fieldGroup: {
+    marginBottom: 16,
+  },
+  fieldLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.textSecondary,
+    marginBottom: 8,
+    marginLeft: 4,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.white,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    paddingHorizontal: 16,
+    height: 56,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: colors.darkText,
+    height: '100%',
+  },
+  footer: {
+    paddingHorizontal: 24,
+    marginTop: 32,
   },
 });
 

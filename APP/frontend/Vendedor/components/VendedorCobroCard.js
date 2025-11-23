@@ -5,14 +5,14 @@ import colors from '../../theme/colors';
 import globalStyles from '../../theme/styles';
 
 const BADGE_MAP = {
-  PENDIENTE_COBRO: { label: 'Pendiente de cobro', color: colors.warning },
-  COBRADO_REPORTADO: { label: 'Cobro reportado', color: colors.tabInactive },
-  PENDIENTE: { label: 'Pendiente', color: colors.tabInactive },
-  VENCIDA: { label: 'Vencida', color: colors.danger },
-  VENCIDO: { label: 'Vencida', color: colors.danger },
-  PAGADA: { label: 'Pago reportado', color: colors.primaryDark },
-  PAGO_PENDIENTE_VALIDACION: { label: 'Pago reportado', color: colors.primaryDark },
-  PENDIENTE_COBRO_EFECTIVO: { label: 'Cobro en proceso', color: colors.warning },
+  PENDIENTE_COBRO: { label: 'Cobrar', color: colors.warning, icon: 'cash-outline' },
+  COBRADO_REPORTADO: { label: 'En validación', color: colors.info, icon: 'time-outline' },
+  PENDIENTE: { label: 'Pendiente', color: colors.tabInactive, icon: 'calendar-outline' },
+  VENCIDA: { label: 'Vencida', color: colors.danger, icon: 'alert-circle-outline' },
+  VENCIDO: { label: 'Vencida', color: colors.danger, icon: 'alert-circle-outline' },
+  PAGADA: { label: 'Pagada', color: colors.success, icon: 'checkmark-circle-outline' },
+  PAGO_PENDIENTE_VALIDACION: { label: 'Validando pago', color: colors.info, icon: 'hourglass-outline' },
+  PENDIENTE_COBRO_EFECTIVO: { label: 'Efectivo recibido', color: colors.primary, icon: 'wallet-outline' },
 };
 
 const formatCurrency = (value = 0) => {
@@ -32,38 +32,46 @@ const VendedorCobroCard = ({ item, onPress }) => {
   const type = (item.type || 'PEDIDO').toUpperCase();
   const clienteNombre = item.clienteNombre || 'Cliente sin nombre';
   const badgeKey = (item.estado || item.estadoPago || 'PENDIENTE').toUpperCase();
-  const badge = BADGE_MAP[badgeKey] || { label: badgeKey, color: colors.primary };
+  const badge = BADGE_MAP[badgeKey] || { label: badgeKey, color: colors.primary, icon: 'ellipse' };
+
+  const isOverdue = badgeKey === 'VENCIDA' || badgeKey === 'VENCIDO';
 
   return (
-    <TouchableOpacity style={styles.card} activeOpacity={0.85} onPress={onPress}>
-      <View style={styles.row}>
-        <View style={styles.iconWrapper}>
+    <TouchableOpacity
+      style={[styles.card, isOverdue && styles.cardOverdue]}
+      activeOpacity={0.85}
+      onPress={onPress}
+    >
+      <View style={styles.headerRow}>
+        <View style={styles.typeTag}>
           <Ionicons
-            name={type === 'CUOTA' ? 'calendar-outline' : 'cube-outline'}
-            size={20}
-            color={colors.primary}
+            name={type === 'CUOTA' ? 'calendar-number-outline' : 'cube-outline'}
+            size={14}
+            color={colors.textLight}
           />
-        </View>
-        <View style={styles.info}>
-          <Text style={styles.title} numberOfLines={1}>
+          <Text style={styles.typeText}>
             {type === 'CUOTA'
-              ? `Cuota ${item.numeroCuota || item.numero || '?'} – Pedido ${item.pedidoId || '??'}`
+              ? `Cuota ${item.numeroCuota || item.numero || '?'}`
               : `Pedido ${item.code || item.pedidoId || '??'}`}
           </Text>
-          <Text style={styles.subtitle} numberOfLines={1}>
+        </View>
+        <Text style={[styles.dateText, isOverdue && styles.dateTextOverdue]}>
+          {type === 'CUOTA' ? 'Vence: ' : 'Entrega: '}
+          {formatDate(item.fechaVencimiento || item.fechaEntrega)}
+        </Text>
+      </View>
+
+      <View style={styles.mainRow}>
+        <View style={styles.info}>
+          <Text style={styles.clientName} numberOfLines={1}>
             {clienteNombre}
           </Text>
-          <Text style={styles.subtitle}>
-            {type === 'CUOTA'
-              ? `Vence: ${formatDate(item.fechaVencimiento)}`
-              : `Entrega: ${formatDate(item.fechaEntrega)}`}
-          </Text>
-        </View>
-        <View style={styles.right}>
           <Text style={styles.amount}>{formatCurrency(item.monto)}</Text>
-          <View style={[styles.badge, { backgroundColor: badge.color }]}>
-            <Text style={styles.badgeText}>{badge.label}</Text>
-          </View>
+        </View>
+
+        <View style={[styles.badge, { backgroundColor: badge.color }]}>
+          <Ionicons name={badge.icon} size={12} color={colors.white} style={{ marginRight: 4 }} />
+          <Text style={styles.badgeText}>{badge.label}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -72,52 +80,80 @@ const VendedorCobroCard = ({ item, onPress }) => {
 
 const styles = StyleSheet.create({
   card: {
-    ...globalStyles.card,
-    padding: 14,
+    backgroundColor: colors.white,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  cardOverdue: {
+    borderColor: colors.danger,
+    backgroundColor: '#FFF5F5',
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 12,
   },
-  row: {
+  typeTag: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: colors.background,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
   },
-  iconWrapper: {
-    width: 44,
-    height: 44,
-    borderRadius: 16,
-    backgroundColor: '#FFF4F0',
+  typeText: {
+    fontSize: 12,
+    color: colors.textLight,
+    fontWeight: '600',
+    marginLeft: 4,
+  },
+  dateText: {
+    fontSize: 12,
+    color: colors.textLight,
+    fontWeight: '500',
+  },
+  dateTextOverdue: {
+    color: colors.danger,
+    fontWeight: '700',
+  },
+  mainRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
   },
   info: {
     flex: 1,
+    marginRight: 12,
   },
-  title: {
-    fontSize: 14,
+  clientName: {
+    fontSize: 15,
     fontWeight: '700',
     color: colors.textDark,
-  },
-  subtitle: {
-    fontSize: 12,
-    color: colors.textLight,
-    marginTop: 2,
-  },
-  right: {
-    alignItems: 'flex-end',
+    marginBottom: 4,
   },
   amount: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '800',
-    color: colors.primary,
+    color: colors.textDark,
   },
   badge: {
-    marginTop: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 999,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
   },
   badgeText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
     color: colors.white,
   },

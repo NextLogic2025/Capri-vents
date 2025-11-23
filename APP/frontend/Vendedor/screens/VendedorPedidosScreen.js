@@ -9,8 +9,11 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  StatusBar,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import colors from '../../theme/colors';
 import globalStyles from '../../theme/styles';
 import { useAppContext } from '../../context/AppContext';
@@ -18,7 +21,6 @@ import SectionCard from '../../Cliente/components/SectionCard';
 import PrimaryButton from '../../Cliente/components/PrimaryButton';
 import EmptyState from '../../Cliente/components/EmptyState';
 import VendedorOrderCard from '../components/VendedorOrderCard';
-import ScreenHeader from '../../Cliente/components/ScreenHeader';
 
 const FILTERS = [
   { key: 'HOY', label: 'Hoy' },
@@ -35,11 +37,6 @@ const VendedorPedidosScreen = () => {
   const navigation = useNavigation();
   const { vendorAssignedOrders = [], vendorUser } = useAppContext();
   const [filter, setFilter] = useState('PENDIENTES');
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [detailVisible, setDetailVisible] = useState(false);
-  const [cashModalVisible, setCashModalVisible] = useState(false);
-  const [cashAmount, setCashAmount] = useState('');
-  const [invoiceNumber, setInvoiceNumber] = useState('');
   const todayISO = new Date().toISOString().split('T')[0];
 
   const filteredOrders = useMemo(() => {
@@ -49,7 +46,7 @@ const VendedorPedidosScreen = () => {
         return (order.date || order.fecha || '').startsWith(todayISO);
       }
       if (filter === 'PENDIENTES') {
-        return status !== 'ENTREGADO' && status !== 'ENTREGADA';
+        return status !== 'ENTREGADO' && status !== 'ENTREGADA' && status !== 'CANCELADO';
       }
       if (filter === 'ENTREGADOS') {
         return status === 'ENTREGADO' || status === 'ENTREGADA';
@@ -62,64 +59,22 @@ const VendedorPedidosScreen = () => {
     const total = vendorAssignedOrders.length;
     const pendientes = vendorAssignedOrders.filter((order) => {
       const status = (order.status || order.estadoPedido || '').toUpperCase();
-      return status !== 'ENTREGADO' && status !== 'ENTREGADA';
+      return status !== 'ENTREGADO' && status !== 'ENTREGADA' && status !== 'CANCELADO';
     }).length;
     const entregados = total - pendientes;
     return { total, pendientes, entregados };
   }, [vendorAssignedOrders]);
 
   const openDetail = (order) => {
-    setSelectedOrder(order);
-    setDetailVisible(true);
-    setCashAmount(formatCurrency(order?.total));
-    setInvoiceNumber('');
-  };
-
-  const closeDetail = () => {
-    setDetailVisible(false);
-    setSelectedOrder(null);
-  };
-
-  const openCashModal = () => {
-    if (!selectedOrder) return;
-    setCashAmount(formatCurrency(selectedOrder.total));
-    setCashModalVisible(true);
-  };
-
-  const closeCashModal = () => setCashModalVisible(false);
-
-  const handleViewReceipt = () => {
-    // BACKEND: aqui se abriria la imagen del comprobante de transferencia.
-    Alert.alert('Comprobante', 'Se mostraria el comprobante cargado por el cliente.');
-  };
-
-  const handleUploadInvoice = () => {
-    // BACKEND: aqui se subiria la foto o archivo de la factura.
-    Alert.alert('Subir factura', 'Se simula carga de imagen. // BACKEND: subir archivo');
-  };
-
-  const handleConfirmCash = () => {
-    if (!selectedOrder) return;
-    // BACKEND: registrar cobro en efectivo y actualizar estados del pedido.
-    console.log('Registrar cobro en efectivo', {
-      orderId: selectedOrder.id,
-      amount: cashAmount,
-      invoiceNumber,
-    });
-    Alert.alert('Cobro registrado', 'Se registro el cobro en efectivo.');
-    setCashModalVisible(false);
-    setDetailVisible(false);
-    setSelectedOrder(null);
-  };
-
-  const goToCredits = () => {
-    // BACKEND: podria navegar al detalle del plan en otra pantalla
-    navigation.navigate('CobrosCreditos');
-    setDetailVisible(false);
+    navigation.navigate('VendedorDetallePedido', { order });
   };
 
   const renderFilterChips = () => (
-    <View style={styles.filterRow}>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.filterContainer}
+    >
       {FILTERS.map((item) => {
         const active = filter === item.key;
         return (
@@ -127,164 +82,67 @@ const VendedorPedidosScreen = () => {
             key={item.key}
             style={[styles.chip, active && styles.chipActive]}
             onPress={() => setFilter(item.key)}
+            activeOpacity={0.7}
           >
             <Text style={[styles.chipText, active && styles.chipTextActive]}>{item.label}</Text>
           </TouchableOpacity>
         );
       })}
-    </View>
+    </ScrollView>
   );
 
   const renderHeader = () => (
     <View style={styles.headerContent}>
-      <SectionCard title="Resumen diario">
+      <View style={styles.statsCard}>
+        <Text style={styles.statsTitle}>Resumen diario</Text>
         <View style={styles.statsRow}>
           <View style={styles.statItem}>
             <Text style={styles.statValue}>{resumen.total}</Text>
             <Text style={styles.statLabel}>Asignados</Text>
           </View>
+          <View style={styles.statDivider} />
           <View style={styles.statItem}>
             <Text style={styles.statValue}>{resumen.pendientes}</Text>
             <Text style={styles.statLabel}>Pendientes</Text>
           </View>
+          <View style={styles.statDivider} />
           <View style={styles.statItem}>
             <Text style={styles.statValue}>{resumen.entregados}</Text>
             <Text style={styles.statLabel}>Entregados</Text>
           </View>
         </View>
-        {renderFilterChips()}
-      </SectionCard>
+      </View>
+      {renderFilterChips()}
     </View>
   );
 
-  const renderOrderDetail = () => {
-    if (!selectedOrder) return null;
-    const paymentMethod = (selectedOrder.paymentMethod || '').toUpperCase();
-    const isCash = paymentMethod === 'EFECTIVO';
-    const isTransfer = paymentMethod.includes('TRANSFER');
-    const isCredit = paymentMethod.includes('CREDITO');
-
-    return (
-      <Modal visible={detailVisible} animationType="slide" transparent onRequestClose={closeDetail}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalCard}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{selectedOrder.code || selectedOrder.id}</Text>
-              <TouchableOpacity onPress={closeDetail} style={styles.closeButton}>
-                <Text style={styles.closeButtonText}>x</Text>
-              </TouchableOpacity>
-            </View>
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <SectionCard title="Cliente">
-                <Text style={styles.detailLabel}>Nombre</Text>
-                <Text style={styles.detailValue}>{selectedOrder.clientName}</Text>
-                <Text style={styles.detailLabel}>Telefono</Text>
-                <Text style={styles.detailValue}>{selectedOrder.clientPhone}</Text>
-                <Text style={styles.detailLabel}>Direccion</Text>
-                <Text style={styles.detailValue}>{selectedOrder.clientAddress}</Text>
-              </SectionCard>
-              <SectionCard title="Productos">
-                {Array.isArray(selectedOrder.items) &&
-                  selectedOrder.items.map((item) => (
-                    <View style={styles.productRow} key={item.productId || item.name}>
-                      <View>
-                        <Text style={styles.productName}>{item.name}</Text>
-                        <Text style={styles.productMeta}>
-                          {item.presentation}  -  {item.quantity} uds
-                        </Text>
-                      </View>
-                      <Text style={styles.productAmount}>
-                        ${(item.price * item.quantity).toFixed(2)}
-                      </Text>
-                    </View>
-                  ))}
-                <View style={styles.totalRow}>
-                  <Text style={styles.totalLabel}>Total</Text>
-                  <Text style={styles.totalValue}>${formatCurrency(selectedOrder.total)}</Text>
-                </View>
-              </SectionCard>
-              <SectionCard title="Pago & estado">
-                <Text style={styles.detailLabel}>Metodo de pago</Text>
-                <Text style={styles.detailValue}>{selectedOrder.paymentMethod}</Text>
-                <Text style={styles.detailLabel}>Estado del pedido</Text>
-                <Text style={styles.detailValue}>{selectedOrder.status}</Text>
-                <Text style={styles.detailLabel}>Estado del pago</Text>
-                <Text style={styles.detailValue}>{selectedOrder.paymentStatus}</Text>
-                {isTransfer && (
-                  <PrimaryButton
-                    title="Ver comprobante"
-                    style={styles.modalButton}
-                    onPress={handleViewReceipt}
-                  />
-                )}
-                {isCash && (
-                  <PrimaryButton
-                    title="Registrar cobro en efectivo"
-                    style={styles.modalButton}
-                    onPress={openCashModal}
-                  />
-                )}
-                {isCredit && (
-                  <TouchableOpacity style={styles.secondaryButton} onPress={goToCredits}>
-                    <Text style={styles.secondaryButtonText}>Ver plan de cuotas</Text>
-                  </TouchableOpacity>
-                )}
-              </SectionCard>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
-    );
-  };
-
-  const renderCashModal = () => {
-    if (!selectedOrder) return null;
-    return (
-      <Modal
-        visible={cashModalVisible}
-        animationType="fade"
-        transparent
-        onRequestClose={closeCashModal}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.cashModalCard}>
-            <Text style={styles.modalTitle}>Registrar cobro en efectivo</Text>
-            <Text style={styles.detailLabel}>Monto recibido</Text>
-            <TextInput
-              keyboardType="decimal-pad"
-              style={styles.input}
-              value={cashAmount}
-              onChangeText={setCashAmount}
-            />
-            <Text style={styles.detailLabel}>Numero de factura</Text>
-            <TextInput
-              placeholder="Ej. F001-12345"
-              style={styles.input}
-              value={invoiceNumber}
-              onChangeText={setInvoiceNumber}
-            />
-            <TouchableOpacity style={styles.secondaryButton} onPress={handleUploadInvoice}>
-              <Text style={styles.secondaryButtonText}>Subir foto de factura</Text>
-            </TouchableOpacity>
-            <PrimaryButton title="Confirmar" onPress={handleConfirmCash} style={{ marginTop: 12 }} />
-            <TouchableOpacity onPress={closeCashModal} style={styles.modalCancel}>
-              <Text style={styles.modalCancelText}>Cancelar</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-    );
-  };
-
   return (
     <View style={styles.screen}>
-      <ScreenHeader
-        greeting={`Hola, ${vendorUser?.name || 'Vendedor'}`}
-        title="Bienvenido"
-        sectionLabel="Pedidos"
-        icon="notifications-outline"
-        notificationsCount={resumen.pendientes}
-      />
+      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+
+      {/* Header con Gradiente */}
+      <LinearGradient
+        colors={[colors.primary, colors.primaryDark || '#8B0000']}
+        style={styles.headerGradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <View style={styles.headerContentTop}>
+          <View>
+            <Text style={styles.greeting}>Hola, {vendorUser?.name || 'Vendedor'}</Text>
+            <Text style={styles.headerTitle}>Mis Pedidos</Text>
+            {resumen.pendientes > 0 && (
+              <Text style={styles.headerSubtitle}>
+                {resumen.pendientes} pendiente{resumen.pendientes !== 1 ? 's' : ''}
+              </Text>
+            )}
+          </View>
+          <View style={styles.headerIcon}>
+            <Ionicons name="cube" size={32} color={colors.white} />
+          </View>
+        </View>
+      </LinearGradient>
+
       <FlatList
         data={filteredOrders}
         keyExtractor={(item) => item.id || item.code}
@@ -299,8 +157,6 @@ const VendedorPedidosScreen = () => {
           />
         }
       />
-      {renderOrderDetail()}
-      {renderCashModal()}
     </View>
   );
 };
@@ -314,166 +170,118 @@ const styles = StyleSheet.create({
     paddingBottom: 120,
     paddingHorizontal: 16,
   },
+  headerGradient: {
+    paddingTop: 50,
+    paddingBottom: 24,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  headerContentTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  greeting: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.8)',
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  headerTitle: {
+    fontSize: 28,
+    color: colors.white,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.9)',
+    fontWeight: '600',
+    marginTop: 4,
+  },
+  headerIcon: {
+    width: 56,
+    height: 56,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   headerContent: {
     paddingTop: 16,
   },
-  gradientHeader: {
-    marginBottom: 8,
+  filterContainer: {
+    paddingHorizontal: 4,
+    paddingBottom: 8,
+  },
+  statsCard: {
+    backgroundColor: colors.white,
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  statsTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.textDark,
+    marginBottom: 16,
   },
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    alignItems: 'center',
   },
   statItem: {
     alignItems: 'center',
     flex: 1,
   },
+  statDivider: {
+    width: 1,
+    height: 30,
+    backgroundColor: colors.borderSoft,
+  },
   statValue: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.textDark,
+    fontSize: 24,
+    fontWeight: '800',
+    color: colors.primary,
   },
   statLabel: {
     fontSize: 12,
     color: colors.textLight,
     marginTop: 4,
-  },
-  filterRow: {
-    flexDirection: 'row',
-    marginTop: 8,
-    flexWrap: 'wrap',
+    fontWeight: '500',
   },
   chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: colors.border,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 24,
     backgroundColor: colors.white,
-    marginRight: 8,
-    marginBottom: 8,
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
   },
   chipActive: {
     backgroundColor: colors.primary,
     borderColor: colors.primary,
   },
   chipText: {
-    color: colors.textDark,
+    color: colors.textSecondary,
     fontWeight: '600',
+    fontSize: 14,
   },
   chipTextActive: {
     color: colors.white,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16,
-  },
-  modalCard: {
-    width: '100%',
-    maxHeight: '90%',
-    backgroundColor: colors.white,
-    borderRadius: 26,
-    padding: 16,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.textDark,
-  },
-  closeButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 14,
-    backgroundColor: colors.borderSoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  closeButtonText: {
-    fontSize: 20,
-    color: colors.textDark,
-    fontWeight: '700',
-  },
-  detailLabel: {
-    fontSize: 12,
-    color: colors.textLight,
-    marginTop: 8,
-  },
-  detailValue: {
-    fontSize: 14,
-    color: colors.textDark,
-    fontWeight: '600',
-    marginTop: 2,
-  },
-  productRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  productName: {
-    fontWeight: '600',
-    color: colors.textDark,
-  },
-  productMeta: {
-    fontSize: 12,
-    color: colors.textLight,
-    marginTop: 2,
-  },
-  productAmount: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.textDark,
-  },
-  totalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 12,
-  },
-  totalLabel: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.textDark,
-  },
-  totalValue: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: colors.primary,
-  },
-  modalButton: {
-    marginTop: 12,
-  },
-  secondaryButton: {
-    ...globalStyles.secondaryButton,
-    marginTop: 12,
-  },
-  secondaryButtonText: {
-    ...globalStyles.secondaryButtonText,
-  },
-  cashModalCard: {
-    width: '100%',
-    backgroundColor: colors.white,
-    borderRadius: 22,
-    padding: 20,
-  },
-  input: {
-    ...globalStyles.input,
-    marginTop: 6,
-  },
-  modalCancel: {
-    marginTop: 10,
-    alignItems: 'center',
-  },
-  modalCancelText: {
-    color: colors.textLight,
-    fontWeight: '600',
   },
 });
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,17 +8,21 @@ import {
   Modal,
   TextInput,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Location from 'expo-location';
 import colors from '../../theme/colors';
 import globalStyles from '../../theme/styles';
 import PrimaryButton from '../components/PrimaryButton';
+import ScreenHeader from '../components/ScreenHeader';
 import { useAppContext } from '../../context/AppContext';
 
-const DireccionesScreen = () => {
+const DireccionesScreen = ({ navigation }) => {
   const { addresses, addAddress, updateAddress, setDefaultAddress } = useAppContext();
   const [modalVisible, setModalVisible] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
+  const [loadingLocation, setLoadingLocation] = useState(false);
   const [form, setForm] = useState({
     label: '',
     street: '',
@@ -67,6 +71,46 @@ const DireccionesScreen = () => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
+  const handleUseCurrentLocation = async () => {
+    setLoadingLocation(true);
+    try {
+      // Solicitar permisos
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permiso denegado', 'Necesitamos acceso a tu ubicación para autocompletar la dirección.');
+        setLoadingLocation(false);
+        return;
+      }
+
+      // Obtener ubicación actual
+      let location = await Location.getCurrentPositionAsync({});
+
+      // Geocodificación inversa (convertir coords a dirección)
+      let reverseGeocode = await Location.reverseGeocodeAsync({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+
+      if (reverseGeocode.length > 0) {
+        const address = reverseGeocode[0];
+        setForm((prev) => ({
+          ...prev,
+          street: address.street || prev.street,
+          number: address.streetNumber || prev.number,
+          city: address.city || address.subregion || prev.city,
+          province: address.region || prev.province,
+          zip: address.postalCode || prev.zip,
+        }));
+        Alert.alert('Ubicación encontrada', 'Hemos completado los campos con tu ubicación actual.');
+      }
+    } catch (error) {
+      console.log('Error obteniendo ubicación:', error);
+      Alert.alert('Error', 'No pudimos obtener tu ubicación exacta. Por favor ingresa los datos manualmente.');
+    } finally {
+      setLoadingLocation(false);
+    }
+  };
+
   const handleSaveAddress = () => {
     if (!form.label.trim() || !form.street.trim() || !form.number.trim() || !form.city.trim()) {
       Alert.alert('Campos obligatorios', 'Completa al menos nombre, calle, número y ciudad.');
@@ -75,11 +119,11 @@ const DireccionesScreen = () => {
 
     if (editingAddress) {
       updateAddress(editingAddress.id, form);
-      Alert.alert('Dirección actualizada', 'Se actualizará en tu perfil (mock).');
+      Alert.alert('Dirección actualizada', 'Se actualizará en tu perfil.');
       // BACKEND: PUT /cliente/direcciones/:id
     } else {
       addAddress(form);
-      Alert.alert('Dirección agregada', 'Se enviará al backend para guardarla (mock).');
+      Alert.alert('Dirección agregada', 'Se ha guardado tu nueva dirección.');
       // BACKEND: POST /cliente/direcciones
     }
 
@@ -93,24 +137,33 @@ const DireccionesScreen = () => {
 
   return (
     <View style={styles.screen}>
+
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
-        <PrimaryButton title="+ Agregar dirección" onPress={openNewAddress} style={styles.addButton} />
+        <PrimaryButton
+          title="+ Agregar nueva dirección"
+          onPress={openNewAddress}
+          style={styles.addButton}
+        />
 
         {addresses.map((address) => (
           <TouchableOpacity
             key={address.id}
-            style={styles.addressCard}
+            style={[styles.addressCard, address.isDefault && styles.addressCardDefault]}
             activeOpacity={0.9}
             onPress={() => openEditAddress(address)}
           >
             <View style={styles.addressHeaderRow}>
               <View style={styles.addressTitleRow}>
-                <View style={styles.addressIconCircle}>
-                  <Ionicons name="home-outline" size={18} color={colors.primary} />
+                <View style={[styles.addressIconCircle, address.isDefault && styles.addressIconCircleDefault]}>
+                  <Ionicons
+                    name={address.isDefault ? "star" : "location"}
+                    size={18}
+                    color={address.isDefault ? colors.white : colors.primary}
+                  />
                 </View>
                 <Text style={styles.addressLabel}>{address.label}</Text>
                 {address.isDefault && (
@@ -119,126 +172,170 @@ const DireccionesScreen = () => {
                   </View>
                 )}
               </View>
-              <Ionicons name="ellipsis-horizontal" size={18} color={colors.textMuted} />
+              <TouchableOpacity onPress={() => openEditAddress(address)}>
+                <Ionicons name="pencil-outline" size={20} color={colors.primary} />
+              </TouchableOpacity>
             </View>
-            <Text style={styles.addressLine}>
-              {address.street} {address.number}
-            </Text>
-            <Text style={styles.addressLine}>
-              {address.city}, {address.province} · CP {address.zip}
-            </Text>
-            {address.references ? (
-              <Text style={styles.addressRefs} numberOfLines={2}>
-                {address.references}
+
+            <View style={styles.addressDetails}>
+              <Text style={styles.addressLine}>
+                {address.street} {address.number}
               </Text>
-            ) : null}
+              <Text style={styles.addressLine}>
+                {address.city}, {address.province}
+              </Text>
+              {address.zip ? <Text style={styles.addressLine}>CP: {address.zip}</Text> : null}
+
+              {address.references ? (
+                <View style={styles.referenceContainer}>
+                  <Ionicons name="information-circle-outline" size={14} color={colors.textMuted} style={{ marginTop: 2, marginRight: 4 }} />
+                  <Text style={styles.addressRefs} numberOfLines={2}>
+                    {address.references}
+                  </Text>
+                </View>
+              ) : null}
+            </View>
+
             {!address.isDefault && (
               <TouchableOpacity
                 style={styles.setDefaultButton}
                 onPress={() => handleSetDefault(address.id)}
               >
-                <Text style={styles.setDefaultText}>Marcar como predeterminada</Text>
+                <Text style={styles.setDefaultText}>Usar como predeterminada</Text>
               </TouchableOpacity>
             )}
           </TouchableOpacity>
         ))}
 
         {addresses.length === 0 && (
-          <Text style={styles.emptyText}>
-            Aún no tienes direcciones guardadas. Agrega tu primera dirección para agilizar tus pedidos.
-          </Text>
+          <View style={styles.emptyContainer}>
+            <Ionicons name="map-outline" size={64} color={colors.borderSoft} />
+            <Text style={styles.emptyText}>
+              Aún no tienes direcciones guardadas.
+            </Text>
+            <Text style={styles.emptySubtext}>
+              Agrega tu primera dirección para agilizar tus pedidos.
+            </Text>
+          </View>
         )}
       </ScrollView>
 
-      <Modal visible={modalVisible} transparent animationType="fade">
+      <Modal visible={modalVisible} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
-              {editingAddress ? 'Editar dirección' : 'Agregar dirección'}
-            </Text>
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>
+                {editingAddress ? 'Editar dirección' : 'Nueva dirección'}
+              </Text>
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <Ionicons name="close" size={24} color={colors.textDark} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.modalScroll}>
+
+              {!editingAddress && (
+                <TouchableOpacity
+                  style={styles.locationButton}
+                  onPress={handleUseCurrentLocation}
+                  disabled={loadingLocation}
+                >
+                  {loadingLocation ? (
+                    <ActivityIndicator size="small" color={colors.white} />
+                  ) : (
+                    <>
+                      <Ionicons name="locate" size={20} color={colors.white} style={{ marginRight: 8 }} />
+                      <Text style={styles.locationButtonText}>Usar mi ubicación actual</Text>
+                    </>
+                  )}
+                </TouchableOpacity>
+              )}
+
               <LabeledInput
-                label="Nombre de la dirección *"
+                label="Nombre (Ej: Casa, Trabajo)"
                 value={form.label}
                 onChangeText={(t) => handleFormChange('label', t)}
-                placeholder="Casa, Oficina, etc."
+                placeholder="Ej: Casa"
               />
+
               <View style={styles.row}>
-                <View style={styles.rowItem}>
+                <View style={[styles.rowItem, { flex: 2 }]}>
                   <LabeledInput
-                    label="Calle *"
+                    label="Calle"
                     value={form.street}
                     onChangeText={(t) => handleFormChange('street', t)}
                     placeholder="Av. Principal"
                   />
                 </View>
-                <View style={styles.rowItem}>
+                <View style={[styles.rowItem, { flex: 1 }]}>
                   <LabeledInput
-                    label="Número *"
+                    label="Número"
                     value={form.number}
                     onChangeText={(t) => handleFormChange('number', t)}
                     placeholder="123"
                   />
                 </View>
               </View>
+
               <View style={styles.row}>
                 <View style={styles.rowItem}>
                   <LabeledInput
-                    label="Piso"
+                    label="Piso (Opcional)"
                     value={form.floor}
                     onChangeText={(t) => handleFormChange('floor', t)}
-                    placeholder="5"
+                    placeholder="PB"
                   />
                 </View>
                 <View style={styles.rowItem}>
                   <LabeledInput
-                    label="Depto/Of"
+                    label="Depto (Opcional)"
                     value={form.dept}
                     onChangeText={(t) => handleFormChange('dept', t)}
-                    placeholder="B"
+                    placeholder="4B"
                   />
                 </View>
               </View>
+
               <View style={styles.row}>
                 <View style={styles.rowItem}>
                   <LabeledInput
-                    label="Ciudad *"
+                    label="Ciudad"
                     value={form.city}
                     onChangeText={(t) => handleFormChange('city', t)}
-                    placeholder="Loja"
+                    placeholder="Ciudad"
                   />
                 </View>
                 <View style={styles.rowItem}>
                   <LabeledInput
-                    label="Provincia *"
+                    label="Provincia"
                     value={form.province}
                     onChangeText={(t) => handleFormChange('province', t)}
-                    placeholder="Loja"
+                    placeholder="Provincia"
                   />
                 </View>
               </View>
+
               <LabeledInput
-                label="Código postal *"
+                label="Código Postal"
                 value={form.zip}
                 onChangeText={(t) => handleFormChange('zip', t)}
                 keyboardType="numeric"
-                placeholder="110101"
+                placeholder="000000"
               />
+
               <LabeledInput
-                label="Referencias (opcional)"
+                label="Referencias adicionales"
                 value={form.references}
                 onChangeText={(t) => handleFormChange('references', t)}
-                placeholder="Ej: Portón verde, timbre 5B..."
+                placeholder="Ej: Frente al parque, portón negro..."
                 multiline
               />
+
               <PrimaryButton
-                title={editingAddress ? 'Actualizar' : 'Agregar'}
+                title={editingAddress ? 'Guardar cambios' : 'Guardar dirección'}
                 onPress={handleSaveAddress}
-                style={{ marginTop: 8 }}
+                style={{ marginTop: 16 }}
               />
-              <TouchableOpacity style={styles.modalCancel} onPress={() => setModalVisible(false)}>
-                <Text style={styles.modalCancelText}>Cancelar</Text>
-              </TouchableOpacity>
             </ScrollView>
           </View>
         </View>
@@ -276,92 +373,154 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 16,
-    paddingBottom: 32,
+    paddingBottom: 40,
   },
   addButton: {
-    marginBottom: 16,
+    marginBottom: 20,
   },
   addressCard: {
-    ...globalStyles.card,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginBottom: 12,
+    backgroundColor: colors.white,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  addressCardDefault: {
+    borderColor: colors.primary,
+    backgroundColor: '#FFF5F2',
   },
   addressHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 12,
   },
   addressTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   addressIconCircle: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: '#FFE9E2',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F5F5F5',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 8,
+    marginRight: 10,
+  },
+  addressIconCircleDefault: {
+    backgroundColor: colors.primary,
   },
   addressLabel: {
+    fontSize: 16,
     fontWeight: '700',
     color: colors.textDark,
   },
   defaultBadge: {
-    marginLeft: 6,
-    borderRadius: 12,
+    marginLeft: 8,
+    borderRadius: 8,
     paddingHorizontal: 8,
-    paddingVertical: 2,
-    backgroundColor: '#E6FFFB',
+    paddingVertical: 4,
+    backgroundColor: colors.primary,
   },
   defaultBadgeText: {
-    fontSize: 11,
-    color: '#08979C',
-    fontWeight: '600',
+    fontSize: 10,
+    color: colors.white,
+    fontWeight: '700',
+  },
+  addressDetails: {
+    paddingLeft: 42,
   },
   addressLine: {
-    color: colors.textMuted,
-    fontSize: 13,
+    color: colors.textDark,
+    fontSize: 14,
+    marginBottom: 2,
+  },
+  referenceContainer: {
+    flexDirection: 'row',
+    marginTop: 6,
+    backgroundColor: 'rgba(0,0,0,0.03)',
+    padding: 8,
+    borderRadius: 8,
   },
   addressRefs: {
-    marginTop: 4,
-    fontSize: 12,
+    fontSize: 13,
     color: colors.textMuted,
     fontStyle: 'italic',
+    flex: 1,
   },
   setDefaultButton: {
-    marginTop: 8,
+    marginTop: 12,
+    paddingLeft: 42,
   },
   setDefaultText: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '600',
     color: colors.primary,
   },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 40,
+    opacity: 0.7,
+  },
   emptyText: {
     marginTop: 16,
-    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.textDark,
+  },
+  emptySubtext: {
+    marginTop: 8,
+    fontSize: 14,
     color: colors.textMuted,
+    textAlign: 'center',
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.45)',
-    justifyContent: 'center',
-    padding: 16,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
   },
   modalContent: {
     backgroundColor: colors.white,
-    borderRadius: 20,
-    padding: 18,
-    maxHeight: '90%',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 20,
+    height: '85%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
-    marginBottom: 12,
     color: colors.textDark,
+  },
+  modalScroll: {
+    paddingBottom: 40,
+  },
+  locationButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.secondary || '#4CAF50',
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 20,
+  },
+  locationButtonText: {
+    color: colors.white,
+    fontWeight: '600',
+    fontSize: 14,
   },
   row: {
     flexDirection: 'row',
@@ -369,28 +528,26 @@ const styles = StyleSheet.create({
   },
   rowItem: {
     flex: 1,
-    marginRight: 8,
+    marginRight: 10,
   },
   fieldGroup: {
-    marginBottom: 10,
+    marginBottom: 16,
   },
   fieldLabel: {
-    fontSize: 12,
-    color: colors.textMuted,
-    marginBottom: 4,
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.textDark,
+    marginBottom: 8,
   },
   input: {
-    ...globalStyles.input,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-  },
-  modalCancel: {
-    marginTop: 10,
-    alignItems: 'center',
-  },
-  modalCancelText: {
-    color: colors.textMuted,
-    fontWeight: '600',
+    backgroundColor: '#F9F9F9',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: colors.textDark,
   },
 });
 

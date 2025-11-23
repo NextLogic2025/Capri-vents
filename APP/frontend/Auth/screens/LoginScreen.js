@@ -7,6 +7,8 @@ import {
   StyleSheet,
   ScrollView,
   Image,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import Checkbox from 'expo-checkbox';
 import { Ionicons } from '@expo/vector-icons';
@@ -46,8 +48,13 @@ const AuthInput = ({
 }) => (
   <View style={styles.fieldGroup}>
     <Text style={styles.fieldLabel}>{label}</Text>
-    <View style={styles.inputWrapper}>
-      <Ionicons name={icon} size={20} color={colors.muted} style={styles.inputIcon} />
+    <View style={[styles.inputWrapper, value ? styles.inputWrapperActive : null]}>
+      <Ionicons
+        name={icon}
+        size={20}
+        color={value ? colors.primary : colors.textMuted}
+        style={styles.inputIcon}
+      />
       <TextInput
         value={value}
         onChangeText={onChangeText}
@@ -63,7 +70,7 @@ const AuthInput = ({
           <Ionicons
             name={showPassword ? 'eye-outline' : 'eye-off-outline'}
             size={20}
-            color={colors.muted}
+            color={colors.textMuted}
           />
         </TouchableOpacity>
       )}
@@ -79,17 +86,6 @@ const LoginScreen = ({ navigation }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const navigateByRole = (role) => {
-    const parentNav = navigation.getParent?.() || navigation;
-    const target =
-      role === 'vendedor'
-        ? 'VendedorModulo'
-        : role === 'supervisor'
-        ? 'SupervisorModulo'
-        : 'ClienteTabs';
-    parentNav.reset({ index: 0, routes: [{ name: target }] });
-  };
-
   const handleLogin = () => {
     setErrorMessage('');
     if (!email.trim() || !password.trim()) {
@@ -97,7 +93,6 @@ const LoginScreen = ({ navigation }) => {
       return;
     }
 
-    // BACKEND: aquí debe ir el POST /auth/login para obtener tokens y los datos del usuario.
     const matchedAccount = demoAccounts.find(
       (account) =>
         account.email.toLowerCase() === email.trim().toLowerCase() &&
@@ -110,77 +105,90 @@ const LoginScreen = ({ navigation }) => {
     }
 
     login(matchedAccount.role);
-    navigateByRole(matchedAccount.role);
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.container}
-      showsVerticalScrollIndicator={false}
-      keyboardShouldPersistTaps="handled"
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <Image source={LogoCafrilosa} style={styles.logo} />
+      <ScrollView
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.headerBackground} />
 
-      <View style={styles.card}>
-        <Text style={styles.heading}>¡Bienvenido!</Text>
-        <Text style={styles.subheading}>Ingresa a tu cuenta para continuar</Text>
+        <View style={styles.contentWrapper}>
+          <View style={styles.logoContainer}>
+            <Image source={LogoCafrilosa} style={styles.logo} />
+          </View>
 
-        <AuthInput
-          label="Correo Electrónico"
-          icon="mail-outline"
-          value={email}
-          onChangeText={setEmail}
-          placeholder="tucorreo@ejemplo.com"
-          keyboardType="email-address"
-        />
-        <AuthInput
-          label="Contraseña"
-          icon="lock-closed-outline"
-          value={password}
-          onChangeText={setPassword}
-          placeholder="Ingresa tu contraseña"
-          secure
-          showPassword={showPassword}
-          onTogglePassword={() => setShowPassword((prev) => !prev)}
-        />
+          <View style={styles.card}>
+            <Text style={styles.heading}>¡Bienvenido!</Text>
+            <Text style={styles.subheading}>Inicia sesión para continuar</Text>
 
-        <View style={styles.actionsRow}>
-          <TouchableOpacity
-            style={styles.rememberRow}
-            onPress={() => setRememberMe((prev) => !prev)}
-          >
-            <Checkbox
-              value={rememberMe}
-              onValueChange={setRememberMe}
-              color={rememberMe ? colors.primary : undefined}
+            <AuthInput
+              label="Correo Electrónico"
+              icon="mail-outline"
+              value={email}
+              onChangeText={setEmail}
+              placeholder="tucorreo@cafrilosa.com"
+              keyboardType="email-address"
             />
-            <Text style={styles.rememberText}>Recordarme</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
-            <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
-          </TouchableOpacity>
+            <AuthInput
+              label="Contraseña"
+              icon="lock-closed-outline"
+              value={password}
+              onChangeText={setPassword}
+              placeholder="••••••••"
+              secure
+              showPassword={showPassword}
+              onTogglePassword={() => setShowPassword((prev) => !prev)}
+            />
+
+            <View style={styles.actionsRow}>
+              <TouchableOpacity
+                style={styles.rememberRow}
+                onPress={() => setRememberMe((prev) => !prev)}
+              >
+                <Checkbox
+                  value={rememberMe}
+                  onValueChange={setRememberMe}
+                  color={rememberMe ? colors.primary : undefined}
+                  style={styles.checkbox}
+                />
+                <Text style={styles.rememberText}>Recordarme</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+                <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
+              </TouchableOpacity>
+            </View>
+
+            {!!errorMessage && (
+              <View style={styles.errorContainer}>
+                <Ionicons name="alert-circle" size={20} color={colors.danger} />
+                <Text style={styles.errorText}>{errorMessage}</Text>
+              </View>
+            )}
+
+            <TouchableOpacity style={styles.primaryButton} onPress={handleLogin}>
+              <Text style={styles.primaryButtonText}>INICIAR SESIÓN</Text>
+              <Ionicons name="arrow-forward" size={20} color={colors.white} />
+            </TouchableOpacity>
+
+            <View style={styles.footerRow}>
+              <Text style={styles.subtleText}>¿No tienes una cuenta?</Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+                <Text style={styles.link}>Regístrate aquí</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <Text style={styles.versionText}>Versión 2.0.1</Text>
         </View>
-
-        {!!errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
-
-        <TouchableOpacity style={styles.primaryButton} onPress={handleLogin}>
-          <Text style={styles.primaryButtonText}>Iniciar Sesión</Text>
-        </TouchableOpacity>
-
-        <View style={styles.dividerRow}>
-          <View style={styles.divider} />
-          <Text style={styles.dividerDot}>o</Text>
-          <View style={styles.divider} />
-        </View>
-
-        <View style={styles.footerRow}>
-          <Text style={styles.subtleText}>¿No tienes una cuenta?</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-            <Text style={styles.link}>Regístrate</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -188,133 +196,178 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: colors.background,
+  },
+  headerBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '40%',
+    backgroundColor: colors.primary,
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
+  },
+  contentWrapper: {
+    flex: 1,
     paddingHorizontal: 24,
-    paddingTop: 56,
+    paddingTop: 60,
     paddingBottom: 40,
     alignItems: 'center',
   },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 30,
+  },
   logo: {
-    width: 210,
-    height: 120,
+    width: 240,
+    height: 140,
     resizeMode: 'contain',
+    // tintColor removed to show original logo colors
   },
   slogan: {
-    marginTop: 6,
-    marginBottom: 24,
-    fontSize: 16,
-    color: colors.goldDark,
-    fontWeight: '600',
-    textAlign: 'center',
+    marginTop: 8,
+    fontSize: 18,
+    color: colors.gold,
+    fontWeight: '700',
+    fontStyle: 'italic',
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   card: {
     width: '100%',
-    // Sin fondo blanco ni sombra para parecerse más al mock
-    backgroundColor: 'transparent',
-    paddingTop: 8,
+    backgroundColor: colors.white,
+    borderRadius: 24,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 10,
   },
   heading: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: '800',
     color: colors.darkText,
-    marginBottom: 4,
+    marginBottom: 8,
+    textAlign: 'center',
   },
   subheading: {
-    color: colors.textLight,
-    marginBottom: 24,
-    fontSize: 14,
+    color: colors.textSecondary,
+    marginBottom: 32,
+    fontSize: 15,
+    textAlign: 'center',
   },
   fieldGroup: {
-    marginBottom: 18,
+    marginBottom: 20,
   },
   fieldLabel: {
-    fontWeight: '700',
-    color: colors.bodyText,
-    marginBottom: 6,
-    fontSize: 13,
+    fontWeight: '600',
+    color: colors.darkText,
+    marginBottom: 8,
+    fontSize: 14,
+    marginLeft: 4,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 22,
-    paddingHorizontal: 14,
-    borderWidth: 1,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    borderWidth: 1.5,
     borderColor: colors.borderSoft,
+    backgroundColor: colors.inputBackground,
+    height: 56,
+  },
+  inputWrapperActive: {
+    borderColor: colors.primary,
     backgroundColor: colors.white,
   },
   inputIcon: {
-    marginRight: 8,
+    marginRight: 12,
   },
   input: {
     flex: 1,
-    paddingVertical: 12,
-    fontSize: 15,
+    fontSize: 16,
     color: colors.darkText,
+    height: '100%',
   },
   eyeButton: {
-    padding: 4,
+    padding: 8,
   },
   actionsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 24,
     marginTop: 4,
-    marginBottom: 12,
   },
   rememberRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+  checkbox: {
+    borderRadius: 6,
+    borderColor: colors.primary,
+  },
   rememberText: {
     marginLeft: 8,
-    color: colors.bodyText,
-    fontSize: 13,
+    color: colors.textSecondary,
+    fontSize: 14,
   },
   link: {
     color: colors.primary,
     fontWeight: '700',
-    fontSize: 13,
+    fontSize: 14,
+  },
+  errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFEBEE',
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 20,
   },
   errorText: {
     color: colors.danger,
-    marginBottom: 10,
+    marginLeft: 8,
     fontSize: 13,
+    flex: 1,
   },
   primaryButton: {
     backgroundColor: colors.primary,
-    borderRadius: 24,
-    paddingVertical: 14,
+    borderRadius: 16,
+    paddingVertical: 16,
+    flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 8,
+    justifyContent: 'center',
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+    marginBottom: 24,
   },
   primaryButtonText: {
     color: colors.white,
-    fontWeight: '700',
+    fontWeight: '800',
     fontSize: 16,
-  },
-  dividerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 24,
-    marginBottom: 10,
-  },
-  divider: {
-    flex: 1,
-    height: 1,
-    backgroundColor: colors.border,
-  },
-  dividerDot: {
-    marginHorizontal: 8,
-    color: colors.textMuted,
-    fontSize: 12,
+    marginRight: 8,
+    letterSpacing: 0.5,
   },
   footerRow: {
     flexDirection: 'row',
     justifyContent: 'center',
+    alignItems: 'center',
   },
   subtleText: {
-    color: colors.textMuted,
+    color: colors.textSecondary,
     marginRight: 4,
-    fontSize: 13,
+    fontSize: 14,
+  },
+  versionText: {
+    marginTop: 40,
+    color: colors.textMuted,
+    fontSize: 12,
   },
 });
 

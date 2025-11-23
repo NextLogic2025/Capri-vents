@@ -8,6 +8,8 @@ import {
   ScrollView,
   Image,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import Checkbox from 'expo-checkbox';
 import { Ionicons } from '@expo/vector-icons';
@@ -28,8 +30,13 @@ const AuthInput = ({
 }) => (
   <View style={styles.fieldGroup}>
     <Text style={styles.fieldLabel}>{label}</Text>
-    <View style={styles.inputWrapper}>
-      <Ionicons name={icon} size={20} color={colors.muted} style={styles.inputIcon} />
+    <View style={[styles.inputWrapper, value ? styles.inputWrapperActive : null]}>
+      <Ionicons
+        name={icon}
+        size={20}
+        color={value ? colors.primary : colors.textMuted}
+        style={styles.inputIcon}
+      />
       <TextInput
         value={value}
         onChangeText={onChangeText}
@@ -45,7 +52,7 @@ const AuthInput = ({
           <Ionicons
             name={showPassword ? 'eye-outline' : 'eye-off-outline'}
             size={20}
-            color={colors.muted}
+            color={colors.textMuted}
           />
         </TouchableOpacity>
       )}
@@ -96,9 +103,6 @@ const RegisterScreen = ({ navigation }) => {
       phone: form.phone,
       password: form.password,
     };
-    // BACKEND: el teléfono debe guardarse al crear el cliente
-    // para luego mostrarlo y editarlo en la sección Perfil.
-    // BACKEND: aquí se debe invocar el endpoint de registro para crear el cliente en Cafrilosa.
     console.log('Payload registro:', payload);
 
     Alert.alert(
@@ -109,87 +113,100 @@ const RegisterScreen = ({ navigation }) => {
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.container}
-      showsVerticalScrollIndicator={false}
-      keyboardShouldPersistTaps="handled"
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <Image source={LogoCafrilosa} style={styles.logo} />
+      <ScrollView
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.headerBackground} />
 
-      <View style={styles.form}>
-        <Text style={styles.heading}>Crear Cuenta</Text>
-        <Text style={styles.subheading}>Completa los datos para registrarte</Text>
+        <View style={styles.contentWrapper}>
+          <View style={styles.logoContainer}>
+            <Image source={LogoCafrilosa} style={styles.logo} />
+          </View>
 
-        <AuthInput
-          label="Nombre completo"
-          icon="person-circle-outline"
-          value={form.name}
-          onChangeText={(text) => handleChange('name', text)}
-          placeholder="Juan Pérez"
-          autoCapitalize="words"
-        />
-        <AuthInput
-          label="Correo electrónico"
-          icon="mail-outline"
-          value={form.email}
-          onChangeText={(text) => handleChange('email', text)}
-          placeholder="tucorreo@cafrilosa.com"
-          keyboardType="email-address"
-        />
-        <AuthInput
-          label="Teléfono"
-          icon="call-outline"
-          value={form.phone}
-          onChangeText={(text) => handleChange('phone', text)}
-          placeholder="0999999999"
-          keyboardType="phone-pad"
-        />
-        <AuthInput
-          label="Contraseña"
-          icon="lock-closed-outline"
-          value={form.password}
-          onChangeText={(text) => handleChange('password', text)}
-          placeholder="Mínimo 6 caracteres"
-          secure
-          showPassword={showPassword}
-          onTogglePassword={() => setShowPassword((prev) => !prev)}
-        />
-        <AuthInput
-          label="Confirmar contraseña"
-          icon="lock-closed-outline"
-          value={form.confirmPassword}
-          onChangeText={(text) => handleChange('confirmPassword', text)}
-          placeholder="Repite tu contraseña"
-          secure
-          showPassword={showConfirm}
-          onTogglePassword={() => setShowConfirm((prev) => !prev)}
-        />
+          <View style={styles.card}>
+            <Text style={styles.heading}>Crear Cuenta</Text>
+            <Text style={styles.subheading}>Completa los datos para registrarte</Text>
 
-        <View style={styles.termsRow}>
-          <Checkbox
-            value={acceptTerms}
-            onValueChange={setAcceptTerms}
-            color={acceptTerms ? colors.secondaryGold : undefined}
-          />
-          <Text style={styles.termsText}>
-            Acepto los{' '}
-            <Text style={styles.termsLink}>Términos y Condiciones</Text> y la{' '}
-            <Text style={styles.termsLink}>Política de Privacidad</Text>.
-          </Text>
+            <AuthInput
+              label="Nombre completo"
+              icon="person-circle-outline"
+              value={form.name}
+              onChangeText={(text) => handleChange('name', text)}
+              placeholder="Juan Pérez"
+              autoCapitalize="words"
+            />
+            <AuthInput
+              label="Correo electrónico"
+              icon="mail-outline"
+              value={form.email}
+              onChangeText={(text) => handleChange('email', text)}
+              placeholder="tucorreo@cafrilosa.com"
+              keyboardType="email-address"
+            />
+            <AuthInput
+              label="Teléfono"
+              icon="call-outline"
+              value={form.phone}
+              onChangeText={(text) => handleChange('phone', text)}
+              placeholder="0999999999"
+              keyboardType="phone-pad"
+            />
+            <AuthInput
+              label="Contraseña"
+              icon="lock-closed-outline"
+              value={form.password}
+              onChangeText={(text) => handleChange('password', text)}
+              placeholder="Mínimo 6 caracteres"
+              secure
+              showPassword={showPassword}
+              onTogglePassword={() => setShowPassword((prev) => !prev)}
+            />
+            <AuthInput
+              label="Confirmar contraseña"
+              icon="lock-closed-outline"
+              value={form.confirmPassword}
+              onChangeText={(text) => handleChange('confirmPassword', text)}
+              placeholder="Repite tu contraseña"
+              secure
+              showPassword={showConfirm}
+              onTogglePassword={() => setShowConfirm((prev) => !prev)}
+            />
+
+            <View style={styles.termsRow}>
+              <Checkbox
+                value={acceptTerms}
+                onValueChange={setAcceptTerms}
+                color={acceptTerms ? colors.primary : undefined}
+                style={styles.checkbox}
+              />
+              <Text style={styles.termsText}>
+                Acepto los{' '}
+                <Text style={styles.termsLink}>Términos y Condiciones</Text> y la{' '}
+                <Text style={styles.termsLink}>Política de Privacidad</Text>.
+              </Text>
+            </View>
+
+            <TouchableOpacity style={styles.primaryButton} onPress={handleRegister}>
+              <Text style={styles.primaryButtonText}>CREAR CUENTA</Text>
+              <Ionicons name="arrow-forward" size={20} color={colors.white} />
+            </TouchableOpacity>
+
+            <View style={styles.footerRow}>
+              <Text style={styles.subtleText}>¿Ya tienes una cuenta?</Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                <Text style={styles.link}>Inicia sesión</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
-
-        <TouchableOpacity style={styles.primaryButton} onPress={handleRegister}>
-          <Text style={styles.primaryButtonText}>Crear Cuenta</Text>
-        </TouchableOpacity>
-
-        <View style={styles.footerRow}>
-          <Text style={styles.subtleText}>¿Ya tienes una cuenta?</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.link}>Inicia sesión</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -197,103 +214,160 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: colors.background,
+  },
+  headerBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '35%',
+    backgroundColor: colors.primary,
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
+  },
+  contentWrapper: {
+    flex: 1,
     paddingHorizontal: 24,
+    paddingTop: 50,
     paddingBottom: 40,
     alignItems: 'center',
   },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
   logo: {
-    width: 190,
-    height: 120,
-    marginTop: 40,
+    width: 200,
+    height: 110,
     resizeMode: 'contain',
   },
   slogan: {
-    color: colors.goldDark,
-    marginTop: 4,
-    marginBottom: 20,
-    fontWeight: '600',
+    marginTop: 8,
+    fontSize: 16,
+    color: colors.gold,
+    fontWeight: '700',
+    fontStyle: 'italic',
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
-  form: {
+  card: {
     width: '100%',
+    backgroundColor: colors.white,
+    borderRadius: 24,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 10,
   },
   heading: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: '800',
     color: colors.darkText,
+    marginBottom: 8,
+    textAlign: 'center',
   },
   subheading: {
-    color: colors.textLight,
+    color: colors.textSecondary,
     marginBottom: 24,
-    marginTop: 4,
+    fontSize: 14,
+    textAlign: 'center',
   },
   fieldGroup: {
-    marginBottom: 18,
+    marginBottom: 16,
   },
   fieldLabel: {
-    fontWeight: '700',
-    color: colors.bodyText,
+    fontWeight: '600',
+    color: colors.darkText,
     marginBottom: 6,
+    fontSize: 13,
+    marginLeft: 4,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    borderWidth: 1.5,
+    borderColor: colors.borderSoft,
+    backgroundColor: colors.inputBackground,
+    height: 52,
+  },
+  inputWrapperActive: {
+    borderColor: colors.primary,
     backgroundColor: colors.white,
   },
   inputIcon: {
-    marginRight: 8,
+    marginRight: 12,
   },
   input: {
     flex: 1,
-    paddingVertical: 12,
-    fontSize: 16,
+    fontSize: 15,
     color: colors.darkText,
+    height: '100%',
   },
   eyeButton: {
-    padding: 4,
+    padding: 8,
   },
   termsRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 22,
-    marginTop: 4,
+    alignItems: 'flex-start',
+    marginBottom: 24,
+    marginTop: 8,
+  },
+  checkbox: {
+    marginTop: 2,
+    borderRadius: 6,
+    borderColor: colors.primary,
   },
   termsText: {
     flex: 1,
     marginLeft: 10,
-    color: colors.bodyText,
+    color: colors.textSecondary,
     fontSize: 13,
+    lineHeight: 18,
   },
   termsLink: {
-    color: colors.primaryRed,
+    color: colors.primary,
     fontWeight: '700',
   },
   primaryButton: {
-    backgroundColor: colors.secondaryGold,
-    borderRadius: 22,
-    paddingVertical: 14,
+    backgroundColor: colors.primary,
+    borderRadius: 16,
+    paddingVertical: 16,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+    marginBottom: 24,
   },
   primaryButtonText: {
-    color: colors.darkText,
-    fontWeight: '700',
+    color: colors.white,
+    fontWeight: '800',
     fontSize: 16,
+    marginRight: 8,
+    letterSpacing: 0.5,
   },
   footerRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 24,
+    alignItems: 'center',
   },
   subtleText: {
-    color: colors.textMuted,
+    color: colors.textSecondary,
     marginRight: 4,
+    fontSize: 14,
   },
   link: {
-    color: colors.primaryRed,
+    color: colors.primary,
     fontWeight: '700',
+    fontSize: 14,
   },
 });
 

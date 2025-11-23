@@ -38,17 +38,23 @@ const SeleccionPlanCreditoScreen = ({ route, navigation }) => {
   };
 
   const handleConfirm = () => {
+    console.log('🟢 [DEBUG] handleConfirm iniciado');
     if (!selectedPlan) {
       Alert.alert('Selecciona un plan', 'Elige el plan de cuotas que prefieras.');
       return;
     }
+    console.log('🟢 [DEBUG] Creando orden con método CREDITO');
     const order = createOrderFromCart('CREDITO', { tipo: 'credito' });
+    console.log('🟢 [DEBUG] Orden creada:', order);
     if (!order) {
       Alert.alert('Sin productos', 'Tu carrito esta vacio.');
       return;
     }
     const installments = generateInstallments(selectedPlan);
-    const credit = createCreditPlanFromOrder(order.id, { cuotas: installments });
+    console.log('🟢 [DEBUG] Cuotas generadas:', installments);
+    // Pasamos el objeto order completo
+    const credit = createCreditPlanFromOrder(order, { cuotas: installments });
+    console.log('🟢 [DEBUG] Crédito retornado:', credit);
     // BACKEND: aqui se generaria el pedido y el cronograma de cuotas en la BD.
     navigation.navigate('CreditoConfirmacion', {
       orderCode: order.code,

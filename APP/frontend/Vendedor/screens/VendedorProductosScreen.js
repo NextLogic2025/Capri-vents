@@ -8,16 +8,20 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
 import colors from '../../theme/colors';
 import globalStyles from '../../theme/styles';
 import { useAppContext } from '../../context/AppContext';
 import EmptyState from '../../Cliente/components/EmptyState';
-import ScreenHeader from '../../Cliente/components/ScreenHeader';
+import ProductCard from '../../Cliente/components/ProductCard';
 import LogoCafrilosa from '../../assets/images/logo-cafrilosa.png';
 
 const VendedorProductosScreen = () => {
+  const navigation = useNavigation();
   const { products = [] } = useAppContext();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('Todos');
@@ -39,31 +43,11 @@ const VendedorProductosScreen = () => {
   }, [products, search, category]);
 
   const renderProduct = ({ item }) => (
-    <View style={styles.card}>
-      <Image
-        source={item.image || LogoCafrilosa}
-        defaultSource={LogoCafrilosa}
-        resizeMode="cover"
-        style={styles.image}
-      />
-      <View style={styles.cardBody}>
-        <Text style={styles.name} numberOfLines={2}>
-          {item.name}
-        </Text>
-        <Text style={styles.presentation}>{item.presentation}</Text>
-        <Text style={styles.price}>${item.price.toFixed(2)}</Text>
-        <View style={styles.stockRow}>
-          <Ionicons
-            name={item.stockActual > 0 ? 'checkmark-circle' : 'close-circle'}
-            size={16}
-            color={item.stockActual > 0 ? colors.success : colors.danger}
-          />
-          <Text style={styles.stockText}>
-            Stock: {item.stockActual}/{item.stockMax}
-          </Text>
-        </View>
-      </View>
-    </View>
+    <ProductCard
+      product={item}
+      showCartButton={false}
+      onPress={(product) => navigation.navigate('VendedorProductDetail', { product })}
+    />
   );
 
   const renderHeader = () => (
@@ -108,11 +92,25 @@ const VendedorProductosScreen = () => {
 
   return (
     <View style={styles.screen}>
-      {/* HEADER: solo título y subtítulo */}
-      <ScreenHeader
-        title="Productos"
-        sectionLabel="Catálogo de productos"
-      />
+      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+
+      {/* Header con Gradiente */}
+      <LinearGradient
+        colors={[colors.primary, colors.primaryDark || '#8B0000']}
+        style={styles.headerGradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <View style={styles.headerContent}>
+          <View>
+            <Text style={styles.headerTitle}>Productos</Text>
+            <Text style={styles.headerSubtitle}>Catálogo de productos</Text>
+          </View>
+          <View style={styles.headerIcon}>
+            <Ionicons name="pricetags" size={32} color={colors.white} />
+          </View>
+        </View>
+      </LinearGradient>
 
       <FlatList
         data={filtered}
@@ -140,6 +138,43 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  headerGradient: {
+    paddingTop: 50,
+    paddingBottom: 24,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 28,
+    color: colors.white,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.8)',
+    fontWeight: '600',
+    marginTop: 4,
+  },
+  headerIcon: {
+    width: 56,
+    height: 56,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   listContent: {
     paddingBottom: 120,
     paddingHorizontal: 16,
@@ -154,9 +189,14 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderWidth: 1,
     borderColor: colors.border,
-    marginTop: 14,
-    paddingVertical: 4,
-    ...globalStyles.shadow,
+    marginTop: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   searchInput: {
     flex: 1,
@@ -171,14 +211,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.white,
-    marginRight: 10,
+    marginRight: 8,
   },
   chipActive: {
     backgroundColor: colors.primary,
     borderColor: colors.primary,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 4,
   },
   chipText: {
     fontWeight: '600',
@@ -186,50 +228,6 @@ const styles = StyleSheet.create({
   },
   chipTextActive: {
     color: colors.white,
-  },
-  card: {
-    width: '48%',
-    backgroundColor: colors.white,
-    borderRadius: 24,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#F2C3BC',
-    marginBottom: 16,
-    ...globalStyles.shadow,
-  },
-  image: {
-    width: '100%',
-    height: 110,
-  },
-  cardBody: {
-    padding: 12,
-  },
-  name: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.textDark,
-  },
-  presentation: {
-    fontSize: 12,
-    color: colors.textLight,
-    marginTop: 3,
-  },
-  price: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: colors.primary,
-    marginTop: 6,
-  },
-  stockRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  stockText: {
-    marginLeft: 6,
-    fontSize: 12,
-    color: colors.textDark,
-    fontWeight: '600',
   },
 });
 

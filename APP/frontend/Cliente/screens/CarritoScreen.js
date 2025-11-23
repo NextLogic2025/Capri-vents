@@ -1,11 +1,12 @@
 import React, { useMemo } from 'react';
-import { View, FlatList, StyleSheet, Text } from 'react-native';
+import { View, FlatList, StyleSheet, Text, StatusBar } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { useAppContext } from '../../context/AppContext';
 import colors from '../../theme/colors';
 import CartItemCard from '../components/CartItemCard';
-import PrimaryButton from '../components/PrimaryButton';
-import EmptyState from '../components/EmptyState';
-import ScreenHeader from '../components/ScreenHeader';
+import PrimaryButton from '../../components/PrimaryButton';
+import EmptyState from '../../components/EmptyState';
 
 const CarritoScreen = ({ navigation }) => {
   const { cart, cartTotals, updateCartQuantity, removeFromCart } = useAppContext();
@@ -65,7 +66,26 @@ const CarritoScreen = ({ navigation }) => {
 
   return (
     <View style={styles.screen}>
-      <ScreenHeader title="Carrito" subtitle="Tus productos listos para comprar"/>
+      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+
+      {/* Header con Gradiente */}
+      <LinearGradient
+        colors={[colors.primary, colors.primaryDark || '#8B0000']}
+        style={styles.headerGradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <View style={styles.headerContent}>
+          <View>
+            <Text style={styles.headerTitle}>Carrito</Text>
+            <Text style={styles.headerSubtitle}>Tus productos listos para comprar</Text>
+          </View>
+          <View style={styles.headerIcon}>
+            <Ionicons name="cart" size={32} color={colors.white} />
+          </View>
+        </View>
+      </LinearGradient>
+
       <FlatList
         data={cart}
         keyExtractor={(item) => (item.productId || item.id || Math.random().toString())}
@@ -103,6 +123,43 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  headerGradient: {
+    paddingTop: 50,
+    paddingBottom: 24,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 28,
+    color: colors.white,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.8)',
+    fontWeight: '600',
+    marginTop: 4,
+  },
+  headerIcon: {
+    width: 56,
+    height: 56,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   summaryWrapper: {
     paddingHorizontal: 16,

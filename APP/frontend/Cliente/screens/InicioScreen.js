@@ -1,4 +1,3 @@
-// frontend/Cliente/screens/InicioScreen.js
 import React, { useMemo, useState } from 'react';
 import {
   View,
@@ -8,6 +7,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Image,
+  StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -16,18 +17,16 @@ import colors from '../../theme/colors';
 import sharedStyles from '../../theme/styles';
 import NotificationsModal from '../components/NotificationsModal';
 import ProductCard from '../components/ProductCard';
-import ScreenHeader from '../components/ScreenHeader';
-import GlobalToast from '../../components/GlobalToast'; // 👈 usamos el nuevo toast
+import GlobalToast from '../../components/GlobalToast';
+import LogoCafrilosa from '../../assets/images/logo-cafrilosa.png';
 
 const InicioScreen = () => {
   const navigation = useNavigation();
-  const { products, orders = [], credits = [] } = useAppContext();
+  const { products, orders = [], credits = [], user } = useAppContext();
 
   const [category, setCategory] = useState('Todos');
   const [search, setSearch] = useState('');
   const [notificationsVisible, setNotificationsVisible] = useState(false);
-
-  // estado del toast
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
@@ -88,90 +87,88 @@ const InicioScreen = () => {
     });
   }, [category, search, products]);
 
-  const searchContainerStyle = sharedStyles.searchContainer || styles.searchContainer;
-  const searchInputStyle = sharedStyles.searchInput || styles.searchInput;
-
   const openCredits = () => {
     const parentNav = navigation.getParent?.();
     (parentNav || navigation).navigate('Creditos');
   };
 
-  // cuando un producto se agrega al carrito
   const handleProductAdded = (product) => {
     setToastMessage(`${product.name} se añadió al carrito`);
     setToastVisible(true);
-
-    // ocultar automáticamente después de 2 segundos
     setTimeout(() => {
       setToastVisible(false);
     }, 2000);
   };
 
   const renderHeader = () => (
-    <View>
-      {/* HEADER ROJO DE BORDE A BORDE */}
-      <View style={styles.headerCardWrapper}>
-        <ScreenHeader
-          greeting="Hola Cliente"
-          title="Bienvenido"
-          sectionLabel="Supermercado El Ahorro"
-          icon="notifications-outline"
-          notificationsCount={notifications.length}
-          onIconPress={() => setNotificationsVisible(true)}
-          style={styles.headerCard}
-        />
-        {/* TODO BACKEND: reemplazar greeting/store por datos reales */}
-      </View>
-
-      <View style={styles.headerContent}>
-        {hasCuotaNotifications && (
-          <View style={styles.reminderBanner}>
-            <Text style={styles.reminderTitle}>Tienes cuotas por pagar</Text>
-            <Text style={styles.reminderText}>
-              Revisa tus créditos y mantente al día con tus pagos.
-            </Text>
-            <TouchableOpacity style={styles.reminderButton} onPress={openCredits}>
-              <Text style={styles.reminderButtonText}>Ver cuotas</Text>
-            </TouchableOpacity>
+    <View style={styles.headerContainer}>
+      {/* Banner Principal */}
+      <View style={styles.banner}>
+        <View style={styles.bannerContent}>
+          <View style={styles.userInfo}>
+            <Text style={styles.greeting}>Hola, {user?.name?.split(' ')[0] || 'Cliente'}</Text>
+            <Text style={styles.welcomeText}>¿Qué vas a pedir hoy?</Text>
           </View>
-        )}
-
-        <View style={searchContainerStyle}>
-          <Ionicons
-            name="search-outline"
-            size={20}
-            color={colors.muted}
-            style={{ marginHorizontal: 8 }}
-          />
-          <TextInput
-            style={[searchInputStyle, { flex: 1 }]}
-            placeholder="Buscar productos..."
-            placeholderTextColor={colors.muted}
-            value={search}
-            onChangeText={setSearch}
-          />
+          <TouchableOpacity
+            style={styles.notificationButton}
+            onPress={() => setNotificationsVisible(true)}
+          >
+            <Ionicons name="notifications-outline" size={24} color={colors.white} />
+            {notifications.length > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>
+                  {notifications.length > 9 ? '9+' : notifications.length}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
         </View>
 
+        {/* Barra de Búsqueda Flotante */}
+        <View style={styles.searchWrapper}>
+          <View style={styles.searchContainer}>
+            <Ionicons name="search-outline" size={20} color={colors.textLight} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Buscar productos..."
+              placeholderTextColor={colors.textLight}
+              value={search}
+              onChangeText={setSearch}
+            />
+          </View>
+        </View>
+      </View>
+
+      {/* Alerta de Cuotas */}
+      {hasCuotaNotifications && (
+        <TouchableOpacity style={styles.alertBanner} onPress={openCredits} activeOpacity={0.9}>
+          <View style={styles.alertIcon}>
+            <Ionicons name="alert-circle" size={24} color="#D32F2F" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.alertTitle}>Atención requerida</Text>
+            <Text style={styles.alertText}>Tienes cuotas pendientes de pago.</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color="#D32F2F" />
+        </TouchableOpacity>
+      )}
+
+      {/* Categorías */}
+      <View style={styles.categoriesContainer}>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filterScroll}
+          contentContainerStyle={styles.categoriesScroll}
         >
           {categories.map((cat) => {
-            const active = cat === category;
+            const isActive = cat === category;
             return (
               <TouchableOpacity
                 key={cat}
                 onPress={() => setCategory(cat)}
-                style={[styles.filterChip, active && styles.filterChipActive]}
+                style={[styles.categoryChip, isActive && styles.categoryChipActive]}
               >
-                <Ionicons
-                  name="ellipse"
-                  size={8}
-                  color={active ? colors.white : colors.primary}
-                  style={styles.filterDot}
-                />
-                <Text style={[styles.filterText, active && styles.filterTextActive]}>
+                <Text style={[styles.categoryText, isActive && styles.categoryTextActive]}>
                   {cat}
                 </Text>
               </TouchableOpacity>
@@ -184,12 +181,12 @@ const InicioScreen = () => {
 
   return (
     <View style={styles.screen}>
+      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
       <FlatList
-        style={styles.flatList}
         data={filtered}
         keyExtractor={(item) => item.id}
         numColumns={2}
-        columnWrapperStyle={{ justifyContent: 'space-between' }}
+        columnWrapperStyle={styles.listColumnWrapper}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={renderHeader}
@@ -197,7 +194,7 @@ const InicioScreen = () => {
           <ProductCard
             product={item}
             onPress={() => navigation.navigate('ProductDetail', { product: item })}
-            onAddToCart={handleProductAdded} // 👈 dispara el toast
+            onAddToCart={handleProductAdded}
           />
         )}
       />
@@ -208,7 +205,6 @@ const InicioScreen = () => {
         notifications={notifications}
       />
 
-      {/* Toast global para “producto añadido” */}
       <GlobalToast visible={toastVisible} message={toastMessage} />
     </View>
   );
@@ -219,103 +215,152 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  flatList: {
+  headerContainer: {
+    marginBottom: 16,
+  },
+  banner: {
+    backgroundColor: colors.primary,
+    paddingTop: 60, // Para status bar
+    paddingBottom: 40,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    marginBottom: 20,
+  },
+  bannerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  userInfo: {
     flex: 1,
-    backgroundColor: colors.background,
   },
-  listContent: {
-    paddingBottom: 160,
-    paddingHorizontal: 16,
-    paddingTop: 0,
+  greeting: {
+    fontSize: 16,
+    color: 'rgba(255,255,255,0.9)',
+    fontWeight: '600',
+    marginBottom: 4,
   },
-  // el header ignora el padding horizontal de la lista para ir de borde a borde
-  headerCardWrapper: {
-    marginHorizontal: -16,
+  welcomeText: {
+    fontSize: 24,
+    color: colors.white,
+    fontWeight: '800',
   },
-  headerCard: {
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+  notificationButton: {
+    width: 44,
+    height: 44,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  headerContent: {
-    paddingTop: 16,
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: colors.gold,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.primary,
+  },
+  badgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: colors.darkText,
+  },
+  searchWrapper: {
+    position: 'absolute',
+    bottom: -24,
+    left: 20,
+    right: 20,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.white,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...(sharedStyles.shadow || {}), // 👈 sombra segura
-    paddingVertical: 4,
-    marginBottom: 12,
-    marginHorizontal: 16,
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    height: 56,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
   },
   searchInput: {
+    flex: 1,
+    marginLeft: 12,
     fontSize: 16,
     color: colors.darkText,
-    paddingVertical: 10,
-    paddingRight: 16,
   },
-  filterScroll: {
-    paddingVertical: 6,
-    paddingHorizontal: 16,
-  },
-  filterChip: {
+  alertBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 22,
+    backgroundColor: '#FFEBEE',
+    marginHorizontal: 20,
+    marginBottom: 16,
+    marginTop: 16,
+    padding: 16,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: '#FFCDD2',
+  },
+  alertIcon: {
+    marginRight: 12,
+  },
+  alertTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#D32F2F',
+  },
+  alertText: {
+    fontSize: 12,
+    color: '#B71C1C',
+  },
+  categoriesContainer: {
+    marginTop: 8,
+  },
+  categoriesScroll: {
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+  },
+  categoryChip: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 25,
     backgroundColor: colors.white,
     marginRight: 10,
+    borderWidth: 1,
+    borderColor: colors.borderSoft,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  filterChipActive: {
+  categoryChipActive: {
     backgroundColor: colors.primary,
     borderColor: colors.primary,
   },
-  filterDot: {
-    marginRight: 6,
-  },
-  filterText: {
-    color: colors.bodyText,
-    fontWeight: '600',
-  },
-  filterTextActive: {
-    color: colors.white,
-  },
-  reminderBanner: {
-    backgroundColor: '#FFF2CC',
-    borderRadius: 16,
-    padding: 12,
-    marginHorizontal: 16,
-    marginBottom: 12,
-    marginTop: 8,
-  },
-  reminderTitle: {
+  categoryText: {
     fontSize: 14,
-    fontWeight: '700',
-    color: colors.textDark,
-  },
-  reminderText: {
-    fontSize: 12,
-    color: colors.textLight,
-    marginTop: 4,
-  },
-  reminderButton: {
-    alignSelf: 'flex-start',
-    marginTop: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: colors.primary,
-  },
-  reminderButtonText: {
-    color: colors.white,
-    fontSize: 12,
     fontWeight: '600',
+    color: colors.textLight,
+  },
+  categoryTextActive: {
+    color: colors.white,
+  },
+  listContent: {
+    paddingBottom: 100,
+  },
+  listColumnWrapper: {
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
   },
 });
 

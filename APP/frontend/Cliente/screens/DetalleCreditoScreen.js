@@ -1,10 +1,11 @@
 ﻿import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAppContext } from '../../context/AppContext';
 import colors from '../../theme/colors';
 import sharedStyles from '../../theme/styles';
 import SectionCard from '../components/SectionCard';
-import PrimaryButton from '../components/PrimaryButton';
+import ScreenHeader from '../components/ScreenHeader';
 
 const DetalleCreditoScreen = ({ route, navigation }) => {
   const { creditId } = route.params || {};
@@ -13,296 +14,252 @@ const DetalleCreditoScreen = ({ route, navigation }) => {
 
   if (!credit) {
     return (
-      <View style={sharedStyles.centeredScreen}>
+      <View style={styles.centeredScreen}>
         <Text>No encontramos el credito.</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Text style={{ color: colors.primary, marginTop: 10 }}>Volver</Text>
+        </TouchableOpacity>
       </View>
     );
   }
 
   const installments = credit.installments || credit.cuotas || [];
-  const saldo = credit.saldoPendiente ?? credit.balance ?? 0;
+  const total = Number(credit.total) || 0;
+  const saldoPendiente = Number(credit.saldoPendiente) || 0;
 
-  // Progreso de pago (cuotas pagadas vs totales)
-  const { totalCuotas, cuotasPagadas, progreso } = useMemo(() => {
-    const total = installments.length;
-    const pagadas = installments.filter((cuota) => {
-      const estado = (cuota.status || cuota.estado || '').toUpperCase();
-      return estado === 'PAGADA' || estado === 'PAGADO';
-    }).length;
-    const p = total ? pagadas / total : 0;
-    return { totalCuotas: total, cuotasPagadas: pagadas, progreso: p };
-  }, [installments]);
+  // Progreso de pago basado en montos
+  const progress = useMemo(() => {
+    if (total === 0) return 0;
+    const paid = total - saldoPendiente;
+    return paid / total;
+  }, [total, saldoPendiente]);
 
-  const formatMoney = (value) => `$${(Number(value) || 0).toFixed(2)}`;
-
-  const getEstadoChip = () => {
-    const base = (credit.status || credit.estado || '').toLowerCase();
-
-    if (base.includes('cancel') || base.includes('pag')) {
-      return { label: 'Finalizado', bg: '#F5F5F5', text: '#595959' };
-    }
-    if (base.includes('mora') || base.includes('venc')) {
-      return { label: 'En mora', bg: '#FFF1F0', text: colors.danger || '#CF1322' };
-    }
-    return { label: 'En curso', bg: '#F9F0FF', text: '#722ED1' };
-  };
-
-  const getInstallmentChip = (cuota) => {
-    const estadoBase = (cuota.status || cuota.estado || 'Pendiente').toLowerCase();
-
-    if (estadoBase.includes('pag')) {
-      return {
-        label: cuota.status || 'Pagada',
-        bg: '#E6FFFB',
-        text: '#08979C',
-      };
-    }
-    if (estadoBase.includes('venc')) {
-      return {
-        label: cuota.status || 'Vencida',
-        bg: '#FFF1F0',
-        text: colors.danger || '#CF1322',
-      };
-    }
-    return {
-      label: cuota.status || 'Pendiente',
-      bg: '#FFFBE6',
-      text: '#AD6800',
-    };
-  };
-
-  const estadoChip = getEstadoChip();
-
-  const renderInstallment = (cuota) => {
-    const status = (cuota.status || cuota.estado || 'Pendiente').toLowerCase();
-    const isPending =
-      status.includes('pendiente') || status.includes('vencida') || status.includes('vencido');
-    const chip = getInstallmentChip(cuota);
-
-    return (
-      <View key={cuota.id || cuota.numero} style={styles.installmentCard}>
-        <View style={styles.installmentHeaderRow}>
-          <View>
-            <Text style={styles.installmentTitle}>
-              Cuota {cuota.number || cuota.numero}
-            </Text>
-            <Text style={styles.installmentMeta}>
-              Monto:{' '}
-              <Text style={styles.installmentStrong}>
-                {formatMoney(cuota.amount ?? cuota.monto ?? 0)}
-              </Text>
-            </Text>
-            <Text style={styles.installmentMeta}>
-              Vence:{' '}
-              <Text style={styles.installmentStrong}>
-                {cuota.dueDate || cuota.fechaVencimiento || '—'}
-              </Text>
-            </Text>
-          </View>
-
-          <View style={[styles.installmentChip, { backgroundColor: chip.bg }]}>
-            <Text style={[styles.installmentChipText, { color: chip.text }]}>
-              {chip.label}
-            </Text>
-          </View>
-        </View>
-
-        {isPending && (
-          <PrimaryButton
-            title="Pagar ahora"
-            style={styles.payButton}
-            textStyle={{ fontSize: 13 }}
-            onPress={() =>
-              navigation.navigate('PagoCuota', {
-                creditId: credit.id,
-                installmentId: cuota.id,
-              })
-            }
-          />
-        )}
-      </View>
-    );
+  const handlePayInstallment = (cuota) => {
+    navigation.navigate('PagoCuota', {
+      creditId: credit.id,
+      installmentId: cuota.id || cuota.numero, // Fallback to numero if id is missing
+    });
   };
 
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor: colors.background }}
-      contentContainerStyle={{ padding: 16, paddingBottom: 160 }}
-    >
-      {/* Resumen del crédito */}
-      <SectionCard title={`Pedido #${credit.orderCode || credit.id}`}>
-        <View style={styles.summaryRow}>
-          <View>
-            <Text style={styles.summaryLabel}>Total</Text>
-            <Text style={styles.summaryValue}>
-              {formatMoney(credit.total ?? credit.montoTotal ?? 0)}
-            </Text>
-          </View>
-          <View>
-            <Text style={styles.summaryLabel}>Saldo pendiente</Text>
-            <Text style={[styles.summaryValue, { color: colors.danger }]}>
-              {formatMoney(saldo)}
-            </Text>
+    <View style={styles.screen}>
+      <ScreenHeader title="Detalle de Crédito" subtitle={`Ref: ${credit.id}`} showBack />
+
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+
+        {/* Resumen de Saldo */}
+        <View style={styles.summaryCard}>
+          <Text style={styles.summaryLabel}>Saldo Pendiente</Text>
+          <Text style={styles.summaryValue}>${saldoPendiente.toFixed(2)}</Text>
+
+          <View style={styles.progressContainer}>
+            <View style={styles.progressBarBg}>
+              <View style={[styles.progressBarFill, { width: `${progress * 100}%` }]} />
+            </View>
+            <View style={styles.progressLabels}>
+              <Text style={styles.progressText}>Pagado: ${(total - saldoPendiente).toFixed(2)}</Text>
+              <Text style={styles.progressText}>Total: ${total.toFixed(2)}</Text>
+            </View>
           </View>
         </View>
 
-        <View style={styles.progressHeaderRow}>
-          <Text style={styles.progressLabel}>Progreso de pago</Text>
-          <Text style={styles.progressPercent}>
-            {Math.round((progreso || 0) * 100)}%
+        {/* Lista de Cuotas */}
+        <SectionCard title="Plan de Pagos">
+          {installments.map((cuota, index) => {
+            const status = (cuota.status || cuota.estado || 'Pendiente').toUpperCase();
+            const isPaid = status === 'PAGADA' || status === 'PAGADO';
+            const isOverdue = status === 'VENCIDA' || status === 'VENCIDO';
+            const monto = Number(cuota.monto) || 0;
+
+            return (
+              <View key={index} style={styles.installmentRow}>
+                <View style={styles.installmentInfo}>
+                  <View style={[
+                    styles.installmentIcon,
+                    isPaid ? styles.iconPaid : (isOverdue ? styles.iconOverdue : styles.iconPending)
+                  ]}>
+                    <Ionicons
+                      name={isPaid ? "checkmark" : "calendar-outline"}
+                      size={16}
+                      color={isPaid ? colors.white : (isOverdue ? colors.white : colors.primary)}
+                    />
+                  </View>
+                  <View>
+                    <Text style={styles.installmentTitle}>Cuota {cuota.numero}</Text>
+                    <Text style={styles.installmentDate}>Vence: {cuota.dueDate}</Text>
+                  </View>
+                </View>
+
+                <View style={styles.installmentRight}>
+                  <Text style={styles.installmentAmount}>${monto.toFixed(2)}</Text>
+                  {isPaid ? (
+                    <Text style={styles.statusPaid}>Pagada</Text>
+                  ) : (
+                    <TouchableOpacity
+                      style={styles.payButton}
+                      onPress={() => handlePayInstallment(cuota)}
+                    >
+                      <Text style={styles.payButtonText}>Pagar</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </View>
+            );
+          })}
+        </SectionCard>
+
+        <View style={styles.infoBox}>
+          <Ionicons name="information-circle-outline" size={24} color={colors.primary} />
+          <Text style={styles.infoText}>
+            Recuerda pagar tus cuotas a tiempo para mantener un buen historial crediticio y acceder a mayores beneficios.
           </Text>
         </View>
-        <View style={styles.progressBar}>
-          <View
-            style={[
-              styles.progressFill,
-              { flex: progreso || 0 },
-            ]}
-          />
-          <View style={{ flex: 1 - (progreso || 0) }} />
-        </View>
 
-        <View
-          style={[
-            styles.estadoChip,
-            { backgroundColor: estadoChip.bg },
-          ]}
-        >
-          <Text
-            style={[
-              styles.estadoChipText,
-              { color: estadoChip.text },
-            ]}
-          >
-            {estadoChip.label}
-          </Text>
-        </View>
-      </SectionCard>
-
-      {/* Cuotas */}
-      <SectionCard title="Cuotas">
-        {installments.map(renderInstallment)}
-      </SectionCard>
-
-      {/* Recordatorio inferior */}
-      <View style={styles.reminderCard}>
-        <Text style={styles.reminderTitle}>Recordatorio</Text>
-        <Text style={styles.reminderText}>
-          Puedes pagar tus cuotas antes de la fecha de vencimiento sin penalización.
-        </Text>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  summaryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 12,
+  screen: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  centeredScreen: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 40,
+  },
+  summaryCard: {
+    backgroundColor: colors.primary,
+    borderRadius: 24,
+    padding: 24,
+    marginBottom: 20,
+    marginTop: 30, // Added top margin
+    alignItems: 'center',
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
   },
   summaryLabel: {
-    fontSize: 13,
-    color: colors.textMuted,
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 8,
   },
   summaryValue: {
-    marginTop: 4,
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.textDark,
+    color: colors.white,
+    fontSize: 36,
+    fontWeight: '800',
+    marginBottom: 24,
   },
-  progressHeaderRow: {
+  progressContainer: {
+    width: '100%',
+  },
+  progressBarBg: {
+    height: 8,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 4,
+    marginBottom: 8,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: colors.gold,
+    borderRadius: 4,
+  },
+  progressLabels: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  progressText: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  installmentRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 8,
-    marginBottom: 4,
-  },
-  progressLabel: {
-    fontSize: 12,
-    color: colors.textMuted,
-  },
-  progressPercent: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: colors.textDark,
-  },
-  progressBar: {
-    flexDirection: 'row',
-    height: 6,
-    borderRadius: 999,
-    overflow: 'hidden',
-    backgroundColor: '#F5F5F5',
-    marginBottom: 12,
-  },
-  progressFill: {
-    backgroundColor: colors.primary,
-    borderRadius: 999,
-  },
-  estadoChip: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 999,
-    marginTop: 4,
-  },
-  estadoChipText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-
-  installmentCard: {
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: colors.borderSoft || '#F0F0F0',
+    borderBottomColor: colors.borderSoft,
   },
-  installmentHeaderRow: {
+  installmentInfo: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+  },
+  installmentIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  iconPaid: {
+    backgroundColor: '#4CAF50',
+  },
+  iconPending: {
+    backgroundColor: '#FFF0F0',
+  },
+  iconOverdue: {
+    backgroundColor: '#F44336',
   },
   installmentTitle: {
+    fontSize: 14,
     fontWeight: '700',
-    color: colors.textDark,
-    marginBottom: 2,
+    color: colors.darkText,
   },
-  installmentMeta: {
-    fontSize: 13,
-    color: colors.textMuted,
+  installmentDate: {
+    fontSize: 12,
+    color: colors.textLight,
   },
-  installmentStrong: {
-    color: colors.textDark,
-    fontWeight: '600',
+  installmentRight: {
+    alignItems: 'flex-end',
   },
-  installmentChip: {
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    alignSelf: 'flex-start',
-  },
-  installmentChipText: {
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  payButton: {
-    marginTop: 10,
-    alignSelf: 'flex-start',
-    paddingHorizontal: 18,
-  },
-  reminderCard: {
-    marginTop: 16,
-    borderRadius: 18,
-    padding: 14,
-    backgroundColor: '#E6F7FF',
-  },
-  reminderTitle: {
+  installmentAmount: {
+    fontSize: 14,
     fontWeight: '700',
-    color: colors.textDark,
+    color: colors.darkText,
     marginBottom: 4,
   },
-  reminderText: {
+  statusPaid: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#4CAF50',
+  },
+  payButton: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  payButtonText: {
+    color: colors.white,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  infoBox: {
+    flexDirection: 'row',
+    backgroundColor: '#E3F2FD',
+    padding: 16,
+    borderRadius: 16,
+    marginTop: 8,
+    alignItems: 'center',
+  },
+  infoText: {
+    flex: 1,
+    marginLeft: 12,
     fontSize: 13,
-    color: colors.textMuted,
+    color: '#1565C0',
+    lineHeight: 18,
   },
 });
 

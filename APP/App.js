@@ -9,6 +9,10 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import colors from './frontend/theme/colors';
 import { AppProvider, useAppContext } from './frontend/context/AppContext';
 import VendedorTabNavigator from './frontend/Vendedor/navigation/VendedorTabNavigator';
+import VendedorDetallePedidoScreen from './frontend/Vendedor/screens/VendedorDetallePedidoScreen';
+import VendedorProductDetailScreen from './frontend/Vendedor/screens/VendedorProductDetailScreen';
+import VendedorSoporteScreen from './frontend/Vendedor/screens/VendedorSoporteScreen';
+import VendedorCrearTicketScreen from './frontend/Vendedor/screens/VendedorCrearTicketScreen';
 
 // Auth screens
 import SplashScreen from './frontend/Auth/screens/SplashScreen';
@@ -22,6 +26,13 @@ import CarritoScreen from './frontend/Cliente/screens/CarritoScreen';
 import PedidosScreen from './frontend/Cliente/screens/PedidosScreen';
 import CreditosScreen from './frontend/Cliente/screens/CreditosScreen';
 import PerfilScreen from './frontend/Cliente/screens/PerfilScreen';
+import ClienteSoporteScreen from './frontend/Cliente/screens/ClienteSoporteScreen';
+import ClienteCrearTicketScreen from './frontend/Cliente/screens/ClienteCrearTicketScreen';
+import SupervisorProductosScreen from './frontend/Supervisor/screens/SupervisorProductosScreen';
+import SupervisorPerfilScreen from './frontend/Supervisor/screens/SupervisorPerfilScreen';
+import SupervisorSolicitudesScreen from './frontend/Supervisor/screens/SupervisorSolicitudesScreen';
+import SupervisorSoporteScreen from './frontend/Supervisor/screens/SupervisorSoporteScreen';
+import SupervisorDetalleTicketScreen from './frontend/Supervisor/screens/SupervisorDetalleTicketScreen';
 import ProductDetailScreen from './frontend/Cliente/screens/ProductDetailScreen';
 
 // Flujo cliente adicional
@@ -38,7 +49,6 @@ import DireccionesScreen from './frontend/Cliente/screens/DireccionesScreen';
 import CambiarContrasenaScreen from './frontend/Cliente/screens/CambiarContrasenaScreen';
 import PreguntasFrecuentesScreen from './frontend/Cliente/screens/PreguntasFrecuentesScreen';
 import SupervisorTabNavigator from './frontend/Supervisor/navigation/SupervisorTabNavigator';
-import SupervisorPlaceholderScreen from './frontend/Supervisor/screens/SupervisorPlaceholderScreen';
 
 const RootStack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
@@ -117,71 +127,129 @@ const ClienteTabsNavigator = () => {
 };
 
 const AppNavigator = () => {
-  const { currentRole } = useAppContext();
-  const normalizedRole = (currentRole || '').toLowerCase();
-  // BACKEND: el rol se definirá después de que el usuario se autentique, según el perfil devuelto por la API (cliente, vendedor o supervisor).
+  const { isLoggedIn, currentRole, sessionVersion } = useAppContext();
+  const normalizedRole = (currentRole || "").toLowerCase();
+  const navigatorKey = `${isLoggedIn ? "app" : "auth"}-${normalizedRole || "guest"}-${sessionVersion}`;
 
-  if (normalizedRole === 'supervisor') {
+  React.useEffect(() => {
+    console.log('[NAV] render', { isLoggedIn, currentRole, sessionVersion, navigatorKey });
+  }, [isLoggedIn, currentRole, sessionVersion, navigatorKey]);
+  // BACKEND: el rol se definira despues de que el usuario se autentique, segun el perfil devuelto por la API (cliente, vendedor o supervisor).
+
+  if (!isLoggedIn) {
     return (
-      <NavigationContainer theme={navTheme}>
-        <SupervisorTabNavigator />
+      <NavigationContainer key={navigatorKey} theme={navTheme} independent={true}>
+        <RootStack.Navigator screenOptions={{ headerShown: false }}>
+          <RootStack.Screen name="Splash" component={SplashScreen} />
+          <RootStack.Screen name="AuthStack" component={AuthStackNavigator} />
+        </RootStack.Navigator>
       </NavigationContainer>
     );
   }
 
-  if (normalizedRole === 'vendedor') {
+  if (normalizedRole === "supervisor") {
     return (
-      <NavigationContainer theme={navTheme}>
-        <VendedorTabNavigator />
+      <NavigationContainer key={navigatorKey} theme={navTheme} independent={true}>
+        <RootStack.Navigator>
+          <RootStack.Screen name="SupervisorModulo" component={SupervisorTabNavigator} options={{ headerShown: false }} />
+          <RootStack.Screen
+            name="SupervisorSolicitudes"
+            component={SupervisorSolicitudesScreen}
+            options={{ headerShown: false }}
+          />
+          <RootStack.Screen
+            name="SupervisorSoporte"
+            component={SupervisorSoporteScreen}
+            options={{ headerShown: false }}
+          />
+          <RootStack.Screen
+            name="SupervisorDetalleTicket"
+            component={SupervisorDetalleTicketScreen}
+            options={{ headerShown: false }}
+          />
+          <RootStack.Screen
+            name="DatosPersonales"
+            component={DatosPersonalesScreen}
+            options={{ title: "Datos personales" }}
+          />
+          <RootStack.Screen
+            name="CambiarContrasena"
+            component={CambiarContrasenaScreen}
+            options={{ title: "Cambiar contrasena" }}
+          />
+        </RootStack.Navigator>
+      </NavigationContainer>
+    );
+  }
+
+  if (normalizedRole === "vendedor") {
+    return (
+      <NavigationContainer key={navigatorKey} theme={navTheme} independent={true}>
+        <RootStack.Navigator>
+          <RootStack.Screen name="VendedorModulo" component={VendedorTabNavigator} options={{ headerShown: false }} />
+          <RootStack.Screen name="VendedorDetallePedido" component={VendedorDetallePedidoScreen} options={{ headerShown: false }} />
+          <RootStack.Screen name="VendedorProductDetail" component={VendedorProductDetailScreen} options={{ headerShown: false }} />
+          <RootStack.Screen
+            name="DatosPersonales"
+            component={DatosPersonalesScreen}
+            options={{ title: "Datos personales" }}
+          />
+          <RootStack.Screen
+            name="CambiarContrasena"
+            component={CambiarContrasenaScreen}
+            options={{ title: "Cambiar contrasena" }}
+          />
+          <RootStack.Screen name="VendedorSoporte" component={VendedorSoporteScreen} options={{ headerShown: false }} />
+          <RootStack.Screen name="VendedorCrearTicket" component={VendedorCrearTicketScreen} options={{ headerShown: false }} />
+        </RootStack.Navigator>
       </NavigationContainer>
     );
   }
 
   return (
-    <NavigationContainer theme={navTheme}>
-      <RootStack.Navigator screenOptions={{ headerTintColor: colors.darkText }}>
-        <RootStack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
-        <RootStack.Screen name="AuthStack" component={AuthStackNavigator} options={{ headerShown: false }} />
+    <NavigationContainer key={navigatorKey} theme={navTheme} independent={true}>
+      <RootStack.Navigator initialRouteName="ClienteTabs" screenOptions={{ headerTintColor: colors.darkText }}>
         <RootStack.Screen name="ClienteTabs" component={ClienteTabsNavigator} options={{ headerShown: false }} />
-        <RootStack.Screen name="Checkout" component={CheckoutScreen} options={{ title: 'Checkout' }} />
+        <RootStack.Screen name="Checkout" component={CheckoutScreen} options={{ headerShown: false }} />
         <RootStack.Screen name="ProductDetail" component={ProductDetailScreen} options={{ headerShown: false }} />
-        <RootStack.Screen name="SeleccionPlanCredito" component={SeleccionPlanCreditoScreen} options={{ title: 'Plan de credito' }} />
-        <RootStack.Screen name="DetallePedido" component={DetallePedidoScreen} options={{ title: 'Detalle de pedido' }} />
-        <RootStack.Screen name="DetalleCredito" component={DetalleCreditoScreen} options={{ title: 'Detalle de credito' }} />
-        <RootStack.Screen name="PagoCuota" component={PagoCuotaScreen} options={{ title: 'Pago de cuota' }} />
+        <RootStack.Screen name="SeleccionPlanCredito" component={SeleccionPlanCreditoScreen} options={{ title: "Plan de credito" }} />
+        <RootStack.Screen name="DetallePedido" component={DetallePedidoScreen} options={{ headerShown: false }} />
+        <RootStack.Screen name="DetalleCredito" component={DetalleCreditoScreen} options={{ headerShown: false }} />
+        <RootStack.Screen name="PagoCuota" component={PagoCuotaScreen} options={{ headerShown: false }} />
         <RootStack.Screen name="PedidoConfirmacion" component={PedidoConfirmacionScreen} options={{ headerShown: false }} />
         <RootStack.Screen name="CreditoConfirmacion" component={CreditoConfirmacionScreen} options={{ headerShown: false }} />
         <RootStack.Screen
           name="MetodosPago"
           component={MetodosPagoScreen}
-          options={{ title: 'Métodos de pago' }}
+          options={{ title: "Metodos de pago" }}
         />
         <RootStack.Screen
           name="DatosPersonales"
           component={DatosPersonalesScreen}
-          options={{ title: 'Datos personales' }}
+          options={{ title: "Datos personales" }}
         />
         <RootStack.Screen
           name="Direcciones"
           component={DireccionesScreen}
-          options={{ title: 'Direcciones' }}
+          options={{ title: "Direcciones" }}
         />
         <RootStack.Screen
           name="CambiarContrasena"
           component={CambiarContrasenaScreen}
-          options={{ title: 'Cambiar contraseña' }}
+          options={{ title: "Cambiar contrasena" }}
         />
         <RootStack.Screen
           name="PreguntasFrecuentes"
           component={PreguntasFrecuentesScreen}
-          options={{ title: 'Preguntas frecuentes' }}
+          options={{ title: "Preguntas frecuentes" }}
         />
-        <RootStack.Screen name="VendedorModulo" component={VendedorTabNavigator} options={{ headerShown: false }} />
-        <RootStack.Screen name="SupervisorModulo" component={SupervisorPlaceholderScreen} options={{ title: 'Modulo Supervisor' }} />
+        <RootStack.Screen name="ClienteSoporte" component={ClienteSoporteScreen} options={{ headerShown: false }} />
+        <RootStack.Screen name="ClienteCrearTicket" component={ClienteCrearTicketScreen} options={{ headerShown: false }} />
       </RootStack.Navigator>
     </NavigationContainer>
   );
 };
+
 
 export default function App() {
   return (

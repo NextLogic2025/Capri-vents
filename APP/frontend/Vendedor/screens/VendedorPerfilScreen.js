@@ -7,35 +7,33 @@ import {
   Text,
   TouchableOpacity,
   View,
+  StatusBar,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import colors from '../../theme/colors';
 import { useAppContext } from '../../context/AppContext';
-import ScreenHeader from '../../Cliente/components/ScreenHeader';
-
-/** Bloque de título de sección (Información personal, Seguridad, Soporte) */
-const Section = ({ title, children }) => (
-  <View style={styles.section}>
-    <Text style={styles.sectionLabel}>{title}</Text>
-    <View style={styles.sectionCard}>{children}</View>
-  </View>
-);
 
 /** Ítem de menú reutilizable (ícono rojo + título + subtítulo + chevron) */
-const ProfileMenuItem = ({ iconName, title, subtitle, onPress }) => (
-  <TouchableOpacity style={styles.menuItem} onPress={onPress} activeOpacity={0.8}>
-    <View style={styles.menuIcon}>
-      <Ionicons name={iconName} size={22} color={colors.white} />
+const ProfileMenuItem = ({ iconName, title, subtitle, onPress, isLast }) => (
+  <TouchableOpacity
+    style={[styles.menuItem, isLast && styles.menuItemLast]}
+    onPress={onPress}
+    activeOpacity={0.7}
+  >
+    <View style={styles.menuIconContainer}>
+      <Ionicons name={iconName} size={22} color={colors.primary} />
     </View>
     <View style={styles.menuTextContainer}>
       <Text style={styles.menuTitle}>{title}</Text>
       {subtitle ? <Text style={styles.menuSubtitle}>{subtitle}</Text> : null}
     </View>
-    <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
+    <Ionicons name="chevron-forward" size={20} color={colors.textLight} />
   </TouchableOpacity>
 );
 
-const VendedorPerfilScreen = () => {
+const VendedorPerfilScreen = ({ navigation }) => {
   const { vendorUser, logout } = useAppContext();
 
   const initials = vendorUser?.name
@@ -61,7 +59,20 @@ const VendedorPerfilScreen = () => {
   };
 
   const handleLogout = () => {
-    logout();
+    if (Platform.OS === 'web') {
+      logout();
+      return;
+    }
+    Alert.alert('Cerrar sesión', '¿Deseas salir de tu cuenta?', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Cerrar sesión',
+        style: 'destructive',
+        onPress: () => {
+          logout();
+        },
+      },
+    ]);
   };
 
   const handlePlaceholder = (msg) => {
@@ -70,76 +81,127 @@ const VendedorPerfilScreen = () => {
 
   return (
     <View style={styles.screen}>
-      <ScreenHeader title="Perfil" sectionLabel="Gestiona tu cuenta" />
+      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+
+      {/* Header con Gradiente */}
+      <LinearGradient
+        colors={[colors.primary, colors.primaryDark || '#8B0000']}
+        style={styles.headerGradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <View style={styles.headerContent}>
+          <View>
+            <Text style={styles.headerTitle}>Perfil</Text>
+            <Text style={styles.headerSubtitle}>Gestiona tu cuenta</Text>
+          </View>
+          <View style={styles.headerIcon}>
+            <Ionicons name="person" size={32} color={colors.white} />
+          </View>
+        </View>
+      </LinearGradient>
 
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* Cabecera con avatar, nombre y datos básicos */}
-        <View style={styles.profileHeader}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{initials || 'VD'}</Text>
+        {/* Header del Perfil - Estilo Profesional */}
+        <View style={styles.profileHeaderCard}>
+          <View style={styles.avatarContainer}>
+            <View style={styles.avatarPlaceholder}>
+              <Text style={styles.avatarText}>{initials || 'VD'}</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.editAvatarButton}
+              onPress={() => navigation.navigate('DatosPersonales')}
+            >
+              <Ionicons name="pencil" size={16} color={colors.white} />
+            </TouchableOpacity>
           </View>
-          <Text style={styles.name}>{vendorUser?.name || 'Vendedor asignado'}</Text>
-          <Text style={styles.email}>{vendorUser?.email}</Text>
-          <Text style={styles.zone}>
-            Zona: {vendorUser?.zone || 'Sin zona asignada'}
-          </Text>
+          <Text style={styles.name}>{vendorUser?.name || 'Vendedor Cafrilosa'}</Text>
+          <Text style={styles.email}>{vendorUser?.email || 'vendedor@cafrilosa.com'}</Text>
+          <View style={styles.roleBadge}>
+            <Ionicons name="briefcase" size={14} color={colors.primary} />
+            <Text style={styles.roleText}>VENDEDOR</Text>
+          </View>
+          {vendorUser?.zone && (
+            <View style={styles.zoneBadge}>
+              <Ionicons name="location" size={12} color={colors.textMuted} />
+              <Text style={styles.zoneText}>{vendorUser.zone}</Text>
+            </View>
+          )}
         </View>
 
         {/* INFORMACIÓN PERSONAL */}
-        <Section title="Información personal">
-          <ProfileMenuItem
-            iconName="person-circle-outline"
-            title="Datos personales"
-            subtitle="Nombre, correo y teléfono"
-            onPress={() =>
-              handlePlaceholder('Aquí irá la pantalla de Datos Personales del vendedor.')
-            }
-          />
-          <ProfileMenuItem
-            iconName="navigate-outline"
-            title="Zona y bodega base"
-            subtitle={vendorUser?.address || 'Configura tu zona de trabajo'}
-            onPress={() =>
-              handlePlaceholder('Aquí podrás ajustar zona y bodega base del vendedor.')
-            }
-          />
-        </Section>
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>Cuenta</Text>
+          <View style={styles.menuCard}>
+            <ProfileMenuItem
+              iconName="person-outline"
+              title="Datos personales"
+              subtitle="Nombre, correo y teléfono"
+              onPress={() => navigation.navigate('DatosPersonales')}
+              isLast={false}
+            />
+            <ProfileMenuItem
+              iconName="map-outline"
+              title="Zona Asignada"
+              subtitle={vendorUser?.zone || 'Norte - Sector 4'}
+              onPress={() => handlePlaceholder('Detalles de la zona: Cobertura de 5km a la redonda.')}
+              isLast={true}
+            />
+          </View>
+        </View>
 
         {/* SEGURIDAD */}
-        <Section title="Seguridad">
-          <ProfileMenuItem
-            iconName="lock-closed-outline"
-            title="Contraseña"
-            subtitle="Cambia tu contraseña de acceso"
-            onPress={() =>
-              handlePlaceholder('Aquí se gestionará el cambio de contraseña del vendedor.')
-            }
-          />
-        </Section>
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>Seguridad</Text>
+          <View style={styles.menuCard}>
+            <ProfileMenuItem
+              iconName="lock-closed-outline"
+              title="Cambiar contraseña"
+              subtitle="Actualiza tu contraseña de acceso"
+              onPress={() => navigation.navigate('CambiarContrasena')}
+              isLast={true}
+            />
+          </View>
+        </View>
 
         {/* SOPORTE */}
-        <Section title="Soporte">
-          <ProfileMenuItem
-            iconName="chatbubble-ellipses-outline"
-            title="Contactar supervisor"
-            subtitle="Abre una conversación en WhatsApp"
-            onPress={handleSupportWhatsapp}
-          />
-          <ProfileMenuItem
-            iconName="help-circle-outline"
-            title="Soporte TI"
-            subtitle="Escríbenos por correo para ayuda técnica"
-            onPress={handleSupportEmail}
-          />
-        </Section>
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>Soporte y Legal</Text>
+          <View style={styles.menuCard}>
+            <ProfileMenuItem
+              iconName="chatbubble-ellipses-outline"
+              title="Contactar supervisor"
+              subtitle="Abre una conversación en WhatsApp"
+              onPress={handleSupportWhatsapp}
+              isLast={false}
+            />
+            <ProfileMenuItem
+              iconName="help-circle-outline"
+              title="Soporte TI"
+              subtitle="Escríbenos por correo para ayuda técnica"
+              onPress={handleSupportEmail}
+              isLast={false}
+            />
+            <ProfileMenuItem
+              iconName="ticket-outline"
+              title="Mis Tickets de Soporte"
+              subtitle="Reportar problemas y ver estado"
+              onPress={() => navigation.navigate('VendedorSoporte')}
+              isLast={true}
+            />
+          </View>
+        </View>
 
         {/* BOTÓN CERRAR SESIÓN */}
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Ionicons name="log-out-outline" size={20} color={colors.danger} />
           <Text style={styles.logoutText}>Cerrar sesión</Text>
         </TouchableOpacity>
+
+        <Text style={styles.versionText}>Versión 2.0.1 • Vendedor</Text>
       </ScrollView>
     </View>
   );
@@ -150,87 +212,185 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  content: {
-    paddingHorizontal: 16,
-    paddingBottom: 32,
-    paddingTop: 16,
+  headerGradient: {
+    paddingTop: 50,
+    paddingBottom: 24,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
   },
-  profileHeader: {
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 24,
   },
-  avatar: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    backgroundColor: '#FFE1D8',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-  },
-  avatarText: {
-    fontSize: 32,
+  headerTitle: {
+    fontSize: 28,
+    color: colors.white,
     fontWeight: '800',
-    color: colors.primary,
+    letterSpacing: 0.5,
   },
-  name: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.textDark,
-  },
-  email: {
-    color: colors.textLight,
+  headerSubtitle: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.8)',
+    fontWeight: '600',
     marginTop: 4,
   },
-  zone: {
-    marginTop: 6,
-    color: colors.textDark,
-    fontWeight: '600',
+  headerIcon: {
+    width: 56,
+    height: 56,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  section: {
-    marginBottom: 16,
+  content: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 40,
   },
-  sectionLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.textMuted,
-    marginBottom: 8,
-    textTransform: 'uppercase',
-  },
-  sectionCard: {
+  profileHeaderCard: {
+    alignItems: 'center',
     backgroundColor: colors.white,
     borderRadius: 24,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
+    padding: 24,
+    marginBottom: 24,
     shadowColor: '#000',
-    shadowOpacity: 0.04,
-    shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  avatarContainer: {
+    position: 'relative',
+    marginBottom: 16,
+  },
+  avatarPlaceholder: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#FFEBEE',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 4,
+    borderColor: colors.white,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  avatarText: {
+    fontSize: 40,
+    color: colors.primary,
+    fontWeight: '800',
+  },
+  editAvatarButton: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: colors.primary,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.white,
+  },
+  name: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: colors.darkText,
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  email: {
+    fontSize: 14,
+    color: colors.textLight,
+    marginBottom: 12,
+  },
+  roleBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFEBEE',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  roleText: {
+    color: colors.primary,
+    fontSize: 12,
+    fontWeight: '700',
+    marginLeft: 4,
+  },
+  zoneBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+  },
+  zoneText: {
+    color: colors.textMuted,
+    fontSize: 11,
+    fontWeight: '600',
+    marginLeft: 4,
+  },
+  sectionContainer: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.darkText,
+    marginBottom: 12,
+    marginLeft: 4,
+  },
+  menuCard: {
+    backgroundColor: colors.white,
+    borderRadius: 20,
+    paddingHorizontal: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
     elevation: 3,
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
     borderBottomWidth: 1,
     borderBottomColor: colors.borderSoft,
   },
-  menuIcon: {
+  menuItemLast: {
+    borderBottomWidth: 0,
+  },
+  menuIconContainer: {
     width: 40,
     height: 40,
-    borderRadius: 16,
-    backgroundColor: colors.primary,
+    borderRadius: 12,
+    backgroundColor: '#FFEBEE',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginRight: 16,
   },
   menuTextContainer: {
     flex: 1,
   },
   menuTitle: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '600',
-    color: colors.textDark,
+    color: colors.darkText,
   },
   menuSubtitle: {
     fontSize: 13,
@@ -238,16 +398,25 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   logoutButton: {
-    marginTop: 24,
-    backgroundColor: colors.primary,
-    borderRadius: 24,
-    paddingVertical: 14,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFEBEE',
+    paddingVertical: 16,
+    borderRadius: 16,
+    marginBottom: 24,
   },
   logoutText: {
-    color: colors.white,
+    color: colors.danger,
     fontWeight: '700',
     fontSize: 16,
+    marginLeft: 8,
+  },
+  versionText: {
+    textAlign: 'center',
+    color: colors.textMuted,
+    fontSize: 12,
+    marginBottom: 20,
   },
 });
 
