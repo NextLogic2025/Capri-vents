@@ -6,10 +6,11 @@
 
 # ¿Qué es un modelo de datos?
 
-El modelo de datos es la representación estructurada de toda la información que maneja el sistema. Define cómo se organizan las tablas, cómo se relacionan entre sí, qué atributos tienen y qué reglas garantizan la integridad de los datos.
+El modelo de datos es un elemento fundamental dentro del diseño y gestión de sistemas de información, ya que establece la estructura lógica mediante la cual se almacenará y relacionará la información. Su importancia radica en que permite organizar los datos de forma coherente, evitar redundancias, garantizar la integridad referencial y facilitar la escalabilidad del sistema.
 
-Su objetivo es establecer una arquitectura clara, lógica y coherente que permita almacenar, consultar y procesar la información de forma eficiente, asegurando consistencia, seguridad y escalabilidad del sistema. 
+Un modelo bien diseñado mejora la eficiencia de las operaciones, optimiza las consultas, y asegura que los desarrolladores, analistas y administradores compartan una misma visión del entorno de datos.
 
+Además, en el marco de la ISO 8000 y del DAMA-DMBOK, el modelo de datos se considera un componente clave de la arquitectura de información, asegurando calidad, consistencia y trazabilidad durante todo el ciclo de vida de los datos.
 Es un diseño conceptual que describe:
 
 **Entidades:** Objetos o conceptos del mundo real, como "Clientes", "Productos".
