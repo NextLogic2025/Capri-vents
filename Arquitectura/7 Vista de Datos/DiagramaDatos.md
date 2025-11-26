@@ -17,7 +17,7 @@ Es un diseño conceptual que describe:
 
 **Atributos:** Propiedades o características de las entidades, como el "nombre" de un cliente o el "precio" de un producto.
 
-**Relaciones:** Conexiones o asociaciones entre entidades, como la relación entre "Clientes" y "Órdenes".
+**Relaciones:** Conexiones o asociaciones entre entidades, como la relación entre "Clientes" y "Productos".
 
 El propósito principal de un modelo de datos es facilitar la comprensión y gestión de los datos en sistemas complejos, asegurando que estén organizados de manera lógica y eficiente.
 
