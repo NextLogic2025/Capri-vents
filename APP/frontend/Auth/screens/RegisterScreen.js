@@ -15,6 +15,9 @@ import Checkbox from 'expo-checkbox';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../../theme/colors';
 import LogoCafrilosa from '../../assets/images/logo-cafrilosa.png';
+import { useWebLayout, useResponsive } from '../../hooks';
+import AuthBackground from '../../components/AuthBackground';
+import PDFViewerModal from '../../components/PDFViewerModal';
 
 const AuthInput = ({
   label,
@@ -61,6 +64,9 @@ const AuthInput = ({
 );
 
 const RegisterScreen = ({ navigation }) => {
+  const { containerStyle } = useWebLayout(500);
+  const { isDesktop } = useResponsive();
+
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -71,9 +77,16 @@ const RegisterScreen = ({ navigation }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [showPDFModal, setShowPDFModal] = useState(false);
+  const [currentPDF, setCurrentPDF] = useState(null);
 
   const handleChange = (key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const openPDF = (pdfType) => {
+    setCurrentPDF(pdfType);
+    setShowPDFModal(true);
   };
 
   const handleRegister = () => {
@@ -113,100 +126,127 @@ const RegisterScreen = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <ScrollView
-        contentContainerStyle={styles.container}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
+    <AuthBackground>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <View style={styles.headerBackground} />
+        <ScrollView
+          contentContainerStyle={[
+            styles.container,
+            isDesktop && styles.containerWeb
+          ]}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={[
+            styles.headerBackground,
+            isDesktop && styles.headerBackgroundWeb
+          ]} />
 
-        <View style={styles.contentWrapper}>
-          <View style={styles.logoContainer}>
-            <Image source={LogoCafrilosa} style={styles.logo} />
-          </View>
+          <View style={[styles.contentWrapper, containerStyle]}>
+            <View style={styles.logoContainer}>
+              <Image source={LogoCafrilosa} style={styles.logo} />
+            </View>
 
-          <View style={styles.card}>
-            <Text style={styles.heading}>Crear Cuenta</Text>
-            <Text style={styles.subheading}>Completa los datos para registrarte</Text>
+            <View style={[
+              styles.card,
+              isDesktop && styles.cardWeb
+            ]}>
+              <Text style={styles.heading}>Crear Cuenta</Text>
+              <Text style={styles.subheading}>Completa los datos para registrarte</Text>
 
-            <AuthInput
-              label="Nombre completo"
-              icon="person-circle-outline"
-              value={form.name}
-              onChangeText={(text) => handleChange('name', text)}
-              placeholder="Juan Pérez"
-              autoCapitalize="words"
-            />
-            <AuthInput
-              label="Correo electrónico"
-              icon="mail-outline"
-              value={form.email}
-              onChangeText={(text) => handleChange('email', text)}
-              placeholder="tucorreo@cafrilosa.com"
-              keyboardType="email-address"
-            />
-            <AuthInput
-              label="Teléfono"
-              icon="call-outline"
-              value={form.phone}
-              onChangeText={(text) => handleChange('phone', text)}
-              placeholder="0999999999"
-              keyboardType="phone-pad"
-            />
-            <AuthInput
-              label="Contraseña"
-              icon="lock-closed-outline"
-              value={form.password}
-              onChangeText={(text) => handleChange('password', text)}
-              placeholder="Mínimo 6 caracteres"
-              secure
-              showPassword={showPassword}
-              onTogglePassword={() => setShowPassword((prev) => !prev)}
-            />
-            <AuthInput
-              label="Confirmar contraseña"
-              icon="lock-closed-outline"
-              value={form.confirmPassword}
-              onChangeText={(text) => handleChange('confirmPassword', text)}
-              placeholder="Repite tu contraseña"
-              secure
-              showPassword={showConfirm}
-              onTogglePassword={() => setShowConfirm((prev) => !prev)}
-            />
-
-            <View style={styles.termsRow}>
-              <Checkbox
-                value={acceptTerms}
-                onValueChange={setAcceptTerms}
-                color={acceptTerms ? colors.primary : undefined}
-                style={styles.checkbox}
+              <AuthInput
+                label="Nombre completo"
+                icon="person-circle-outline"
+                value={form.name}
+                onChangeText={(text) => handleChange('name', text)}
+                placeholder="Juan Pérez"
+                autoCapitalize="words"
               />
-              <Text style={styles.termsText}>
-                Acepto los{' '}
-                <Text style={styles.termsLink}>Términos y Condiciones</Text> y la{' '}
-                <Text style={styles.termsLink}>Política de Privacidad</Text>.
-              </Text>
-            </View>
+              <AuthInput
+                label="Correo electrónico"
+                icon="mail-outline"
+                value={form.email}
+                onChangeText={(text) => handleChange('email', text)}
+                placeholder="tucorreo@cafrilosa.com"
+                keyboardType="email-address"
+              />
+              <AuthInput
+                label="Teléfono"
+                icon="call-outline"
+                value={form.phone}
+                onChangeText={(text) => handleChange('phone', text)}
+                placeholder="0999999999"
+                keyboardType="phone-pad"
+              />
+              <AuthInput
+                label="Contraseña"
+                icon="lock-closed-outline"
+                value={form.password}
+                onChangeText={(text) => handleChange('password', text)}
+                placeholder="Mínimo 6 caracteres"
+                secure
+                showPassword={showPassword}
+                onTogglePassword={() => setShowPassword((prev) => !prev)}
+              />
+              <AuthInput
+                label="Confirmar contraseña"
+                icon="lock-closed-outline"
+                value={form.confirmPassword}
+                onChangeText={(text) => handleChange('confirmPassword', text)}
+                placeholder="Repite tu contraseña"
+                secure
+                showPassword={showConfirm}
+                onTogglePassword={() => setShowConfirm((prev) => !prev)}
+              />
 
-            <TouchableOpacity style={styles.primaryButton} onPress={handleRegister}>
-              <Text style={styles.primaryButtonText}>CREAR CUENTA</Text>
-              <Ionicons name="arrow-forward" size={20} color={colors.white} />
-            </TouchableOpacity>
+              <View style={styles.termsRow}>
+                <Checkbox
+                  value={acceptTerms}
+                  onValueChange={setAcceptTerms}
+                  color={acceptTerms ? colors.primary : undefined}
+                  style={styles.checkbox}
+                />
+                <Text style={styles.termsText}>
+                  Acepto los{' '}
+                  <Text
+                    style={styles.termsLink}
+                    onPress={() => openPDF('terminos')}
+                  >
+                    Términos y Condiciones
+                  </Text>{' '}y la{' '}
+                  <Text
+                    style={styles.termsLink}
+                    onPress={() => openPDF('privacidad')}
+                  >
+                    Política de Privacidad
+                  </Text>.
+                </Text>
+              </View>
 
-            <View style={styles.footerRow}>
-              <Text style={styles.subtleText}>¿Ya tienes una cuenta?</Text>
-              <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                <Text style={styles.link}>Inicia sesión</Text>
+              <TouchableOpacity style={styles.primaryButton} onPress={handleRegister}>
+                <Text style={styles.primaryButtonText}>CREAR CUENTA</Text>
+                <Ionicons name="arrow-forward" size={20} color={colors.white} />
               </TouchableOpacity>
+
+              <View style={styles.footerRow}>
+                <Text style={styles.subtleText}>¿Ya tienes una cuenta?</Text>
+                <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                  <Text style={styles.link}>Inicia sesión</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+
+      <PDFViewerModal
+        visible={showPDFModal}
+        onClose={() => setShowPDFModal(false)}
+        pdfType={currentPDF}
+      />
+    </AuthBackground>
   );
 };
 
@@ -214,6 +254,9 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: colors.background,
+  },
+  containerWeb: {
+    backgroundColor: '#f0f0f0',
   },
   headerBackground: {
     position: 'absolute',
@@ -224,6 +267,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderBottomLeftRadius: 40,
     borderBottomRightRadius: 40,
+  },
+  headerBackgroundWeb: {
+    height: '30%',
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
   },
   contentWrapper: {
     flex: 1,
@@ -241,16 +289,6 @@ const styles = StyleSheet.create({
     height: 110,
     resizeMode: 'contain',
   },
-  slogan: {
-    marginTop: 8,
-    fontSize: 16,
-    color: colors.gold,
-    fontWeight: '700',
-    fontStyle: 'italic',
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
-  },
   card: {
     width: '100%',
     backgroundColor: colors.white,
@@ -261,6 +299,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 20,
     elevation: 10,
+  },
+  cardWeb: {
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.15,
+    shadowRadius: 30,
+    elevation: 15,
+    padding: 32,
   },
   heading: {
     fontSize: 24,

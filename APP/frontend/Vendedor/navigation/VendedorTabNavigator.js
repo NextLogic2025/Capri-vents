@@ -7,12 +7,14 @@ import VendedorPedidosScreen from '../screens/VendedorPedidosScreen';
 import VendedorCobrosScreen from '../screens/VendedorCobrosScreen';
 import VendedorProductosScreen from '../screens/VendedorProductosScreen';
 import VendedorPerfilScreen from '../screens/VendedorPerfilScreen';
+import VendedorClientesScreen from '../screens/VendedorClientesScreen';
 
 const Tab = createBottomTabNavigator();
 
 const TAB_ITEMS = {
   Pedidos: { icon: 'list-outline', label: 'Pedidos' },
-  CobrosCreditos: { icon: 'cash-outline', label: 'Cobros & Creditos' },
+  Clientes: { icon: 'people-outline', label: 'Clientes' },
+  CobrosCreditos: { icon: 'wallet-outline', label: 'Cartera' },
   Productos: { icon: 'pricetags-outline', label: 'Productos' },
   PerfilVendedor: { icon: 'person-circle-outline', label: 'Perfil' },
 };
@@ -47,10 +49,11 @@ const VendedorTabNavigator = () => {
       })}
     >
       <Tab.Screen name="Pedidos" component={VendedorPedidosScreen} />
+      <Tab.Screen name="Clientes" component={VendedorClientesScreen} />
       <Tab.Screen
         name="CobrosCreditos"
         component={VendedorCobrosScreen}
-        options={{ tabBarLabel: 'Cobros' }}
+        options={{ tabBarLabel: 'Cartera' }}
       />
       <Tab.Screen name="Productos" component={VendedorProductosScreen} />
       <Tab.Screen name="PerfilVendedor" component={VendedorPerfilScreen} options={{ title: 'Perfil' }} />

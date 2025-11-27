@@ -18,10 +18,15 @@ import colors from '../../theme/colors';
 import globalStyles from '../../theme/styles';
 import { useAppContext } from '../../context/AppContext';
 import PrimaryButton from '../../components/PrimaryButton';
+import DocumentSelectorModal from '../../components/DocumentSelectorModal';
+import PDFViewerModal from '../../components/PDFViewerModal';
 
 const PerfilScreen = ({ navigation }) => {
   const { user, logout, notifications, setNotifications } = useAppContext();
   const [prefModalVisible, setPrefModalVisible] = useState(false);
+  const [docSelectorVisible, setDocSelectorVisible] = useState(false);
+  const [pdfModalVisible, setPdfModalVisible] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState(null);
 
   const preferenceOptions = [
     { key: 'pedidos', label: 'Notificaciones de pedidos' },
@@ -68,6 +73,11 @@ const PerfilScreen = ({ navigation }) => {
 
   const handleTogglePreference = (key) => {
     setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const handleSelectDocument = (docId) => {
+    setSelectedDocument(docId);
+    setPdfModalVisible(true);
   };
 
   return (
@@ -170,13 +180,8 @@ const PerfilScreen = ({ navigation }) => {
             />
             <ProfileMenuItem
               icon="document-text-outline"
-              title="Términos y Condiciones"
-              onPress={() =>
-                Alert.alert(
-                  'Términos y condiciones',
-                  'Consulta los términos y políticas en cafrilosa.com'
-                )
-              }
+              title="Documentos Legales"
+              onPress={() => setDocSelectorVisible(true)}
               isLast={true}
             />
           </View>
@@ -190,6 +195,20 @@ const PerfilScreen = ({ navigation }) => {
 
         <Text style={styles.versionText}>Versión 2.0.1</Text>
       </ScrollView>
+
+      {/* Modal de Selector de Documentos */}
+      <DocumentSelectorModal
+        visible={docSelectorVisible}
+        onClose={() => setDocSelectorVisible(false)}
+        onSelectDocument={handleSelectDocument}
+      />
+
+      {/* Modal de Visualización de PDF */}
+      <PDFViewerModal
+        visible={pdfModalVisible}
+        onClose={() => setPdfModalVisible(false)}
+        pdfType={selectedDocument}
+      />
 
       {/* Modal de Preferencias */}
       <Modal visible={prefModalVisible} transparent animationType="fade">

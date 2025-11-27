@@ -226,92 +226,94 @@ const SupervisorCobrosScreen = () => {
       <Modal visible={!!selectedPayment} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Ionicons name="card" size={28} color={colors.primary} />
-              <Text style={styles.modalTitle}>Validar Pago</Text>
-            </View>
-            <Text style={styles.modalSubtitle}>{selectedPayment?.pedidoId}</Text>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
+              <View style={styles.modalHeader}>
+                <Ionicons name="card" size={28} color={colors.primary} />
+                <Text style={styles.modalTitle}>Validar Pago</Text>
+              </View>
+              <Text style={styles.modalSubtitle}>{selectedPayment?.pedidoId}</Text>
 
-            <View style={styles.detailGrid}>
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Cliente</Text>
-                <Text style={styles.detailValue}>{selectedPayment?.clienteNombre}</Text>
-              </View>
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Método</Text>
-                <Text style={styles.detailValue}>{selectedPayment?.tipo}</Text>
-              </View>
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Monto</Text>
-                <Text style={[styles.detailValue, styles.detailTotal]}>
-                  ${(selectedPayment?.monto ?? 0).toFixed(2)}
-                </Text>
-              </View>
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Fecha</Text>
-                <Text style={styles.detailValue}>{selectedPayment?.fechaRegistro}</Text>
-              </View>
-              {selectedPayment?.vendedorNombre && (
+              <View style={styles.detailGrid}>
                 <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Vendedor</Text>
-                  <Text style={styles.detailValue}>{selectedPayment.vendedorNombre}</Text>
+                  <Text style={styles.detailLabel}>Cliente</Text>
+                  <Text style={styles.detailValue}>{selectedPayment?.clienteNombre}</Text>
                 </View>
-              )}
-            </View>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Método</Text>
+                  <Text style={styles.detailValue}>{selectedPayment?.tipo}</Text>
+                </View>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Monto</Text>
+                  <Text style={[styles.detailValue, styles.detailTotal]}>
+                    ${(selectedPayment?.monto ?? 0).toFixed(2)}
+                  </Text>
+                </View>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Fecha</Text>
+                  <Text style={styles.detailValue}>{selectedPayment?.fechaRegistro}</Text>
+                </View>
+                {selectedPayment?.vendedorNombre && (
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>Vendedor</Text>
+                    <Text style={styles.detailValue}>{selectedPayment.vendedorNombre}</Text>
+                  </View>
+                )}
+              </View>
 
-            <TextInput
-              style={styles.input}
-              placeholder="Motivo de rechazo (opcional)"
-              value={rejectionReason}
-              onChangeText={setRejectionReason}
-              multiline
-            />
+              <TextInput
+                style={styles.input}
+                placeholder="Motivo de rechazo (opcional)"
+                value={rejectionReason}
+                onChangeText={setRejectionReason}
+                multiline
+              />
 
-            <View style={styles.modalActions}>
-              <TouchableOpacity
-                style={[styles.modalButton, { backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.primary + '40' }]}
-                onPress={() => {
-                  Alert.alert('Comprobante', 'Vista previa comprobante (mock).');
-                }}
-              >
-                <Ionicons name="document-text" size={20} color={colors.primary} />
-                <Text style={[styles.modalButtonText, { color: colors.primary }]}>Ver Comprobante</Text>
-              </TouchableOpacity>
+              <View style={styles.modalActions}>
+                <TouchableOpacity
+                  style={[styles.modalButton, { backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.primary + '40' }]}
+                  onPress={() => {
+                    Alert.alert('Comprobante', 'Vista previa comprobante (mock).');
+                  }}
+                >
+                  <Ionicons name="document-text" size={20} color={colors.primary} />
+                  <Text style={[styles.modalButtonText, { color: colors.primary }]}>Ver Comprobante</Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity
-                style={[styles.modalButton, { backgroundColor: colors.success }]}
-                onPress={() => {
-                  Alert.alert('Pago aprobado', 'Se actualizará el estado del pedido/cuota.');
-                  setSelectedPayment(null);
-                  setRejectionReason('');
-                }}
-              >
-                <Ionicons name="checkmark-circle" size={20} color={colors.white} />
-                <Text style={styles.modalButtonText}>Aprobar Pago</Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, { backgroundColor: colors.success }]}
+                  onPress={() => {
+                    Alert.alert('Pago aprobado', 'Se actualizará el estado del pedido/cuota.');
+                    setSelectedPayment(null);
+                    setRejectionReason('');
+                  }}
+                >
+                  <Ionicons name="checkmark-circle" size={20} color={colors.white} />
+                  <Text style={styles.modalButtonText}>Aprobar Pago</Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity
-                style={[styles.modalButton, { backgroundColor: colors.danger }]}
-                onPress={() => {
-                  Alert.alert('Pago rechazado', `Motivo: ${rejectionReason || 'Sin motivo'}.`);
-                  setSelectedPayment(null);
-                  setRejectionReason('');
-                }}
-              >
-                <Ionicons name="close-circle" size={20} color={colors.white} />
-                <Text style={styles.modalButtonText}>Rechazar</Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, { backgroundColor: colors.danger }]}
+                  onPress={() => {
+                    Alert.alert('Pago rechazado', `Motivo: ${rejectionReason || 'Sin motivo'}.`);
+                    setSelectedPayment(null);
+                    setRejectionReason('');
+                  }}
+                >
+                  <Ionicons name="close-circle" size={20} color={colors.white} />
+                  <Text style={styles.modalButtonText}>Rechazar</Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity
-                style={[styles.modalButton, { backgroundColor: colors.background }]}
-                onPress={() => {
-                  setSelectedPayment(null);
-                  setRejectionReason('');
-                }}
-              >
-                <Text style={[styles.modalButtonText, { color: colors.textDark }]}>Cerrar</Text>
-              </TouchableOpacity>
-            </View>
+                <TouchableOpacity
+                  style={[styles.modalButton, { backgroundColor: colors.background }]}
+                  onPress={() => {
+                    setSelectedPayment(null);
+                    setRejectionReason('');
+                  }}
+                >
+                  <Text style={[styles.modalButtonText, { color: colors.textDark }]}>Cerrar</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
           </View>
         </View>
       </Modal>

@@ -24,7 +24,6 @@ import TransferCard from '../components/TransferCard';
 import BankAccountCard from '../components/BankAccountCard';
 
 const tabs = [
-  { key: 'tarjetas', label: 'Tarjetas' },
   { key: 'transferencias', label: 'Transferencias' },
   { key: 'cuentas', label: 'Cuentas Cafrilosa' },
 ];
@@ -80,7 +79,7 @@ const mockBankAccounts = [
 
 const MetodosPagoScreen = ({ navigation }) => {
   const { paymentCards, addPaymentCard, updatePaymentCard, removePaymentCard } = useAppContext();
-  const [activeTab, setActiveTab] = useState('tarjetas');
+  const [activeTab, setActiveTab] = useState('transferencias');
   const [isAddCardVisible, setIsAddCardVisible] = useState(false);
   const [cardForm, setCardForm] = useState(initialCardForm);
   const [editingCardId, setEditingCardId] = useState(null);

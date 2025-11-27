@@ -10,6 +10,8 @@ import PrimaryButton from '../../components/PrimaryButton';
 import colors from '../../theme/colors';
 import { useAppContext } from '../../context/AppContext';
 
+const MOCK_CLIENTS_COUNT = 5; // Mock count for clients
+
 const SupervisorInicioScreen = () => {
   const navigation = useNavigation();
   const {
@@ -73,37 +75,63 @@ const SupervisorInicioScreen = () => {
       >
         {/* KPIs Grid Mejorado */}
         <View style={styles.kpiSection}>
-          <Text style={styles.sectionTitle}>Métricas Clave</Text>
+          <Text style={styles.sectionTitle}>Resumen</Text>
 
           <View style={styles.kpiGrid}>
             <View style={styles.kpiRow}>
-              <SupervisorKpiCard
-                label="Pedidos nuevos"
-                value={pedidosNuevosHoy.toString()}
-                variant="primary"
-                icon="cube-outline"
-              />
-              <SupervisorKpiCard
-                label="En ruta"
-                value={pedidosEnRuta.toString()}
-                variant="warning"
-                icon="car-outline"
-              />
+              <TouchableOpacity
+                style={{ flex: 1 }}
+                onPress={() => navigation.navigate('Pedidos')}
+                activeOpacity={0.9}
+              >
+                <SupervisorKpiCard
+                  label="Pedidos nuevos"
+                  value={pedidosNuevosHoy.toString()}
+                  variant="primary"
+                  icon="cube-outline"
+                />
+              </TouchableOpacity>
+              <View style={{ width: 12 }} />
+              <TouchableOpacity
+                style={{ flex: 1 }}
+                onPress={() => navigation.navigate('SupervisorClientes')}
+                activeOpacity={0.9}
+              >
+                <SupervisorKpiCard
+                  label="Clientes"
+                  value={MOCK_CLIENTS_COUNT.toString()}
+                  variant="warning"
+                  icon="people-outline"
+                />
+              </TouchableOpacity>
             </View>
 
             <View style={styles.kpiRow}>
-              <SupervisorKpiCard
-                label="Pagos pendientes"
-                value={pagosPorValidar.toString()}
-                variant="danger"
-                icon="cash-outline"
-              />
-              <SupervisorKpiCard
-                label="Créditos en mora"
-                value={creditosEnMora.toString()}
-                variant="warning"
-                icon="alert-circle-outline"
-              />
+              <TouchableOpacity
+                style={{ flex: 1 }}
+                onPress={() => navigation.navigate('Cobros')}
+                activeOpacity={0.9}
+              >
+                <SupervisorKpiCard
+                  label="Pagos pendientes"
+                  value={pagosPorValidar.toString()}
+                  variant="danger"
+                  icon="cash-outline"
+                />
+              </TouchableOpacity>
+              <View style={{ width: 12 }} />
+              <TouchableOpacity
+                style={{ flex: 1 }}
+                onPress={() => navigation.navigate('Cobros')}
+                activeOpacity={0.9}
+              >
+                <SupervisorKpiCard
+                  label="Créditos en mora"
+                  value={creditosEnMora.toString()}
+                  variant="warning"
+                  icon="alert-circle-outline"
+                />
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -111,6 +139,24 @@ const SupervisorInicioScreen = () => {
         {/* Acciones Rápidas */}
         <View style={styles.actionsSection}>
           <Text style={styles.sectionTitle}>Acciones Rápidas</Text>
+
+          {/* Card de Clientes */}
+          <TouchableOpacity
+            style={styles.actionCard}
+            onPress={() => navigation.navigate('SupervisorClientes')}
+            activeOpacity={0.8}
+          >
+            <View style={[styles.actionIconContainer, { backgroundColor: '#FFF3E0' }]}>
+              <Ionicons name="people" size={28} color="#EF6C00" />
+            </View>
+            <View style={styles.actionContent}>
+              <Text style={styles.actionTitle}>Clientes</Text>
+              <Text style={styles.actionDescription}>
+                Ver cartera de clientes y su historial
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
+          </TouchableOpacity>
 
           {/* Card de Reclamos */}
           <TouchableOpacity
@@ -125,6 +171,24 @@ const SupervisorInicioScreen = () => {
               <Text style={styles.actionTitle}>Reclamos Activos</Text>
               <Text style={styles.actionDescription}>
                 {tickets?.filter(t => t.status !== 'CERRADO').length || 0} casos en seguimiento
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
+          </TouchableOpacity>
+
+          {/* Card de Vendedores */}
+          <TouchableOpacity
+            style={styles.actionCard}
+            onPress={() => navigation.navigate('SupervisorVendedores')}
+            activeOpacity={0.8}
+          >
+            <View style={[styles.actionIconContainer, { backgroundColor: '#FFEBEE' }]}>
+              <Ionicons name="people-circle" size={28} color={colors.primary} />
+            </View>
+            <View style={styles.actionContent}>
+              <Text style={styles.actionTitle}>Vendedores</Text>
+              <Text style={styles.actionDescription}>
+                5 vendedores activos
               </Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />

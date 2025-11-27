@@ -16,10 +16,9 @@ const PAYMENT_METHODS = [
 ];
 
 const CheckoutScreen = ({ navigation }) => {
-  const { cart, cartTotals, user, createOrderFromCart, paymentCards } = useAppContext();
+  const { cart, cartTotals, user, createOrderFromCart } = useAppContext();
   const [selectedAddress, setSelectedAddress] = useState(user?.address || '');
   const [selectedPayment, setSelectedPayment] = useState(null);
-  const [selectedCard, setSelectedCard] = useState(null);
   const [notes, setNotes] = useState('');
   const [phoneNumber, setPhoneNumber] = useState(user?.phone || '');
 
@@ -44,11 +43,6 @@ const CheckoutScreen = ({ navigation }) => {
       return;
     }
 
-    if (selectedPayment === 'TARJETA' && !selectedCard) {
-      Alert.alert('Tarjeta requerida', 'Por favor selecciona o agrega una tarjeta.');
-      return;
-    }
-
     if (selectedPayment === 'CREDITO') {
       // Navegar a selección de plan
       navigation.navigate('SeleccionPlanCredito', { total: cartTotals.total });
@@ -60,7 +54,6 @@ const CheckoutScreen = ({ navigation }) => {
       address: selectedAddress,
       notes,
       phone: phoneNumber,
-      cardId: selectedPayment === 'TARJETA' ? selectedCard.id : null,
     };
 
     const order = createOrderFromCart(selectedPayment, orderData);
@@ -172,44 +165,6 @@ const CheckoutScreen = ({ navigation }) => {
                     {isSelected && <View style={styles.radioDot} />}
                   </View>
                 </TouchableOpacity>
-
-                {/* Selector de Tarjetas si se elige TARJETA */}
-                {isSelected && method.id === 'TARJETA' && (
-                  <View style={styles.cardsContainer}>
-                    {paymentCards.length > 0 ? (
-                      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.cardsScroll}>
-                        {paymentCards.map((card) => (
-                          <TouchableOpacity
-                            key={card.id}
-                            style={[
-                              styles.miniCard,
-                              selectedCard?.id === card.id && styles.miniCardSelected
-                            ]}
-                            onPress={() => setSelectedCard(card)}
-                          >
-                            <Text style={[styles.miniCardText, selectedCard?.id === card.id && styles.miniCardTextSelected]}>
-                              {card.type} •••• {card.number.slice(-4)}
-                            </Text>
-                          </TouchableOpacity>
-                        ))}
-                        <TouchableOpacity
-                          style={styles.addMiniCard}
-                          onPress={() => navigation.navigate('MetodosPago')}
-                        >
-                          <Ionicons name="add" size={20} color={colors.primary} />
-                          <Text style={styles.addMiniCardText}>Nueva</Text>
-                        </TouchableOpacity>
-                      </ScrollView>
-                    ) : (
-                      <TouchableOpacity
-                        style={styles.addCardButton}
-                        onPress={() => navigation.navigate('MetodosPago')}
-                      >
-                        <Text style={styles.addCardButtonText}>+ Agregar una tarjeta</Text>
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                )}
               </View>
             );
           })}
@@ -389,63 +344,6 @@ const styles = StyleSheet.create({
     height: 12,
     borderRadius: 6,
     backgroundColor: colors.primary,
-  },
-  cardsContainer: {
-    marginLeft: 16,
-    marginBottom: 16,
-  },
-  cardsScroll: {
-    flexDirection: 'row',
-  },
-  miniCard: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-    backgroundColor: '#F5F5F5',
-    marginRight: 8,
-    borderWidth: 1,
-    borderColor: 'transparent',
-  },
-  miniCardSelected: {
-    backgroundColor: colors.primary + '10', // 10% opacity
-    borderColor: colors.primary,
-  },
-  miniCardText: {
-    fontSize: 12,
-    color: colors.textDark,
-    fontWeight: '600',
-  },
-  miniCardTextSelected: {
-    color: colors.primary,
-  },
-  addMiniCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.primary,
-    borderStyle: 'dashed',
-  },
-  addMiniCardText: {
-    fontSize: 12,
-    color: colors.primary,
-    fontWeight: '600',
-    marginLeft: 4,
-  },
-  addCardButton: {
-    padding: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: colors.primary,
-    borderStyle: 'dashed',
-    borderRadius: 12,
-  },
-  addCardButtonText: {
-    color: colors.primary,
-    fontWeight: '600',
   },
   bottomBar: {
     position: 'absolute',

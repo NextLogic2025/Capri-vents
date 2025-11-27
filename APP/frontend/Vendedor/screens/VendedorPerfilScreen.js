@@ -14,6 +14,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import colors from '../../theme/colors';
 import { useAppContext } from '../../context/AppContext';
+import DocumentSelectorModal from '../../components/DocumentSelectorModal';
+import PDFViewerModal from '../../components/PDFViewerModal';
 
 /** Ítem de menú reutilizable (ícono rojo + título + subtítulo + chevron) */
 const ProfileMenuItem = ({ iconName, title, subtitle, onPress, isLast }) => (
@@ -35,6 +37,9 @@ const ProfileMenuItem = ({ iconName, title, subtitle, onPress, isLast }) => (
 
 const VendedorPerfilScreen = ({ navigation }) => {
   const { vendorUser, logout } = useAppContext();
+  const [docSelectorVisible, setDocSelectorVisible] = React.useState(false);
+  const [pdfModalVisible, setPdfModalVisible] = React.useState(false);
+  const [selectedDocument, setSelectedDocument] = React.useState(null);
 
   const initials = vendorUser?.name
     ?.split(' ')
@@ -77,6 +82,11 @@ const VendedorPerfilScreen = ({ navigation }) => {
 
   const handlePlaceholder = (msg) => {
     Alert.alert('Próximamente', msg);
+  };
+
+  const handleSelectDocument = (docId) => {
+    setSelectedDocument(docId);
+    setPdfModalVisible(true);
   };
 
   return (
@@ -179,17 +189,17 @@ const VendedorPerfilScreen = ({ navigation }) => {
               isLast={false}
             />
             <ProfileMenuItem
-              iconName="help-circle-outline"
+              iconName="ticket-outline"
               title="Soporte TI"
-              subtitle="Escríbenos por correo para ayuda técnica"
-              onPress={handleSupportEmail}
+              subtitle="Reportar problemas y ver estado"
+              onPress={() => navigation.navigate('VendedorSoporte')}
               isLast={false}
             />
             <ProfileMenuItem
-              iconName="ticket-outline"
-              title="Mis Tickets de Soporte"
-              subtitle="Reportar problemas y ver estado"
-              onPress={() => navigation.navigate('VendedorSoporte')}
+              iconName="document-text-outline"
+              title="Documentos Legales"
+              subtitle="Términos, privacidad y consentimiento"
+              onPress={() => setDocSelectorVisible(true)}
               isLast={true}
             />
           </View>
@@ -203,6 +213,20 @@ const VendedorPerfilScreen = ({ navigation }) => {
 
         <Text style={styles.versionText}>Versión 2.0.1 • Vendedor</Text>
       </ScrollView>
+
+      {/* Modal de Selector de Documentos */}
+      <DocumentSelectorModal
+        visible={docSelectorVisible}
+        onClose={() => setDocSelectorVisible(false)}
+        onSelectDocument={handleSelectDocument}
+      />
+
+      {/* Modal de Visualización de PDF */}
+      <PDFViewerModal
+        visible={pdfModalVisible}
+        onClose={() => setPdfModalVisible(false)}
+        pdfType={selectedDocument}
+      />
     </View>
   );
 };

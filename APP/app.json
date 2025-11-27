@@ -12,8 +12,12 @@
       "resizeMode": "contain",
       "backgroundColor": "#e53935"
     },
-    "assetBundlePatterns": ["**/*"],
-    "ios": {"supportsTablet": true},
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./frontend/assets/images/logo-cafrilosa.png",
@@ -23,7 +27,15 @@
     "web": {
       "bundler": "metro",
       "output": "single",
-      "favicon": "./frontend/assets/images/logo-cafrilosa.png"
+      "favicon": "./frontend/assets/images/logo-cafrilosa.png",
+      "backgroundColor": "#ffffff",
+      "name": "Cafrilosa App",
+      "shortName": "Cafrilosa",
+      "description": "Aplicación de ventas Cafrilosa",
+      "display": "standalone",
+      "startUrl": "/",
+      "orientation": "any",
+      "lang": "es-ES"
     }
   }
 }

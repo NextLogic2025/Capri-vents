@@ -22,9 +22,13 @@ import LogoCafrilosa from '../../assets/images/logo-cafrilosa.png';
 
 const VendedorProductosScreen = () => {
   const navigation = useNavigation();
-  const { products = [] } = useAppContext();
+  const { products = [], cart, addToCart } = useAppContext();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('Todos');
+
+  const cartItemCount = useMemo(() => {
+    return cart.reduce((total, item) => total + (item.quantity || 0), 0);
+  }, [cart]);
 
   const categories = useMemo(() => {
     const unique = Array.from(
@@ -45,7 +49,7 @@ const VendedorProductosScreen = () => {
   const renderProduct = ({ item }) => (
     <ProductCard
       product={item}
-      showCartButton={false}
+      showCartButton={true}
       onPress={(product) => navigation.navigate('VendedorProductDetail', { product })}
     />
   );
@@ -129,6 +133,23 @@ const VendedorProductosScreen = () => {
         }
         showsVerticalScrollIndicator={false}
       />
+
+      {/* FAB Carrito */}
+      {cartItemCount > 0 && (
+        <TouchableOpacity
+          style={styles.fab}
+          onPress={() => navigation.navigate('VendedorCarrito')}
+          activeOpacity={0.8}
+        >
+          <View style={styles.fabIconContainer}>
+            <Ionicons name="cart" size={24} color={colors.white} />
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{cartItemCount}</Text>
+            </View>
+          </View>
+          <Text style={styles.fabText}>Ver Carrito</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -228,6 +249,50 @@ const styles = StyleSheet.create({
   },
   chipTextActive: {
     color: colors.white,
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 24,
+    right: 24,
+    backgroundColor: colors.primary,
+    borderRadius: 30,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  fabIconContainer: {
+    position: 'relative',
+    marginRight: 8,
+  },
+  badge: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    backgroundColor: colors.secondary || '#FFC107',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.primary,
+  },
+  badgeText: {
+    color: colors.textDark,
+    fontSize: 10,
+    fontWeight: 'bold',
+    paddingHorizontal: 4,
+  },
+  fabText: {
+    color: colors.white,
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
 

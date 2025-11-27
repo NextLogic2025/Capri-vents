@@ -13,8 +13,12 @@ const CartItemCard = ({ item, onIncrease, onDecrease, onRemove }) => {
     <View style={[styles.card, globalStyles.shadow]}>
       <Image source={image || LogoCafrilosa} defaultSource={LogoCafrilosa} style={styles.image} resizeMode="cover" />
       <View style={styles.content}>
-        <TouchableOpacity onPress={() => onRemove?.(item)} style={styles.trashButton}>
-          <Ionicons name="trash-outline" size={18} color={colors.danger} />
+        <TouchableOpacity
+          onPress={() => onRemove?.(item)}
+          style={styles.trashButton}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons name="trash-outline" size={20} color={colors.danger} />
         </TouchableOpacity>
         <Text style={styles.category}>Embutidos</Text>
         <Text style={styles.name} numberOfLines={1}>
@@ -95,6 +99,7 @@ const styles = StyleSheet.create({
     top: 4,
     right: 4,
     padding: 4,
+    zIndex: 10,
   },
   quantityWrapper: {
     flexDirection: 'row',

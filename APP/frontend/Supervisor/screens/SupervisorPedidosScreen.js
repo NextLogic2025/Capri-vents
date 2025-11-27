@@ -19,7 +19,7 @@ import { useAppContext } from '../../context/AppContext';
 
 const STATUS_FILTERS = ['Todos', 'Sin asignar', 'En preparación', 'En ruta', 'Entregado'];
 
-const SupervisorPedidosScreen = () => {
+const SupervisorPedidosScreen = ({ navigation }) => {
   const { allOrders } = useAppContext();
   const [statusFilter, setStatusFilter] = useState('Todos');
   const [zoneFilter, setZoneFilter] = useState('Todas');
@@ -81,7 +81,7 @@ const SupervisorPedidosScreen = () => {
   const renderOrder = ({ item }) => (
     <SupervisorOrderCard
       order={item}
-      onPress={() => setSelectedOrder(item)}
+      onPress={() => navigation.navigate('SupervisorDetallePedido', { order: item })}
       onAssignVendorPress={() => openAssignModal(item)}
     />
   );
@@ -244,75 +244,7 @@ const SupervisorPedidosScreen = () => {
         </View>
       </Modal>
 
-      {/* MODAL: Detalle de Pedido */}
-      <Modal visible={!!selectedOrder} transparent animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Ionicons name="receipt" size={28} color={colors.primary} />
-              <Text style={styles.modalTitle}>Detalle del Pedido</Text>
-            </View>
-            <Text style={styles.modalSubtitle}>{selectedOrder?.code}</Text>
 
-            <View style={styles.detailGrid}>
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Cliente</Text>
-                <Text style={styles.detailValue}>
-                  {selectedOrder?.clientName || selectedOrder?.clienteNombre}
-                </Text>
-              </View>
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Zona</Text>
-                <Text style={styles.detailValue}>
-                  {selectedOrder?.zone || selectedOrder?.zona}
-                </Text>
-              </View>
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Vendedor</Text>
-                <Text style={styles.detailValue}>
-                  {selectedOrder?.assignedVendorName || selectedOrder?.assignedVendor || 'Sin asignar'}
-                </Text>
-              </View>
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Método de pago</Text>
-                <Text style={styles.detailValue}>
-                  {selectedOrder?.paymentMethod || selectedOrder?.metodoPago}
-                </Text>
-              </View>
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Total</Text>
-                <Text style={[styles.detailValue, styles.detailTotal]}>
-                  ${(selectedOrder?.total ?? selectedOrder?.amount ?? 0).toFixed(2)}
-                </Text>
-              </View>
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Estado</Text>
-                <Text style={styles.detailValue}>
-                  {selectedOrder?.status || selectedOrder?.estadoPedido}
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.modalActions}>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.modalButtonPrimary]}
-                onPress={() => {
-                  Alert.alert('Actualizado', 'Estado actualizado en el backend (mock).');
-                }}
-              >
-                <Ionicons name="sync" size={20} color={colors.white} />
-                <Text style={styles.modalButtonTextPrimary}>Actualizar Estado</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.modalButtonSecondary]}
-                onPress={() => setSelectedOrder(null)}
-              >
-                <Text style={styles.modalButtonTextSecondary}>Cerrar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 };

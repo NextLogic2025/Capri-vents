@@ -14,8 +14,13 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../../theme/colors';
 import LogoCafrilosa from '../../assets/images/logo-cafrilosa.png';
+import { useWebLayout, useResponsive } from '../../hooks';
+import AuthBackground from '../../components/AuthBackground';
 
 const ForgotPasswordScreen = ({ navigation }) => {
+  const { containerStyle } = useWebLayout(500);
+  const { isDesktop } = useResponsive();
+
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
 
@@ -46,75 +51,86 @@ const ForgotPasswordScreen = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <ScrollView
-        contentContainerStyle={styles.container}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
+    <AuthBackground>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <View style={styles.headerBackground} />
+        <ScrollView
+          contentContainerStyle={[
+            styles.container,
+            isDesktop && styles.containerWeb
+          ]}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={[
+            styles.headerBackground,
+            isDesktop && styles.headerBackgroundWeb
+          ]} />
 
-        <View style={styles.contentWrapper}>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Ionicons name="chevron-back" size={24} color={colors.white} />
-          </TouchableOpacity>
+          <View style={[styles.contentWrapper, containerStyle]}>
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+              <Ionicons name="chevron-back" size={24} color={colors.white} />
+            </TouchableOpacity>
 
-          <View style={styles.logoContainer}>
-            <Image source={LogoCafrilosa} style={styles.logo} />
-          </View>
-
-          <View style={styles.card}>
-            <Text style={styles.heading}>¿Olvidaste tu contraseña?</Text>
-            <Text style={styles.subheading}>
-              Ingresa tu correo electrónico y te enviaremos un código para restablecerla.
-            </Text>
-
-            <View style={styles.fieldGroup}>
-              <Text style={styles.fieldLabel}>Correo electrónico</Text>
-              <View style={[styles.inputWrapper, email ? styles.inputWrapperActive : null]}>
-                <Ionicons
-                  name="mail-outline"
-                  size={20}
-                  color={email ? colors.primary : colors.textMuted}
-                  style={styles.inputIcon}
-                />
-                <TextInput
-                  value={email}
-                  onChangeText={setEmail}
-                  placeholder="tucorreo@cafrilosa.com"
-                  placeholderTextColor={colors.textMuted}
-                  autoCapitalize="none"
-                  keyboardType="email-address"
-                  style={styles.input}
-                />
-              </View>
+            <View style={styles.logoContainer}>
+              <Image source={LogoCafrilosa} style={styles.logo} />
             </View>
-            {!!error && (
-              <View style={styles.errorContainer}>
-                <Ionicons name="alert-circle" size={20} color={colors.danger} />
-                <Text style={styles.errorText}>{error}</Text>
+
+            <View style={[
+              styles.card,
+              isDesktop && styles.cardWeb
+            ]}>
+              <Text style={styles.heading}>¿Olvidaste tu contraseña?</Text>
+              <Text style={styles.subheading}>
+                Ingresa tu correo electrónico y te enviaremos un código para restablecerla.
+              </Text>
+
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>Correo electrónico</Text>
+                <View style={[styles.inputWrapper, email ? styles.inputWrapperActive : null]}>
+                  <Ionicons
+                    name="mail-outline"
+                    size={20}
+                    color={email ? colors.primary : colors.textMuted}
+                    style={styles.inputIcon}
+                  />
+                  <TextInput
+                    value={email}
+                    onChangeText={setEmail}
+                    placeholder="tucorreo@cafrilosa.com"
+                    placeholderTextColor={colors.textMuted}
+                    autoCapitalize="none"
+                    keyboardType="email-address"
+                    style={styles.input}
+                  />
+                </View>
               </View>
-            )}
+              {!!error && (
+                <View style={styles.errorContainer}>
+                  <Ionicons name="alert-circle" size={20} color={colors.danger} />
+                  <Text style={styles.errorText}>{error}</Text>
+                </View>
+              )}
 
-            <TouchableOpacity style={styles.primaryButton} onPress={handleSubmit}>
-              <Text style={styles.primaryButtonText}>ENVIAR CÓDIGO</Text>
-              <Ionicons name="paper-plane-outline" size={20} color={colors.white} />
-            </TouchableOpacity>
+              <TouchableOpacity style={styles.primaryButton} onPress={handleSubmit}>
+                <Text style={styles.primaryButtonText}>ENVIAR CÓDIGO</Text>
+                <Ionicons name="paper-plane-outline" size={20} color={colors.white} />
+              </TouchableOpacity>
 
-            <Text style={styles.helperText}>
-              Revisa tu bandeja de entrada (y también la carpeta de spam).
-            </Text>
+              <Text style={styles.helperText}>
+                Revisa tu bandeja de entrada (y también la carpeta de spam).
+              </Text>
 
-            <TouchableOpacity onPress={handleResend} style={styles.resendButton}>
-              <Text style={styles.helperLink}>Reenviar correo electrónico</Text>
-            </TouchableOpacity>
+              <TouchableOpacity onPress={handleResend} style={styles.resendButton}>
+                <Text style={styles.helperLink}>Reenviar correo electrónico</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </AuthBackground>
   );
 };
 
@@ -122,6 +138,9 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: colors.background,
+  },
+  containerWeb: {
+    backgroundColor: '#f0f0f0',
   },
   headerBackground: {
     position: 'absolute',
@@ -132,6 +151,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderBottomLeftRadius: 40,
     borderBottomRightRadius: 40,
+  },
+  headerBackgroundWeb: {
+    height: '35%',
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
   },
   contentWrapper: {
     flex: 1,
@@ -156,16 +180,6 @@ const styles = StyleSheet.create({
     height: 120,
     resizeMode: 'contain',
   },
-  slogan: {
-    marginTop: 8,
-    fontSize: 16,
-    color: colors.gold,
-    fontWeight: '700',
-    fontStyle: 'italic',
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
-  },
   card: {
     width: '100%',
     backgroundColor: colors.white,
@@ -176,6 +190,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 20,
     elevation: 10,
+  },
+  cardWeb: {
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.15,
+    shadowRadius: 30,
+    elevation: 15,
+    padding: 32,
   },
   heading: {
     fontSize: 22,

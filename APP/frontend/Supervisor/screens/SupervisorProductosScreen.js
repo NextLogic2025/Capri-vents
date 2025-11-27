@@ -30,7 +30,7 @@ const PRODUCT_TYPES = [
   'Otros',
 ];
 
-const SupervisorProductosScreen = () => {
+const SupervisorProductosScreen = ({ navigation }) => {
   const { products, stockAlerts } = useAppContext();
 
   // Filters
@@ -79,9 +79,7 @@ const SupervisorProductosScreen = () => {
   }, [products, categoryFilter, quickFilter, lowStockIds, nearExpirationIds]);
 
   const openProductModal = (product) => {
-    setSelectedProduct(product);
-    setPriceInput(product.price?.toString() || '');
-    setStockInput(product.stockActual?.toString() || '');
+    navigation.navigate('SupervisorEditarProducto', { product });
   };
 
   const closeProductModal = () => {
@@ -310,75 +308,7 @@ const SupervisorProductosScreen = () => {
         <Ionicons name="add" size={30} color={colors.white} />
       </TouchableOpacity>
 
-      {/* MODAL: Editar Producto */}
-      <Modal visible={!!selectedProduct} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Ionicons name="create" size={28} color={colors.primary} />
-              <Text style={styles.modalTitle}>Editar Producto</Text>
-            </View>
-            <Text style={styles.modalSubtitle}>{selectedProduct?.name}</Text>
 
-            <View style={styles.detailGrid}>
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Categoría</Text>
-                <Text style={styles.detailValue}>{selectedProduct?.category}</Text>
-              </View>
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Presentación</Text>
-                <Text style={styles.detailValue}>{selectedProduct?.presentation}</Text>
-              </View>
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Stock actual</Text>
-                <Text style={styles.detailValue}>
-                  {selectedProduct?.stockActual} / {selectedProduct?.stockMax}
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Precio</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Nuevo precio"
-                keyboardType="decimal-pad"
-                value={priceInput}
-                onChangeText={setPriceInput}
-              />
-
-              <Text style={styles.inputLabel}>Ajustar Stock</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Cantidad de stock"
-                keyboardType="number-pad"
-                value={stockInput}
-                onChangeText={setStockInput}
-              />
-            </View>
-
-            <View style={styles.modalActions}>
-              <TouchableOpacity
-                style={[styles.modalButton, { backgroundColor: colors.primary }]}
-                onPress={() => {
-                  Alert.alert('Cambios guardados', 'El producto se ha actualizado.');
-                  closeProductModal();
-                }}
-              >
-                <Ionicons name="save" size={20} color={colors.white} />
-                <Text style={styles.modalButtonText}>Guardar Cambios</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.modalButton, { backgroundColor: colors.background }]}
-                onPress={closeProductModal}
-              >
-                <Text style={[styles.modalButtonText, { color: colors.textDark }]}>Cerrar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
 
       {/* MODAL: Crear Nuevo Producto */}
       <Modal visible={showCreateModal} transparent animationType="slide">

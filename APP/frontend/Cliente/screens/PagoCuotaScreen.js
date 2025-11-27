@@ -29,11 +29,8 @@ const PagoCuotaScreen = ({ route, navigation }) => {
   const {
     credits,
     registerInstallmentPayment,
-    paymentCards,
-    defaultCard,
   } = useAppContext();
-  const [method, setMethod] = useState('TARJETA');
-  const [selectedCard, setSelectedCard] = useState(defaultCard || null);
+  const [method, setMethod] = useState('TRANSFERENCIA');
   const [transferModalVisible, setTransferModalVisible] = useState(false);
   const [transferReference, setTransferReference] = useState('');
 
@@ -56,25 +53,6 @@ const PagoCuotaScreen = ({ route, navigation }) => {
 
   const handleConfirm = () => {
     if (!installment) return;
-    if (method === 'TARJETA') {
-      if (!selectedCard && paymentCards.length === 0) {
-        Alert.alert(
-          'Tarjeta faltante',
-          'Agrega una tarjeta desde Métodos de pago antes de proceder.',
-          [
-            { text: 'Cancelar', style: 'cancel' },
-            { text: 'Ir a métodos', onPress: () => navigation.navigate('MetodosPago') },
-          ]
-        );
-        return;
-      }
-      if (!selectedCard) {
-        Alert.alert('Selecciona una tarjeta', 'Por favor selecciona una tarjeta para continuar.');
-        return;
-      }
-      handleRegisterPayment('TARJETA', { cardId: selectedCard.id });
-      return;
-    }
 
     if (method === 'TRANSFERENCIA') {
       if (!transferReference.trim()) {
@@ -154,44 +132,6 @@ const PagoCuotaScreen = ({ route, navigation }) => {
                     {isSelected && <View style={styles.radioDot} />}
                   </View>
                 </TouchableOpacity>
-
-                {/* Selector de Tarjetas si se elige TARJETA */}
-                {isSelected && option.key === 'TARJETA' && (
-                  <View style={styles.cardsContainer}>
-                    {paymentCards.length > 0 ? (
-                      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.cardsScroll}>
-                        {paymentCards.map((card) => (
-                          <TouchableOpacity
-                            key={card.id}
-                            style={[
-                              styles.miniCard,
-                              selectedCard?.id === card.id && styles.miniCardSelected
-                            ]}
-                            onPress={() => setSelectedCard(card)}
-                          >
-                            <Text style={[styles.miniCardText, selectedCard?.id === card.id && styles.miniCardTextSelected]}>
-                              {card.type} •••• {card.number.slice(-4)}
-                            </Text>
-                          </TouchableOpacity>
-                        ))}
-                        <TouchableOpacity
-                          style={styles.addMiniCard}
-                          onPress={() => navigation.navigate('MetodosPago')}
-                        >
-                          <Ionicons name="add" size={20} color={colors.primary} />
-                          <Text style={styles.addMiniCardText}>Nueva</Text>
-                        </TouchableOpacity>
-                      </ScrollView>
-                    ) : (
-                      <TouchableOpacity
-                        style={styles.addCardButton}
-                        onPress={() => navigation.navigate('MetodosPago')}
-                      >
-                        <Text style={styles.addCardButtonText}>+ Agregar una tarjeta</Text>
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                )}
 
                 {/* Comprobante si se elige TRANSFERENCIA */}
                 {isSelected && option.key === 'TRANSFERENCIA' && (
@@ -361,63 +301,6 @@ const styles = StyleSheet.create({
     height: 12,
     borderRadius: 6,
     backgroundColor: colors.primary,
-  },
-  cardsContainer: {
-    marginLeft: 16,
-    marginBottom: 16,
-  },
-  cardsScroll: {
-    flexDirection: 'row',
-  },
-  miniCard: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-    backgroundColor: '#F5F5F5',
-    marginRight: 8,
-    borderWidth: 1,
-    borderColor: 'transparent',
-  },
-  miniCardSelected: {
-    backgroundColor: colors.primary + '10', // 10% opacity
-    borderColor: colors.primary,
-  },
-  miniCardText: {
-    fontSize: 12,
-    color: colors.textDark,
-    fontWeight: '600',
-  },
-  miniCardTextSelected: {
-    color: colors.primary,
-  },
-  addMiniCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.primary,
-    borderStyle: 'dashed',
-  },
-  addMiniCardText: {
-    fontSize: 12,
-    color: colors.primary,
-    fontWeight: '600',
-    marginLeft: 4,
-  },
-  addCardButton: {
-    padding: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: colors.primary,
-    borderStyle: 'dashed',
-    borderRadius: 12,
-  },
-  addCardButtonText: {
-    color: colors.primary,
-    fontWeight: '600',
   },
   transferContainer: {
     marginLeft: 16,

@@ -94,53 +94,7 @@ const SupervisorOrderCard = ({
           <Text style={styles.paymentStatus}>{estadoPago}</Text>
         </View>
 
-        {/* Footer: Vendedor y Botón */}
-        <View style={styles.footer}>
-          <View style={styles.vendorInfo}>
-            <View style={[
-              styles.vendorAvatar,
-              { backgroundColor: isUnassigned ? colors.danger + '20' : colors.primary + '20' }
-            ]}>
-              <Ionicons
-                name={isUnassigned ? "person-add-outline" : "person"}
-                size={18}
-                color={isUnassigned ? colors.danger : colors.primary}
-              />
-            </View>
-            <View>
-              <Text style={styles.vendorLabel}>Vendedor</Text>
-              <Text style={[
-                styles.vendorName,
-                isUnassigned && { color: colors.danger }
-              ]}>
-                {vendorName || 'Sin asignar'}
-              </Text>
-            </View>
-          </View>
 
-          <TouchableOpacity
-            onPress={(e) => {
-              e.stopPropagation();
-              onAssignVendorPress();
-            }}
-            style={[
-              styles.assignButton,
-              isUnassigned && styles.assignButtonUrgent
-            ]}
-          >
-            <Ionicons
-              name={isUnassigned ? "add-circle-outline" : "sync-outline"}
-              size={16}
-              color={isUnassigned ? colors.white : colors.primary}
-            />
-            <Text style={[
-              styles.assignText,
-              isUnassigned && styles.assignTextUrgent
-            ]}>
-              {isUnassigned ? 'Asignar' : 'Cambiar'}
-            </Text>
-          </TouchableOpacity>
-        </View>
       </View>
     </TouchableOpacity>
   );

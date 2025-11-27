@@ -700,12 +700,12 @@ export const AppProvider = ({ children }) => {
       code,
       date: new Date().toISOString().split('T')[0],
       method: metodoPago,
-      paymentMethod: metodoPago,
       paymentStatus: paymentStatusByMethod[metodoPago] || 'PENDIENTE',
       status: statusByMethod[metodoPago] || 'CREADO',
       total,
       subtotal,
       taxes,
+      clientName: payload.clientName || user.name,
       deliveryInfo: {
         address: payload.address || user.address,
         phone: payload.phone || user.phone,

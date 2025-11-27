@@ -16,6 +16,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import colors from '../../theme/colors';
 import { useAppContext } from '../../context/AppContext';
 import PrimaryButton from '../../components/PrimaryButton';
+import DocumentSelectorModal from '../../components/DocumentSelectorModal';
+import PDFViewerModal from '../../components/PDFViewerModal';
 
 const SupervisorPerfilScreen = ({ navigation }) => {
   const {
@@ -28,6 +30,9 @@ const SupervisorPerfilScreen = ({ navigation }) => {
 
   const [teamModalVisible, setTeamModalVisible] = useState(false);
   const [summaryModalVisible, setSummaryModalVisible] = useState(false);
+  const [docSelectorVisible, setDocSelectorVisible] = useState(false);
+  const [pdfModalVisible, setPdfModalVisible] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState(null);
 
   // Estadísticas del supervisor
   const stats = useMemo(() => {
@@ -72,6 +77,11 @@ const SupervisorPerfilScreen = ({ navigation }) => {
     } else {
       navigation.navigate(screenName);
     }
+  };
+
+  const handleSelectDocument = (docId) => {
+    setSelectedDocument(docId);
+    setPdfModalVisible(true);
   };
 
   return (
@@ -135,13 +145,6 @@ const SupervisorPerfilScreen = ({ navigation }) => {
               title="Datos personales"
               subtitle="Edita tu información personal"
               onPress={() => goToRoot('DatosPersonales')}
-              isLast={false}
-            />
-            <ProfileMenuItem
-              icon="people-outline"
-              title="Mi Equipo"
-              subtitle={`${stats.totalVendors} vendedores activos`}
-              onPress={() => setTeamModalVisible(true)}
               isLast={true}
             />
           </View>
@@ -195,9 +198,9 @@ const SupervisorPerfilScreen = ({ navigation }) => {
             />
             <ProfileMenuItem
               icon="document-text-outline"
-              title="Términos y condiciones"
-              subtitle="Políticas de uso"
-              onPress={() => Alert.alert('Términos', 'Consulta cafrilosa.com/terminos')}
+              title="Documentos Legales"
+              subtitle="Términos, privacidad y consentimiento"
+              onPress={() => setDocSelectorVisible(true)}
               isLast={true}
             />
           </View>
@@ -314,6 +317,20 @@ const SupervisorPerfilScreen = ({ navigation }) => {
           </View>
         </View>
       </Modal>
+
+      {/* Modal de Selector de Documentos */}
+      <DocumentSelectorModal
+        visible={docSelectorVisible}
+        onClose={() => setDocSelectorVisible(false)}
+        onSelectDocument={handleSelectDocument}
+      />
+
+      {/* Modal de Visualización de PDF */}
+      <PDFViewerModal
+        visible={pdfModalVisible}
+        onClose={() => setPdfModalVisible(false)}
+        pdfType={selectedDocument}
+      />
     </View>
   );
 };
