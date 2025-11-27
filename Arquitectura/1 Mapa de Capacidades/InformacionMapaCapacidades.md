@@ -62,6 +62,9 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
     * **Actualizar Conocimientos de Producto** - Informar a la fuerza de ventas sobre nuevos productos, beneficios, cambios de formato o precios.
     * **Capacitar en Técnicas de Venta y Servicio al Cliente** - Entrenar al equipo en habilidades de negociación, cierre de ventas, manejo de objeciones y protocolos de atención.
 
+
+
+
 ---
 
 <img width="595" height="863" alt="image" src="https://github.com/user-attachments/assets/a85a7f3b-0f0f-411e-b05d-1cfce73cd999" />
@@ -79,6 +82,9 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 * **Fidelización de Clientes:**
     * **Mantener Comunicación Continua** - Enviar notificaciones de promociones, lanzamientos, beneficios o estados de cuenta.
     * **Implementar Programas de Beneficios** - Gestionar bonificaciones por volumen de compra, antigüedad o cumplimiento de pago.
+
+
+
 
 ---
 
@@ -102,6 +108,9 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
     * **Generar alertas por stock bajo o vencimientos** - Notificar automáticamente cuando el stock llegue a un punto de reorden o esté por caducar.
     * **Análisis de rotación** - Calcular indicadores de rotación (días de inventario) e identificar productos de bajo movimiento u obsoletos.
 
+
+
+
 ---
 
 <img width="909" height="776" alt="image" src="https://github.com/user-attachments/assets/1cd7046b-736b-417d-b6d1-8f0e7d854955" />
@@ -121,6 +130,9 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 * **Control de Pedidos:**
     * **Seguimiento del Estado del Pedido** - Monitorear y comunicar las etapas del pedido (Recibido, Aprobado, En Preparación, En Ruta, Entregado).
     * **Cierre Administrativo del Pedido** - Confirmar la entrega final y la facturación para completar el ciclo del pedido en el sistema.
+
+
+
 
 ---
 
@@ -142,6 +154,9 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
     * **Reportar Problemas de Entrega** - Documentar en tiempo real incidencias como producto dañado, faltante, rechazo del cliente o dirección incorrecta.
     * **Coordinar Solución** - Gestionar la acción correctiva ante una incidencia (ej. programar reposición, devolución o emitir nota de crédito).
 
+
+
+
 ---
 
 <img width="1028" height="780" alt="image" src="https://github.com/user-attachments/assets/215945bd-8aa6-44bb-b70a-ce985095fae0" />
@@ -162,6 +177,9 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
     * **Evaluar Solicitud de Crédito** - Analizar el historial del cliente y documentos para aprobar, rechazar o modificar una línea de crédito.
     * **Controlar Cumplimiento de Condiciones** - Monitorear el uso del cupo de crédito, plazos de pago y alertar sobre incumplimientos o excesos.
 
+
+
+
 ---
 
 <img width="1068" height="781" alt="image" src="https://github.com/user-attachments/assets/294cae3c-6024-4671-9b75-978ae6e8eef6" />
@@ -180,6 +198,9 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
     * **Analizar Resultados y Retroalimentar al Equipo** - Identificar puntos críticos recurrentes en el servicio y proponer mejoras a las áreas involucradas (Logística, Ventas).
 * **Fidelización Continua:**
     * **Implementar Programas de Retención.** - Diseñar y ejecutar acciones (descuentos especiales, bonos) para premiar la lealtad y recurrencia de los clientes activos.
+
+
+
 
 ---
 
