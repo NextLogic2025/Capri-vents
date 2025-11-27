@@ -1,10 +1,10 @@
-# 📚 Diagrama de Clases — Diccionario
+# Diagrama de Clases de Cafrilosa — Diccionario
 
 Este archivo complementa la matriz de clases con una descripción breve, atributos, y una lista de sus métodos, herencia, y relaciones (asociaciones/dependencias).
 
 ---
 
-### 👤 Empleado
+### Empleado
 Descripción: Representa a un empleado genérico de la organización (base para roles específicos).
 
 | Atributo | Tipo | Descripción |
@@ -19,7 +19,7 @@ Descripción: Representa a un empleado genérico de la organización (base para 
 
 ---
 
-### 💼 Vendedor
+### Vendedor
 Descripción: Empleado responsable de gestionar clientes y pedidos asignados.
 
 | Atributo | Tipo | Descripción |
@@ -33,7 +33,7 @@ Descripción: Empleado responsable de gestionar clientes y pedidos asignados.
 
 ---
 
-### 📈 SupervisorVentas
+###  SupervisorVentas
 Descripción: Supervisa al equipo de ventas, aprueba pedidos, y gestiona reclamaciones.
 
 | Atributo | Tipo | Descripción |
@@ -46,7 +46,7 @@ Descripción: Supervisa al equipo de ventas, aprueba pedidos, y gestiona reclama
 
 ---
 
-### 📦 GerenteAlmacen
+### GerenteAlmacen
 Descripción: Responsable del inventario y despacho desde el almacén.
 
 | Atributo | Tipo | Descripción |
@@ -59,7 +59,7 @@ Descripción: Responsable del inventario y despacho desde el almacén.
 
 ---
 
-### 🚚 Repartidor
+### Repartidor
 Descripción: Empleado encargado de la entrega física de pedidos.
 
 | Atributo | Tipo | Descripción |
@@ -72,7 +72,7 @@ Descripción: Empleado encargado de la entrega física de pedidos.
 
 ---
 
-### 📣 Marketing
+### Marketing
 Descripción: Área/empleado encargado de promociones y campañas.
 
 | Atributo | Tipo | Descripción |
@@ -85,7 +85,7 @@ Descripción: Área/empleado encargado de promociones y campañas.
 
 ---
 
-### 🤝 Cliente
+### Cliente
 Descripción: Persona o empresa que realiza pedidos y consume servicios.
 
 | Atributo | Tipo | Descripción |
@@ -112,7 +112,7 @@ Descripción: Persona o empresa que realiza pedidos y consume servicios.
 
 ---
 
-### 🛒 Pedido
+### Pedido
 Descripción: Representa una orden de compra realizada por un cliente.
 
 | Atributo | Tipo | Descripción |
@@ -137,7 +137,7 @@ Descripción: Representa una orden de compra realizada por un cliente.
 
 ---
 
-### 🍎 Producto
+### Producto
 Descripción: Ítem vendible con atributos de trazabilidad y conservación.
 
 | Atributo | Tipo | Descripción |
@@ -158,7 +158,7 @@ Descripción: Ítem vendible con atributos de trazabilidad y conservación.
 
 ---
 
-### 🗺️ Ruta
+### Ruta
 Descripción: Ruta de reparto que agrupa pedidos y define ventanas horarias.
 
 | Atributo | Tipo | Descripción |
@@ -175,7 +175,7 @@ Descripción: Ruta de reparto que agrupa pedidos y define ventanas horarias.
 
 ---
 
-### 🚛 Vehiculo
+### Vehiculo
 Descripción: Medio de transporte para entregas.
 
 | Atributo | Tipo | Descripción |
@@ -192,7 +192,7 @@ Descripción: Medio de transporte para entregas.
 
 ---
 
-### 🧾 Factura
+### Factura
 Descripción: Documento fiscal asociado a un pedido.
 
 | Atributo | Tipo | Descripción |
@@ -211,7 +211,7 @@ Descripción: Documento fiscal asociado a un pedido.
 
 ---
 
-### 📄 GuiaDespacho
+### GuiaDespacho
 Descripción: Documento de despacho que acompaña entregas.
 
 | Atributo | Tipo | Descripción |
@@ -226,7 +226,7 @@ Descripción: Documento de despacho que acompaña entregas.
 
 ---
 
-### 🎁 Beneficio
+### Beneficio
 Descripción: Beneficio o incentivo aplicable a clientes o pedidos.
 
 | Atributo | Tipo | Descripción |
@@ -241,7 +241,7 @@ Descripción: Beneficio o incentivo aplicable a clientes o pedidos.
 
 ---
 
-### ✨ Promoción
+### Promoción
 Descripción: Promoción comercial aplicada a productos o clientes.
 
 | Atributo | Tipo | Descripción |
@@ -257,7 +257,7 @@ Descripción: Promoción comercial aplicada a productos o clientes.
 
 ---
 
-### 💳 Pago
+### Pago
 Descripción: Información sobre el pago asociado a un pedido.
 
 | Atributo | Tipo | Descripción |
@@ -272,7 +272,7 @@ Descripción: Información sobre el pago asociado a un pedido.
 
 ---
 
-### 🏦 LineaCredito
+### LineaCredito
 Descripción: Límite de crédito y condiciones asociadas a un cliente.
 
 | Atributo | Tipo | Descripción |
@@ -287,7 +287,7 @@ Descripción: Límite de crédito y condiciones asociadas a un cliente.
 
 ---
 
-### 📊 Inventario
+### Inventario
 Descripción: Registro de stock y niveles críticos por producto.
 
 | Atributo | Tipo | Descripción |
@@ -303,7 +303,7 @@ Descripción: Registro de stock y niveles críticos por producto.
 
 ---
 
-### 🔄 MovimientoInventario
+### MovimientoInventario
 Descripción: Registro de entradas/salidas del inventario.
 
 | Atributo | Tipo | Descripción |
@@ -318,7 +318,7 @@ Descripción: Registro de entradas/salidas del inventario.
 
 ---
 
-### 🛑 Incidencia
+### Incidencia
 Descripción: Evento que indica una anomalía o problema (entrega, calidad, etc.).
 
 | Atributo | Tipo | Descripción |
@@ -334,7 +334,7 @@ Descripción: Evento que indica una anomalía o problema (entrega, calidad, etc.
 
 ---
 
-### 💢 Reclamo
+### Reclamo
 Descripción: Petición formal del cliente por un problema o devolución.
 
 | Atributo | Tipo | Descripción |
@@ -348,5 +348,3 @@ Descripción: Petición formal del cliente por un problema o devolución.
 * **Relaciones:** Cliente, Pedido
 
 ---
-
-*Si tienes algún diagrama de clases visual, podría describirlo o generar una etiqueta de imagen para complementarlo.*
