@@ -7,18 +7,15 @@
 ## 📌 Tabla de contenido
 - [¿Qué es un Mapa de Capacidades?](#qué-es-un-mapa-de-capacidades)
 - [Estructura del Mapa](#estructura-del-mapa)
-- [Mapa de Capacidades (Imagen)](#mapa-de-capacidades-imagen)
 - [Módulos y Subcapacidades](#módulos-y-subcapacidades)
   - [1. Planificación Comercial](#1-planificación-comercial)
   - [2. Gestión de Clientes](#2-gestión-de-clientes)
-  - [3. Gestión de Entregas](#3-gestión-de-entregas)
+  - [3. Gestión de Productos](#3-gestión-de-productos)
   - [4. Gestión de Pedidos](#4-gestión-de-pedidos)
-  - [5. Gestión de Cobros y Créditos](#5-gestión-de-cobros-y-créditos)
-  - [6. Postventa y Servicio al Cliente](#6-postventa-y-servicio-al-cliente)
-  - [7. Control y Análisis Comercial](#7-control-y-análisis-comercial)
-  - [8. Gestión de Productos](#8-gestión-de-productos)
-
-
+  - [5. Gestión de Entregas](#5-gestión-de-entregas)
+  - [6. Gestión de Cobros y Créditos](#6-gestión-de-cobros-y-créditos)
+  - [7. Postventa y Servicio al Cliente](#7-postventa-y-servicio-al-cliente)
+  - [8. Control y Análisis Comercial](#8-control-y-análisis-comercial)
 
 ---
 
@@ -32,9 +29,7 @@ En el contexto de la aplicación de ventas de Cafrilosa, un mapa de capacidades 
 Un mapa de capacidades generalmente se divide en módulos o áreas de alto nivel (Capacidades Nivel 1) que representan conjuntos de funcionalidades interrelacionadas. Cada módulo tiene una serie de subfunciones o componentes (Capacidades Nivel 2 y 3) que especifican en mayor detalle las capacidades que el sistema debe proporcionar. 
 Estos módulos suelen estar organizados de manera jerárquica y permiten a los desarrolladores, diseñadores y stakeholders entender el alcance de las funcionalidades de la aplicación. Este mapa para Cafrilosa se organiza en 8 módulos principales.
 
-
 ---
-
 
 # Mapa de Capacidades del Sistema  
 **ERP Comercial - Arquitectura por Capas (3 Niveles)**
@@ -48,9 +43,7 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 ## Descripción de los Módulos
 
-
-<img width="1911" height="2363" alt="image" src="https://github.com/user-attachments/assets/3a765e48-d908-401e-af70-29da1299b7f5" />
-
+<img width="636" height="1564" alt="image" src="https://github.com/user-attachments/assets/9d615397-b21b-40b0-a03d-850a2bfea842" />
 
 ### 1. Planificación Comercial
 
@@ -69,6 +62,11 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
     * **Actualizar Conocimientos de Producto** - Informar a la fuerza de ventas sobre nuevos productos, beneficios, cambios de formato o precios.
     * **Capacitar en Técnicas de Venta y Servicio al Cliente** - Entrenar al equipo en habilidades de negociación, cierre de ventas, manejo de objeciones y protocolos de atención.
 
+---
+
+<img width="595" height="863" alt="image" src="https://github.com/user-attachments/assets/a85a7f3b-0f0f-411e-b05d-1cfce73cd999" />
+
+
 ### 2. Gestión de Clientes
 
 **Objetivo:** Administrar el ciclo de vida completo del cliente, desde su captación hasta su retención.
@@ -82,27 +80,27 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
     * **Mantener Comunicación Continua** - Enviar notificaciones de promociones, lanzamientos, beneficios o estados de cuenta.
     * **Implementar Programas de Beneficios** - Gestionar bonificaciones por volumen de compra, antigüedad o cumplimiento de pago.
 
-
-
 ---
-<img width="1989" height="789" alt="image" src="https://github.com/user-attachments/assets/71f172f5-0299-4b15-85c1-8ddd67f3f3e8" />
 
+### 3. Gestión de Productos
 
-### 3. Gestión de Entregas
-
-**Objetivo:** Asegurar que los pedidos preparados sean despachados y entregados al cliente de forma eficiente y puntual.
+**Objetivo:** Administrar el catálogo de productos y asegurar la disponibilidad y trazabilidad del stock para satisfacer la demanda.
 
 **Capacidades:**
 
-* **Preparación del Pedido:**
-    * **Verificación de Producto y Lote** - Escanear y validar que los productos, lotes y fechas de vencimiento del picking coincidan con el pedido.
-    * **Embalaje y Documentación** - Empacar los productos (manteniendo cadena de frío) y generar las guías de despacho y etiquetas de ruta.
-* **Distribución y Entrega:**
-    * **Cargar y Transportar Productos** - Asegurar la carga en el vehículo, optimizar la ruta y mantener las condiciones de seguridad y refrigeración.
-    * **Confirmar Entrega al Cliente** - Registrar en la app móvil la entrega exitosa (o parcial) capturando firma, foto u observaciones del cliente.
-* **Gestión de Incidencias:**
-    * **Reportar Problemas de Entrega** - Documentar en tiempo real incidencias como producto dañado, faltante, rechazo del cliente o dirección incorrecta.
-    * **Coordinar Solución** - Gestionar la acción correctiva ante una incidencia (ej. programar reposición, devolución o emitir nota de crédito).
+* **Registro y Mantenimiento:**
+    * **Registro de Producto** - Crear nuevos productos (SKUs) en el sistema con sus datos maestros (descripción, precio base, unidad de medida, fotos).
+    * **Actualización de datos** - Modificar atributos existentes de un producto (ej. cambiar precio, descripción, estado 'activo'/'inactivo').
+* **Control de Inventario:**
+    * **Gestionar stock entradas/salidas** - Registrar movimientos de inventario (compras, ventas, mermas, ajustes) actualizando el stock disponible en tiempo real.
+    * **Asignar y rastrear lotes** - Vincular productos a un lote específico desde su recepción para controlar su trazabilidad y fecha de vencimiento.
+    * **Monitorear niveles de inventario** - Consultar la disponibilidad de stock en tiempo real y definir niveles mínimos y máximos de seguridad.
+* **Monitoreo y Alertas:**
+    * **Verificar fechas de vencimiento** - Monitorear productos próximos a vencer para gestionar su rotación prioritaria (FEFO - First Expires, First Out).
+    * **Generar alertas por stock bajo o vencimientos** - Notificar automáticamente cuando el stock llegue a un punto de reorden o esté por caducar.
+    * **Análisis de rotación** - Calcular indicadores de rotación (días de inventario) e identificar productos de bajo movimiento u obsoletos.
+
+---
 
 ### 4. Gestión de Pedidos
 
@@ -120,13 +118,27 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
     * **Seguimiento del Estado del Pedido** - Monitorear y comunicar las etapas del pedido (Recibido, Aprobado, En Preparación, En Ruta, Entregado).
     * **Cierre Administrativo del Pedido** - Confirmar la entrega final y la facturación para completar el ciclo del pedido en el sistema.
 
+---
 
+### 5. Gestión de Entregas
+
+**Objetivo:** Asegurar que los pedidos preparados sean despachados y entregados al cliente de forma eficiente y puntual.
+
+**Capacidades:**
+
+* **Preparación del Pedido:**
+    * **Verificación de Producto y Lote** - Escanear y validar que los productos, lotes y fechas de vencimiento del picking coincidan con el pedido.
+    * **Embalaje y Documentación** - Empacar los productos (manteniendo cadena de frío) y generar las guías de despacho y etiquetas de ruta.
+* **Distribución y Entrega:**
+    * **Cargar y Transportar Productos** - Asegurar la carga en el vehículo, optimizar la ruta y mantener las condiciones de seguridad y refrigeración.
+    * **Confirmar Entrega al Cliente** - Registrar en la app móvil la entrega exitosa (o parcial) capturando firma, foto u observaciones del cliente.
+* **Gestión de Incidencias:**
+    * **Reportar Problemas de Entrega** - Documentar en tiempo real incidencias como producto dañado, faltante, rechazo del cliente o dirección incorrecta.
+    * **Coordinar Solución** - Gestionar la acción correctiva ante una incidencia (ej. programar reposición, devolución o emitir nota de crédito).
 
 ---
-<img width="2169" height="789" alt="image" src="https://github.com/user-attachments/assets/62a19f98-233a-4fef-8b03-4f1140cd19a4" />
 
-
-### 5. Gestión de Cobros y Créditos
+### 6. Gestión de Cobros y Créditos
 
 **Objetivo:** Administrar la salud financiera de las transacciones, gestionando las líneas de crédito y asegurando el recaudo de la cartera.
 
@@ -142,7 +154,9 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
     * **Evaluar Solicitud de Crédito** - Analizar el historial del cliente y documentos para aprobar, rechazar o modificar una línea de crédito.
     * **Controlar Cumplimiento de Condiciones** - Monitorear el uso del cupo de crédito, plazos de pago y alertar sobre incumplimientos o excesos.
 
-### 6. Postventa y Servicio al Cliente
+---
+
+### 7. Postventa y Servicio al Cliente
 
 **Objetivo:** Brindar soporte al cliente después de la venta para resolver problemas y medir su nivel de satisfacción.
 
@@ -157,13 +171,9 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 * **Fidelización Continua:**
     * **Implementar Programas de Retención.** - Diseñar y ejecutar acciones (descuentos especiales, bonos) para premiar la lealtad y recurrencia de los clientes activos.
 
-
-
 ---
-<img width="2181" height="1461" alt="image" src="https://github.com/user-attachments/assets/1187ca72-749d-4fc3-9579-b78cef19d5ce" />
 
-
-### 7. Control y Análisis Comercial
+### 8. Control y Análisis Comercial
 
 **Objetivo:** Proveer la inteligencia de negocio necesaria para la toma de decisiones estratégicas, midiendo el rendimiento de la operación.
 
@@ -178,23 +188,3 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 * **Reportes Gerenciales:**
     * **Elaborar Informes de Resultados** - Consolidar KPIs en dashboards visuales (ventas por zona, rentabilidad por cliente, etc.) para la gerencia.
     * **Tomar Decisiones Estratégicas** - Usar los informes para redefinir metas, ajustar precios, o enfocar esfuerzos en zonas/clientes de alto potencial.
-
-### 8. Gestión de Productos
-
-**Objetivo:** Administrar el catálogo de productos y asegurar la disponibilidad y trazabilidad del stock para satisfacer la demanda.
-
-**Capacidades:**
-
-* **Registro y Mantenimiento:**
-    * **Registro de Producto** - Crear nuevos productos (SKUs) en el sistema con sus datos maestros (descripción, precio base, unidad de medida, fotos).
-    * **Actualización de datos** - Modificar atributos existentes de un producto (ej. cambiar precio, descripción, estado 'activo'/'inactivo').
-* **Control de Inventario:**
-    * **Gestionar stock entradas/salidas** - Registrar movimientos de inventario (compras, ventas, mermas, ajustes) actualizando el stock disponible en tiempo real.
-    * **Asignar y rastrear lotes** - Vincular productos a un lote específico desde su recepción para controlar su trazabilidad y fecha de vencimiento.
-    * **Monitorear niveles de inventario** - Consultar la disponibilidad de stock en tiempo real y definir niveles mínimos y máximos de seguridad.
-* **Monitoreo y Alertas:**
-    * **Verificar fechas de vencimiento** - Monitorear productos próximos a vencer para gestionar su rotación prioritaria (FEFO - First Expires, First Out).
-    * **Generar alertas por stock bajo o vencimientos** - Notificar automáticamente cuando el stock llegue a un punto de reorden o esté por caducar.
-    * **Análisis de rotación** - Calcular indicadores de rotación (días de inventario) e identificar productos de bajo movimiento u obsoletos.
- 
----
