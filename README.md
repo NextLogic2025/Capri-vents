@@ -63,8 +63,8 @@ Nuestra pasión por la tecnología y la innovación nos motiva a ofrecer product
 # Proyecto: Aplicación de ventas en linea - Cafrilosa
 
 
-## Descripción del reto
-El reto consiste en desarrollar una aplicación de ventas en línea para Cafrilosa, que permita gestionar de forma eficiente los pedidos, clientes, inventarios y promociones de sus productos de embutidos.
+## Descripción del proyecto
+El proyecto consiste en desarrollar una aplicación de ventas en línea para Cafrilosa, que permita gestionar de forma eficiente los pedidos, clientes, inventarios y promociones de sus productos de embutidos.
 El sistema busca optimizar los procesos comerciales y operativos, mejorando la atención al cliente y fortaleciendo la transformación digital de la empresa.
 
 ## Problemática
