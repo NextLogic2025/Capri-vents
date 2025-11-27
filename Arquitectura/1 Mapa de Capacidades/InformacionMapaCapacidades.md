@@ -82,6 +82,8 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 ---
 
+<img width="1068" height="1461" alt="productos" src="https://github.com/user-attachments/assets/fbeb1780-31bb-414c-8b97-5a87805c9e69" />
+
 ### 3. Gestión de Productos
 
 **Objetivo:** Administrar el catálogo de productos y asegurar la disponibilidad y trazabilidad del stock para satisfacer la demanda.
@@ -102,6 +104,8 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 ---
 
+<img width="909" height="776" alt="image" src="https://github.com/user-attachments/assets/1cd7046b-736b-417d-b6d1-8f0e7d854955" />
+
 ### 4. Gestión de Pedidos
 
 **Objetivo:** Manejar el proceso de captura, validación y procesamiento de las órdenes de compra de manera eficiente.
@@ -119,6 +123,8 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
     * **Cierre Administrativo del Pedido** - Confirmar la entrega final y la facturación para completar el ciclo del pedido en el sistema.
 
 ---
+
+<img width="961" height="761" alt="image" src="https://github.com/user-attachments/assets/3646440e-c236-42b6-8a5f-41e424c34875" />
 
 ### 5. Gestión de Entregas
 
@@ -138,6 +144,8 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 ---
 
+<img width="1028" height="780" alt="image" src="https://github.com/user-attachments/assets/215945bd-8aa6-44bb-b70a-ce985095fae0" />
+
 ### 6. Gestión de Cobros y Créditos
 
 **Objetivo:** Administrar la salud financiera de las transacciones, gestionando las líneas de crédito y asegurando el recaudo de la cartera.
@@ -156,6 +164,8 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 ---
 
+<img width="1068" height="781" alt="image" src="https://github.com/user-attachments/assets/294cae3c-6024-4671-9b75-978ae6e8eef6" />
+
 ### 7. Postventa y Servicio al Cliente
 
 **Objetivo:** Brindar soporte al cliente después de la venta para resolver problemas y medir su nivel de satisfacción.
@@ -172,6 +182,8 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
     * **Implementar Programas de Retención.** - Diseñar y ejecutar acciones (descuentos especiales, bonos) para premiar la lealtad y recurrencia de los clientes activos.
 
 ---
+
+<img width="1063" height="735" alt="image" src="https://github.com/user-attachments/assets/4e37c54c-8fd2-4641-a92f-9307b41fb598" />
 
 ### 8. Control y Análisis Comercial
 
