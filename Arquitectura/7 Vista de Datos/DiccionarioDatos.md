@@ -18,269 +18,209 @@ Entre sus beneficios principales destacan:
 **Trazabilidad y gobernanza**: fortalece los procesos definidos por DAMA-DMBOK, facilitando la gestión del ciclo de vida de los datos.
 
 En conjunto, el diccionario de datos se convierte en un elemento esencial para asegurar que el sistema funcione de manera ordenada, eficiente y alineada con las mejores prácticas internacionales de gestión de datos.
+## 1. Tabla: usuarios
+| Campo            | Tipo              | Descripción                                      |
+|------------------|-------------------|--------------------------------------------------|
+| id               | UUID (PK)         | Identificador único del usuario                  |
+| nombre_usuario   | TEXT, único       | Login del usuario                                |
+| contrasena       | TEXT              | Hash de contraseña (bcrypt)                      |
+| nombre_completo  | TEXT              | Nombre completo                                  |
+| rol              | TEXT              | supervisor / vendedor / repartidor / bodeguero / cliente |
+| activo           | BOOLEAN           | Estado de la cuenta                              |
+| created_at       | TIMESTAMPTZ       | Fecha de creación                                |
+| updated_at       | TIMESTAMPTZ       | Última actualización                             |
 
-## 1. Tabla: empleados
+## 2. Tabla: ciudades
+| Campo   | Tipo        | Descripción                          |
+|---------|-------------|--------------------------------------|
+| id      | UUID (PK)   | Identificador único                  |
+| nombre  | TEXT        | Nombre de la ciudad                  |
+| region  | TEXT        | Región o provincia                   |
 
-| Campo       | Tipo        | Descripción                       |
-| ----------- | ----------- | --------------------------------- |
-| id_empleado | UUID (PK)   | Identificador único del empleado. |
-| nombre      | TEXT        | Nombre completo del empleado.     |
-| email       | TEXT, único | Correo institucional.             |
-| telefono    | TEXT        | Teléfono de contacto.             |
-| rol         | TEXT        | Rol asignado en el sistema.       |
+## 3. Tabla: zonas
+| Campo           | Tipo                    | Descripción                              |
+|-----------------|-------------------------|------------------------------------------|
+| id              | UUID (PK)               | Identificador único                      |
+| codigo          | TEXT, único             | Código interno (ej: ZN-001)              |
+| nombre          | TEXT                    | Nombre descriptivo                       |
+| poligono        | GEOGRAPHY(POLYGON,4326) | Área geográfica (PostGIS)                |
+| activa          | BOOLEAN                 | Estado de la zona                        |
+| fecha_version   | DATE                    | Fecha de versión del polígono            |
+| ciudad_id       | UUID (FK → ciudades)    | Ciudad a la que pertenece                |
 
-## 2. Tabla: roles
+## 4. Tabla: asignacion_zonas
+| Campo        | Tipo              | Descripción                              |
+|--------------|-------------------|------------------------------------------|
+| zona_id      | UUID (PK, FK → zonas)    | Zona asignada (exclusiva)                |
+| vendedor_id  | UUID (FK → usuarios)     | Vendedor asignado (relación 1:1)         |
+| desde        | DATE                     | Fecha desde cuando está asignada         |
 
-| Campo       | Tipo      | Descripción                  |
-| ----------- | --------- | ---------------------------- |
-| id_rol      | UUID (PK) | Identificador único del rol. |
-| nombre      | TEXT      | Nombre del rol.              |
-| descripcion | TEXT      | Descripción del rol.         |
-
-## 3. Tabla: permisos 
-
-| Campo       | Tipo      | Descripción                      |
-| ----------- | --------- | -------------------------------- |
-| id_permiso  | UUID (PK) | Identificador único del permiso. |
-| nombre      | TEXT      | Nombre del permiso.              |
-| descripcion | TEXT      | Detalle del permiso.             |
-
-## 4. Tabla: roles_permisos
-   
-| Campo      | Tipo                            | Descripción                |
-| ---------- | ------------------------------- | -------------------------- |
-| id_rol     | UUID (FK → roles.id_rol)        | Rol que recibe el permiso. |
-| id_permiso | UUID (FK → permisos.id_permiso) | Permiso asignado.          |
-
-## 5. Tabla: auditoria
-
-| Campo        | Tipo      | Descripción                              |
-| ------------ | --------- | ---------------------------------------- |
-| id_auditoria | UUID (PK) | Identificador del registro de auditoría. |
-| tabla        | TEXT      | Nombre de la tabla afectada.             |
-| operacion    | TEXT      | INSERT, UPDATE o DELETE.                 |
-| registro_id  | UUID      | Identificador del registro afectado.     |
-| usuario      | TEXT      | Usuario que realizó la acción.           |
-| fecha        | TIMESTAMP | Fecha y hora del evento.                 |
-
+## 5. Tabla: rutas_planificadas
+| Campo          | Tipo           | Descripción                              |
+|----------------|----------------|------------------------------------------|
+| id             | UUID (PK)      | Identificador único                      |
+| zona_id        | UUID (FK → zonas) | Zona base de la ruta                  |
+| dia_semana     | INT (1-7)      | Día de la semana (1=Lunes)               |
+| frecuencia     | TEXT           | semanal / quincenal / mensual            |
+| activo         | BOOLEAN        | Ruta activa                              |
 
 ## 6. Tabla: clientes
+| Campo          | Tipo                    | Descripción                              |
+|----------------|-------------------------|------------------------------------------|
+| id             | UUID (PK)               | Identificador único                      |
+| ruc            | TEXT, único             | RUC o cédula                             |
+| razon_social   | TEXT                    | Nombre del cliente                       |
+| ubicacion      | GEOGRAPHY(POINT,4326)   | Coordenadas GPS                          |
+| tipo_cliente   | TEXT                    | mayorista / minorista / autoservicio     |
+| estado         | TEXT                    | activo / inactivo / bloqueado            |
+| zona_id        | UUID (FK → zonas)       | Zona geográfica asignada                 |
+| vendedor_id    | UUID (FK → usuarios)    | Vendedor responsable                     |
+| created_at     | TIMESTAMPTZ             | Fecha de creación                        |
 
-| Campo                | Tipo      | Descripción                    |
-| -------------------- | --------- | ------------------------------ |
-| id_cliente           | UUID (PK) | Identificador del cliente.     |
-| nombre               | TEXT      | Nombre comercial o personal.   |
-| cedula_ruc           | TEXT      | Identificación tributaria.     |
-| razon_social         | TEXT      | Nombre jurídico.               |
-| direccion            | TEXT      | Dirección principal.           |
-| telefono             | TEXT      | Teléfono de contacto.          |
-| correo               | TEXT      | Correo electrónico.            |
-| categoria_tamano     | TEXT      | Pequeño, Mediano o Grande.     |
-| categoria_frecuencia | TEXT      | Ocasional o Recurrente.        |
-| estado               | TEXT      | Activo, Inactivo, Moroso, etc. |
-| credito_disponible   | NUMERIC   | Monto disponible del crédito.  |
-| score_cumplimiento   | NUMERIC   | Puntaje interno del cliente.   |
-| nps_score            | NUMERIC   | Net Promoter Score.            |
+## 7. Tabla: lineas_credito
+| Campo            | Tipo           | Descripción                              |
+|------------------|----------------|------------------------------------------|
+| cliente_id       | UUID (PK, FK → clientes) | Cliente (relación 1:1)                 |
+| cupo_total       | DECIMAL(12,2)  | Cupo máximo aprobado                     |
+| saldo_utilizado  | DECIMAL(12,2)  | Cupo usado                               |
+| saldo_vencido    | DECIMAL(12,2)  | Saldo vencido                            |
+| dias_gracia      | INT            | Días de gracia permitidos                |
+| bloqueado        | BOOLEAN        | Bloqueado por mora                       |
 
+## 8. Tabla: productos
+| Campo                | Tipo           | Descripción                              |
+|----------------------|----------------|------------------------------------------|
+| id                   | UUID (PK)      | Identificador único                      |
+| codigo               | TEXT, único    | Código interno del producto              |
+| nombre               | TEXT           | Nombre comercial                         |
+| presentacion         | TEXT           | Formato (caja, bolsa, etc.)              |
+| temperatura_requerida| DECIMAL(5,2)   | Temperatura ideal                        |
+| es_perecible         | BOOLEAN        | Requiere cadena de frío                  |
+| peso_kg              | DECIMAL(8,3)   | Peso promedio por unidad                 |
+| activo               | BOOLEAN        | Producto activo                          |
 
-## 7. Tabla: productos
+## 9. Tabla: kardex
+| Campo             | Tipo           | Descripción                              |
+|-------------------|----------------|------------------------------------------|
+| producto_id       | UUID (PK, FK → productos) | Producto (1:1)                        |
+| stock_fisico      | INT            | Stock real en bodega                     |
+| stock_reservado   | INT            | Reservado por pedidos                    |
+| stock_mermas      | INT            | Mermas acumuladas                        |
 
-| Campo                  | Tipo      | Descripción                           |
-| ---------------------- | --------- | ------------------------------------- |
-| id_producto            | UUID (PK) | Identificador del producto.           |
-| codigo                 | TEXT      | Código interno único.                 |
-| nombre                 | TEXT      | Nombre del producto.                  |
-| lote                   | TEXT      | Lote de fabricación.                  |
-| fecha_vencimiento      | DATE      | Fecha de caducidad.                   |
-| temperatura_requerida  | NUMERIC   | Temperatura óptima.                   |
-| condicion_conservacion | TEXT      | Condición de almacenamiento.          |
-| peso_unitario          | NUMERIC   | Peso del producto.                    |
-| volumen_unitario       | NUMERIC   | Volumen del producto.                 |
-| margen_neto            | NUMERIC   | Margen de utilidad.                   |
-| indice_rotacion        | NUMERIC   | Frecuencia de rotación de inventario. |
+## 10. Tabla: movimientos_inventario
+| Campo        | Tipo           | Descripción                              |
+|--------------|----------------|------------------------------------------|
+| id           | UUID (PK)      | Identificador único                      |
+| producto_id  | UUID (FK → productos) | Producto afectado                   |
+| tipo         | TEXT           | entrada / salida / ajuste / merma        |
+| cantidad     | INT            | Cantidad (+ o -)                         |
+| motivo       | TEXT           | Razón del movimiento                     |
+| pedido_id    | UUID           | Pedido relacionado (opcional)            |
 
+## 11. Tabla: pedidos
+| Campo              | Tipo                    | Descripción                              |
+|--------------------|-------------------------|------------------------------------------|
+| id                 | UUID (PK)               | Identificador único                      |
+| numero_pedido      | TEXT, único             | Número secuencial                        |
+| cliente_id         | UUID (FK → clientes)    | Cliente solicitante                      |
+| vendedor_id        | UUID (FK → usuarios)    | Vendedor que registra                    |
+| fecha_creacion     | TIMESTAMPTZ             | Fecha y hora del pedido                  |
+| ubicacion_venta    | GEOGRAPHY(POINT,4326)   | GPS donde se tomó                        |
+| estado             | TEXT                    | borrador / confirmado / entregado / etc |
+| total              | DECIMAL(12,2)           | Total monetario                          |
+| peso_total         | DECIMAL(10,3)           | Peso total en kg                         |
+| factura_id         | UUID                    | Factura generada                         |
+| lote_despacho_id   | UUID                    | Lote de entrega                          |
 
-## 8. Tabla: inventario
+## 12. Tabla: detalles_pedido
+| Campo           | Tipo           | Descripción                              |
+|-----------------|----------------|------------------------------------------|
+| id              | UUID (PK)      | Identificador único                      |
+| pedido_id       | UUID (FK → pedidos)   | Pedido padre                      |
+| producto_id     | UUID (FK → productos) | Producto vendido                  |
+| cantidad        | INT            | Cantidad solicitada                      |
+| precio_unitario | DECIMAL(12,2)  | Precio aplicado                          |
+| subtotal        | DECIMAL(12,2)  | cantidad × precio (calculado)            |
 
-| Campo           | Tipo                              | Descripción                      |
-| --------------- | --------------------------------- | -------------------------------- |
-| id_inventario   | UUID (PK)                         | Identificador del inventario.    |
-| id_producto     | UUID (FK → productos.id_producto) | Producto controlado.             |
-| stock_actual    | INT                               | Cantidad disponible.             |
-| umbral_min      | INT                               | Mínimo permitido.                |
-| umbral_max      | INT                               | Máximo permitido.                |
-| indice_rotacion | NUMERIC                           | Rotación histórica del producto. |
+## 13. Tabla: vehiculos
+| Campo         | Tipo           | Descripción                              |
+|---------------|----------------|------------------------------------------|
+| id            | UUID (PK)      | Identificador único                      |
+| placa         | TEXT, único    | Placa del vehículo                       |
+| capacidad_kg  | DECIMAL(8,2)   | Capacidad máxima                         |
+| cadena_frio   | BOOLEAN        | Tiene refrigeración                      |
+| activo        | BOOLEAN        | Vehículo disponible                      |
 
+## 14. Tabla: lotes_despacho
+| Campo             | Tipo           | Descripción                              |
+|-------------------|----------------|------------------------------------------|
+| id                | UUID (PK)      | Identificador único                      |
+| numero_manifiesto | TEXT, único    | Número del manifiesto                    |
+| repartidor_id     | UUID (FK → usuarios) | Repartidor asignado                |
+| vehiculo_id       | UUID (FK → vehiculos) | Vehículo usado                     |
+| fecha             | DATE           | Fecha del despacho                       |
+| hora_salida       | TIME           | Hora de salida                           |
+| estado            | TEXT           | programado / en_ruta / finalizado        |
 
-## 9. Tabla: movimientos_inventario
+## 15. Tabla: entregas
+| Campo           | Tipo           | Descripción                              |
+|-----------------|----------------|------------------------------------------|
+| pedido_id       | UUID (PK, FK → pedidos) | Pedido entregado                 |
+| hora_llegada    | TIMESTAMPTZ    | Hora real de entrega                     |
+| estado          | TEXT           | entregado / fallido / reagendado         |
+| foto_evidencia  | TEXT           | URL de foto (Storage)                    |
+| firma_cliente   | TEXT           | URL de firma (Storage)                   |
 
-| Campo         | Tipo                              | Descripción                   |
-| ------------- | --------------------------------- | ----------------------------- |
-| id_movimiento | UUID (PK)                         | Identificador del movimiento. |
-| id_producto   | UUID (FK → productos.id_producto) | Producto afectado.            |
-| tipo          | TEXT                              | Entrada o Salida.             |
-| cantidad      | INT                               | Cantidad del movimiento.      |
-| fecha         | TIMESTAMP                         | Fecha del movimiento.         |
+## 16. Tabla: facturas
+| Campo           | Tipo           | Descripción                              |
+|-----------------|----------------|------------------------------------------|
+| id              | UUID (PK)      | Identificador único                      |
+| pedido_id       | UUID (UK, FK → pedidos) | Pedido facturado (1:1)           |
+| folio_fiscal    | TEXT, único    | Número de factura SRI                    |
+| fecha_emision   | DATE           | Fecha de emisión                         |
+| estado_sri      | TEXT           | autorizada / rechazada / pendiente       |
 
+## 17. Tabla: pagos
+| Campo           | Tipo           | Descripción                              |
+|-----------------|----------------|------------------------------------------|
+| id              | UUID (PK)      | Identificador único                      |
+| factura_id      | UUID           | Factura pagada                           |
+| monto           | DECIMAL(12,2)  | Monto del pago                           |
+| forma_pago      | TEXT           | efectivo / transferencia / tarjeta       |
+| foto_comprobante| TEXT           | URL del comprobante                      |
 
-## 10. Tabla: pedidos
+## 18. Tabla: cierres_caja
+| Campo             | Tipo           | Descripción                              |
+|-------------------|----------------|------------------------------------------|
+| id                | UUID (PK)      | Identificador único                      |
+| vendedor_id       | UUID (FK → usuarios) | Vendedor que cierra                |
+| fecha             | DATE           | Fecha del cierre                         |
+| total_sistema     | DECIMAL(12,2)  | Total calculado por sistema              |
+| total_declarado   | DECIMAL(12,2)  | Total contado por vendedor               |
+| diferencia        | DECIMAL(12,2)  | Diferencia (calculada)                   |
 
-| Campo              | Tipo                            | Descripción                           |
-| ------------------ | ------------------------------- | ------------------------------------- |
-| id_pedido          | UUID (PK)                       | Identificador del pedido.             |
-| numero             | TEXT                            | Número interno único.                 |
-| id_cliente         | UUID (FK → clientes.id_cliente) | Cliente que realiza el pedido.        |
-| fecha_entrega      | DATE                            | Fecha programada de entrega.          |
-| nivel_urgencia     | TEXT                            | Normal, Urgente.                      |
-| precio_total       | NUMERIC                         | Total sin descuentos.                 |
-| descuento_aplicado | NUMERIC                         | Descuento otorgado.                   |
-| estado             | TEXT                            | Aprobado, Programado, Entregado, etc. |
-| direccion_envio    | TEXT                            | Dirección de entrega.                 |
-| log                | TEXT                            | Coordenada longitud.                  |
-| lat                | TEXT                            | Coordenada latitud.                   |
-| peso_total         | NUMERIC                         | Peso consolidado.                     |
-| volumen_total      | NUMERIC                         | Volumen consolidado.                  |
+## 19. Tabla: tickets_incidencia
+| Campo      | Tipo           | Descripción                              |
+|------------|----------------|------------------------------------------|
+| id         | UUID (PK)      | Identificador único                      |
+| cliente_id | UUID (FK → clientes) | Cliente que reporta                 |
+| tipo       | TEXT           | falla_producto / demora / facturación    |
+| estado     | TEXT           | nuevo / en_proceso / resuelto            |
 
+## 20. Tabla: solicitudes_devolucion
+| Campo         | Tipo           | Descripción                              |
+|---------------|----------------|------------------------------------------|
+| id            | UUID (PK)      | Identificador único                      |
+| pedido_id     | UUID           | Pedido relacionado                       |
+| cliente_id    | UUID (FK → clientes) | Cliente solicitante                 |
+| motivo        | TEXT           | Motivo de la devolución                  |
+| estado        | TEXT           | pendiente / aprobada / rechazada         |
 
-## 11. Tabla: pedidos_productos
-
-| Campo       | Tipo                              | Descripción            |
-| ----------- | --------------------------------- | ---------------------- |
-| id_pedido   | UUID (FK → pedidos.id_pedido)     | Pedido asociado.       |
-| id_producto | UUID (FK → productos.id_producto) | Producto incluido.     |
-| cantidad    | INT                               | Cantidad del producto. |
-
-## 12. Tabla: pagos
-
-| Campo      | Tipo                          | Descripción                               |
-| ---------- | ----------------------------- | ----------------------------------------- |
-| id_pago    | UUID (PK)                     | Identificador del pago.                   |
-| id_pedido  | UUID (FK → pedidos.id_pedido) | Pedido pagado.                            |
-| metodo     | TEXT                          | Transferencia, Efectivo, Débito, Crédito. |
-| estado     | TEXT                          | Pendiente, Procesado, Fallido.            |
-| monto      | NUMERIC                       | Monto pagado.                             |
-| fecha_pago | TIMESTAMP                     | Fecha del pago.                           |
-
-## 13. Tabla: facturas
-
-| Campo             | Tipo                          | Descripción                        |
-| ----------------- | ----------------------------- | ---------------------------------- |
-| id_factura        | UUID (PK)                     | Identificador único de la factura. |
-| id_pedido         | UUID (FK → pedidos.id_pedido) | Pedido facturado.                  |
-| numero            | TEXT                          | Número de factura.                 |
-| monto             | NUMERIC                       | Subtotal.                          |
-| iva               | NUMERIC                       | Impuesto aplicado.                 |
-| total             | NUMERIC                       | Total a pagar.                     |
-| fecha_emision     | DATE                          | Fecha de emisión.                  |
-| fecha_vencimiento | DATE                          | Fecha límite de pago.              |
-| estado            | TEXT                          | Emitida, Pagada, Vencida.          |
-
-## 14. Tabla: guias_despacho
-
-| Campo         | Tipo                          | Descripción               |
-| ------------- | ----------------------------- | ------------------------- |
-| id_guia       | UUID (PK)                     | Identificador de la guía. |
-| id_pedido     | UUID (FK → pedidos.id_pedido) | Pedido relacionado.       |
-| numero        | TEXT                          | Número de guía.           |
-| numero_bultos | INT                           | Cantidad de bultos.       |
-| peso_total    | NUMERIC                       | Peso total.               |
-| ruta_asignada | TEXT                          | Ruta asignada.            |
-
-## 15. Tabla: lineas_credito
-
-| Campo              | Tipo                            | Descripción                           |
-| ------------------ | ------------------------------- | ------------------------------------- |
-| id_linea_credito   | UUID (PK)                       | Identificador de la línea de crédito. |
-| id_cliente         | UUID (FK → clientes.id_cliente) | Cliente beneficiario.                 |
-| limite             | NUMERIC                         | Límite de crédito aprobado.           |
-| plazo_dias         | INT                             | Plazo para pagar.                     |
-| score_cumplimiento | NUMERIC                         | Puntaje calculado.                    |
-| disponible         | NUMERIC                         | Crédito restante.                     |
-
-## 16. Tabla: beneficios
-
-| Campo        | Tipo                            | Descripción                        |
-| ------------ | ------------------------------- | ---------------------------------- |
-| id_beneficio | UUID (PK)                       | Identificador del beneficio.       |
-| id_cliente   | UUID (FK → clientes.id_cliente) | Cliente beneficiado.               |
-| tipo         | TEXT                            | Bonificación, puntos, evento, etc. |
-| valor        | NUMERIC                         | Valor del beneficio.               |
-| motivo       | TEXT                            | Motivo otorgado.                   |
-
-## 17. Tabla: promociones
-
-| Campo        | Tipo      | Descripción                 |
-| ------------ | --------- | --------------------------- |
-| id_promocion | UUID (PK) | Identificador de promoción. |
-| descripcion  | TEXT      | Detalle de la promoción.    |
-| fecha_inicio | DATE      | Inicio.                     |
-| fecha_fin    | DATE      | Fin.                        |
-| roi          | NUMERIC   | Retorno estimado.           |
-
-## 18. Tabla: reclamos
-
-| Campo      | Tipo                            | Descripción                |
-| ---------- | ------------------------------- | -------------------------- |
-| id_reclamo | UUID (PK)                       | Identificador del reclamo. |
-| id_cliente | UUID (FK → clientes.id_cliente) | Cliente afectado.          |
-| id_pedido  | UUID (FK → pedidos.id_pedido)   | Pedido en disputa.         |
-| motivo     | TEXT                            | Causa del reclamo.         |
-| evidencia  | TEXT                            | Archivo o URL.             |
-| estado     | TEXT                            | Recibido, Resuelto.        |
-
-## 19. Tabla: incidencias
-
-| Campo         | Tipo                            | Descripción                    |
-| ------------- | ------------------------------- | ------------------------------ |
-| id_incidencia | UUID (PK)                       | Identificador de incidencia.   |
-| id_pedido     | UUID (FK → pedidos.id_pedido)   | Pedido involucrado.            |
-| id_cliente    | UUID (FK → clientes.id_cliente) | Cliente afectado.              |
-| tipo          | TEXT                            | Logística, calidad, comercial. |
-| descripcion   | TEXT                            | Detalle del problema.          |
-| evidencia     | TEXT                            | Adjuntos.                      |
-| estado        | TEXT                            | Registrada, Resuelta.          |
-
-## 20. Tabla: rutas
-
-| Campo           | Tipo      | Descripción            |
-| --------------- | --------- | ---------------------- |
-| id_ruta         | UUID (PK) | Identificador de ruta. |
-| zona_geografica | TEXT      | Zona de reparto.       |
-| ventana_horaria | TEXT      | Horario asignado.      |
-| nivel_urgencia  | TEXT      | Prioridad.             |
-| carga_total     | NUMERIC   | Carga asignada.        |
-
-## 21. Tabla: vehiculos
-
-| Campo             | Tipo      | Descripción                 |
-| ----------------- | --------- | --------------------------- |
-| id_vehiculo       | UUID (PK) | Identificador del vehículo. |
-| placa             | TEXT      | Placa del vehículo.         |
-| chofer_asignado   | TEXT      | Nombre del chofer.          |
-| cadena_frio       | BOOLEAN   | Si maneja cadena de frío.   |
-| capacidad_peso    | NUMERIC   | Máximo peso soportado.      |
-| capacidad_volumen | NUMERIC   | Máximo volumen soportado.   |
-
-
-## 22. Tabla: sesiones 
-
-| Campo        | Tipo                              | Descripción              |
-| ------------ | --------------------------------- | ------------------------ |
-| id_sesion    | UUID (PK)                         | Identificador de sesión. |
-| id_empleado  | UUID (FK → empleados.id_empleado) | Usuario autenticado.     |
-| token        | TEXT                              | Token de sesión.         |
-| ip           | TEXT                              | IP del usuario.          |
-| fecha_inicio | TIMESTAMP                         | Inicio de sesión.        |
-| fecha_fin    | TIMESTAMP                         | Fin de sesión.           |
-
-## 23. Tabla: tokens_api 
-
-| Campo        | Tipo      | Descripción              |
-| ------------ | --------- | ------------------------ |
-| id_token_api | UUID (PK) | Identificador del token. |
-| token        | TEXT      | Token de API.            |
-| usuario      | TEXT      | Usuario relacionado.     |
-| permisos     | TEXT      | Permisos asociados.      |
-| expiracion   | TIMESTAMP | Fecha de expiración.     |
-| estado       | TEXT      | Activo / Inactivo.       |
+## 21. Tabla: inspecciones_calidad
+| Campo           | Tipo           | Descripción                              |
+|-----------------|----------------|------------------------------------------|
+| id              | UUID (PK)      | Identificador único                      |
+| solicitud_id    | UUID (FK → solicitudes_devolucion) | Devolución inspeccionada       |
+| fisico_aprobado | BOOLEAN        | Estado físico del producto               |
+| decision        | TEXT           | aprobada / rechazada / nota_credito      ||
 
