@@ -3,348 +3,402 @@
 Este archivo complementa la matriz de clases con una descripción breve, atributos, y una lista de sus métodos, herencia, y relaciones (asociaciones/dependencias).
 
 ---
+### **MÓDULO DE SEGURIDAD Y ACTORES**
 
-### Empleado
-Descripción: Representa a un empleado genérico de la organización (base para roles específicos).
+### Usuario
+
+**Descripción:** Clase base que define los atributos de acceso y seguridad para cualquier persona que interactúe con el sistema.
 
 | Atributo | Tipo | Descripción |
 |---|---|---|
-| id | string | Identificador único del empleado |
-| nombre | string | Nombre completo |
-| rol | string | Rol o cargo (ej. Vendedor, Repartidor) |
+| id | String | Identificador único del usuario |
+| nombreUsuario | String | Nombre de usuario para login |
+| contrasena | String | Credencial de acceso cifrada |
+| activo | boolean | Estado de la cuenta (activa/inactiva) |
+| rol | String | Nivel de permisos asignado |
 
-* **Métodos:** **—**
-* **Hereda de:** **—**
-* **Clase padre de:** Vendedor, SupervisorVentas, GerenteAlmacen, Repartidor, Marketing
+  * **Métodos:** login(), logout()
+  * **Hereda de:** —
+  * **Clase padre de:** Supervisor, Vendedor, Repartidor, Bodeguero, ClienteUsuario
 
----
+-----
+
+### Supervisor
+
+**Descripción:** Usuario encargado de la auditoría en campo y la gestión de excepciones comerciales.
+
+| Atributo | Tipo | Descripción |
+|---|---|---|
+| — | — | Atributos heredados de `Usuario` |
+
+  * **Métodos:** aprobarExcepcionCredito(), disenarRuta(RutaPlanificada), auditarCarteraEnCampo()
+  * **Hereda de:** **Usuario**
+  * **Relaciones:** RutaPlanificada
+
+-----
 
 ### Vendedor
-Descripción: Empleado responsable de gestionar clientes y pedidos asignados.
+
+**Descripción:** Usuario responsable de la gestión comercial, toma de pedidos y cobros en ruta.
 
 | Atributo | Tipo | Descripción |
 |---|---|---|
-| pedidosAsignados | lista/ids | Identificadores de pedidos asignados |
-| clientesAsignados | lista/ids | Clientes que atiende |
+| zonasAsignadas | List\<Zona\> | Zonas geográficas bajo su responsabilidad |
+| — | — | Atributos heredados de `Usuario` |
 
-* **Métodos:** tomarPedido(), realizarSeguimientoPostventa(), registrarVisita(), gestionarCobro(), aplicarEncuestaSatisfaccion()
-* **Hereda de:** **Empleado**
-* **Relaciones:** Pedido, Cliente
+  * **Métodos:** realizarECheckIn(), registrarPedido(), cobrarCartera(), realizarCierreCaja()
+  * **Hereda de:** **Usuario**
+  * **Relaciones:** Zona (1-1 exclusiva), Pedido (1-*), CierreCaja (1-*), SolicitudDevolucion (verificador)
 
----
-
-###  SupervisorVentas
-Descripción: Supervisa al equipo de ventas, aprueba pedidos, y gestiona reclamaciones.
-
-| Atributo | Tipo | Descripción |
-|---|---|---|
-| — | — | Atributos heredados de `Empleado` |
-
-* **Métodos:** clasificarCliente(), aprobarPedido(), implementarBeneficios(), gestionarIncidencia(), aprobarCredito(), resolverReclamo(), analizarDesempeno(), ajustarEstrategia()
-* **Hereda de:** **Empleado**
-* **Relaciones:** Cliente, Pedido, Incidencia, LineaCredito, Reclamo, Promocion
-
----
-
-### GerenteAlmacen
-Descripción: Responsable del inventario y despacho desde el almacén.
-
-| Atributo | Tipo | Descripción |
-|---|---|---|
-| — | — | Atributos heredados de `Empleado` |
-
-* **Métodos:** validarStock(), cerrarPedido(), generarGuia(), monitorearInventario()
-* **Hereda de:** **Empleado**
-* **Relaciones:** Producto, Pedido, GuiaDespacho, Inventario
-
----
+-----
 
 ### Repartidor
-Descripción: Empleado encargado de la entrega física de pedidos.
+
+**Descripción:** Usuario encargado de la logística de última milla y entrega de mercancía.
 
 | Atributo | Tipo | Descripción |
 |---|---|---|
-| — | — | Atributos heredados de `Empleado` |
+| tipoLicencia | String | Categoría de licencia de conducir |
+| — | — | Atributos heredados de `Usuario` |
 
-* **Métodos:** cargarProductos(), confirmarEntrega(), registrarObservacion(), reportarIncidencia()
-* **Hereda de:** **Empleado**
-* **Relaciones:** Pedido, Incidencia
+  * **Métodos:** actualizarEstadoEntrega(), registrarEvidencia(Foto, Firma)
+  * **Hereda de:** **Usuario**
+  * **Relaciones:** LoteDespacho (Conductor)
 
----
+-----
 
-### Marketing
-Descripción: Área/empleado encargado de promociones y campañas.
+### Bodeguero
+
+**Descripción:** Usuario responsable de las operaciones internas de almacén e inventario.
 
 | Atributo | Tipo | Descripción |
 |---|---|---|
-| — | — | Atributos heredados de `Empleado` |
+| — | — | Atributos heredados de `Usuario` |
 
-* **Métodos:** enviarPromocion(), medirROI()
-* **Hereda de:** **Empleado**
-* **Relaciones:** Promocion
+  * **Métodos:** validarStock(), realizarPicking(), cargarVehiculo(), inspeccionarDevolucion(), gestionarCatalogo()
+  * **Hereda de:** **Usuario**
+  * **Relaciones:** Inventario, Vehiculo
 
----
+-----
+
+### ClienteUsuario
+
+**Descripción:** Usuario final externo que accede al sistema para autoservicio.
+
+| Atributo | Tipo | Descripción |
+|---|---|---|
+| — | — | Atributos heredados de `Usuario` |
+
+  * **Métodos:** verEstadoCuenta(), descargarFactura(), crearPedidoAutoservicio()
+  * **Hereda de:** **Usuario**
+  * **Relaciones:** TicketIncidencia, SolicitudDevolucion
+
+-----
+
+### **MÓDULO DE GESTIÓN TERRITORIAL**
+
+### Ciudad
+
+**Descripción:** Entidad geográfica macro que agrupa zonas de venta.
+
+| Atributo | Tipo | Descripción |
+|---|---|---|
+| id | String | Identificador de la ciudad |
+| nombre | String | Nombre de la ciudad |
+| region | String | Región administrativa a la que pertenece |
+
+  * **Métodos:** —
+  * **Relaciones:** Zona (1 contiene \*)
+
+-----
+
+### Zona
+
+**Descripción:** Subdivisión territorial asignada a un vendedor específico.
+
+| Atributo | Tipo | Descripción |
+|---|---|---|
+| codigo | String | Código único de zona |
+| poligonoKML | String | Definición geográfica del área |
+| activa | boolean | Estado de la zona |
+| fechaVersion | Date | Fecha de la última modificación territorial |
+
+  * **Métodos:** validarSolapamiento()
+  * **Relaciones:** Ciudad, Vendedor (1-1), RutaPlanificada (1 contiene \*)
+
+-----
+
+### RutaPlanificada
+
+**Descripción:** Planificación logística de visitas para un día específico.
+
+| Atributo | Tipo | Descripción |
+|---|---|---|
+| id | String | Identificador de la ruta |
+| dia | DiaSemana | Día de la semana asignado |
+| frecuencia | String | Frecuencia de visita (semanal, quincenal, etc.) |
+
+  * **Métodos:** optimizarSecuencia(), ajustarPorFeriado(Calendario)
+  * **Relaciones:** Zona, Calendario, Cliente (visita programada), LoteDespacho (genera ejecución)
+
+-----
+
+### Calendario
+
+**Descripción:** Gestión de fechas, feriados y días operativos.
+
+| Atributo | Tipo | Descripción |
+|---|---|---|
+| fecha | Date | Fecha específica |
+| esFeriado | boolean | Indica si es día no laborable |
+| descripcion | String | Motivo del feriado o nota del día |
+
+  * **Métodos:** validarDiaLaborable()
+  * **Relaciones:** RutaPlanificada (Consulta)
+
+-----
+
+### **MÓDULO COMERCIAL Y VENTAS**
 
 ### Cliente
-Descripción: Persona o empresa que realiza pedidos y consume servicios.
+
+**Descripción:** Entidad comercial a la que se le venden productos.
 
 | Atributo | Tipo | Descripción |
 |---|---|---|
-| id | string | Identificador del cliente |
-| nombre | string | Nombre o razón social |
-| cedulaRUC | string | Documento de identificación |
-| razonSocial | string | Nombre legal (si aplica) |
-| direccion | string | Dirección principal de entrega/facturación |
-| telefono | string | Teléfono de contacto |
-| correo | string | Email de contacto |
-| contactoPrincipal | string | Nombre del contacto principal |
-| categoriaTamano | string | Clasificación por tamaño (ej. PYME, Corporativo) |
-| categoriaFrecuencia | string | Clasificación por frecuencia de compra |
-| estado | string | Estado actual del cliente (activo, inactivo, moroso) |
-| historialPedidos | lista | Referencia a pedidos anteriores |
-| beneficiosAcumulados | lista | Beneficios o puntos acumulados |
-| creditoDisponible | float | Límite de crédito disponible |
-| scoreCumplimiento | float | Puntuación de cumplimiento de pago |
-| npsScore | int | Puntuación de Satisfacción Neta |
+| ruc | String | Registro Único de Contribuyentes |
+| razonSocial | String | Nombre legal de la empresa/persona |
+| latitud | double | Coordenada GPS Y |
+| longitud | double | Coordenada GPS X |
+| tipoCliente | String | Segmentación del cliente |
+| estado | String | Estado comercial (activo, bloqueado, etc.) |
 
-* **Métodos:** registrarDatos(), clasificarPerfil(), recibirNotificacion(), evaluarSatisfaccion(), actualizarEtiquetaCobro(), generarReclamo()
-* **Relaciones:** Pedido (1–*), Beneficio (1–*), LineaCredito (1–1), Reclamo (1–*), Incidencia (1–*)
+  * **Métodos:** validarGeolocalizacion()
+  * **Relaciones:** RutaPlanificada, LineaCredito (1-1), Pedido (1-\*)
 
----
-
-### Pedido
-Descripción: Representa una orden de compra realizada por un cliente.
-
-| Atributo | Tipo | Descripción |
-|---|---|---|
-| numero | string | Identificador único del pedido |
-| productos | lista | Lista de líneas de pedido o ids de producto |
-| cantidades | lista | Cantidades correspondientes por producto |
-| fechaEntrega | date | Fecha de entrega solicitada |
-| nivelUrgencia | string | Prioridad del pedido |
-| precioTotal | float | Monto total antes/después de descuentos |
-| descuentoAplicado | float | Monto del descuento aplicado |
-| estado | string | Estado del pedido (pendiente, pagado, enviado, etc.) |
-| direccionEnvio | string | Dirección donde se debe enviar |
-| log, lat | float | Coordenadas geográficas de envío |
-| pesoTotal, volumenTotal | float | Peso y volumen total del pedido |
-| vendedor | string | Referencia al `Vendedor` asignado |
-| pago | string | Referencia al `Pago` asociado |
-| incidencias | lista | Referencia a `Incidencia` asociadas |
-
-* **Métodos:** registrarProductos(), aplicarDescuentos(), actualizarEstado(), confirmarEntrega(), calcularPesoVolumen(), gestionarIncidencia()
-* **Relaciones:** Cliente, Producto (1–*), Vendedor (1–1), Ruta (1–1), Factura (1–1), GuiaDespacho (1–1), Pago (1–1), Incidencia (1–*), Reclamo (1–*)
-
----
-
-### Producto
-Descripción: Ítem vendible con atributos de trazabilidad y conservación.
-
-| Atributo | Tipo | Descripción |
-|---|---|---|
-| codigo | string | Código o SKU del producto |
-| nombre | string | Nombre comercial |
-| lote | string | Identificación del lote |
-| fechaVencimiento | date | Fecha de caducidad (si aplica) |
-| temperaturaRequerida | string | Condición de temperatura para transporte/almacenaje |
-| condicionConservacion | string | Condiciones generales de conservación |
-| pesoUnitario | float | Peso por unidad |
-| volumenUnitario | float | Volumen por unidad |
-| margenNeto | float | Margen de beneficio neto esperado |
-| indiceRotacion | float | Métrica de qué tan rápido se vende |
-
-* **Métodos:** verificarFrescura(), comprobarTemperatura(), analizarRotacion()
-* **Relaciones:** Pedido, Inventario, MovimientoInventario
-
----
-
-### Ruta
-Descripción: Ruta de reparto que agrupa pedidos y define ventanas horarias.
-
-| Atributo | Tipo | Descripción |
-|---|---|---|
-| id | string | Identificador de la ruta |
-| zonaGeografica | string | Área cubierta por la ruta |
-| ventanaHoraria | string | Horario de entrega previsto |
-| nivelUrgencia | string | Nivel de urgencia de los pedidos agrupados |
-| cargaTotal | float | Peso/volumen total de la carga |
-| pedidosAsignados | lista | Pedidos asignados a la ruta |
-
-* **Métodos:** asignarVehiculo(), programarReparto(), calcularCarga()
-* **Relaciones:** Pedido, Vehiculo
-
----
-
-### Vehiculo
-Descripción: Medio de transporte para entregas.
-
-| Atributo | Tipo | Descripción |
-|---|---|---|
-| id | string | Identificador del vehículo |
-| placa | string | Matrícula |
-| choferAsignado | string | Id del empleado conductor |
-| cadenaFrio | boolean | Indica si tiene refrigeración |
-| capacidadPeso | float | Capacidad máxima de peso |
-| capacidadVolumen | float | Capacidad de volumen |
-
-* **Métodos:** monitorearTemperatura()
-* **Relaciones:** Ruta
-
----
-
-### Factura
-Descripción: Documento fiscal asociado a un pedido.
-
-| Atributo | Tipo | Descripción |
-|---|---|---|
-| pedido | string | Referencia al pedido |
-| numero | string | Número de factura |
-| monto | float | Monto facturado (sin impuestos) |
-| iva | float | Monto de impuesto (IVA) |
-| total | float | Monto total (con impuestos) |
-| fechaEmision | date | Fecha de emisión |
-| fechaVencimiento | date | Fecha límite de pago |
-| estado | string | Estado de la factura (pagada, pendiente) |
-
-* **Métodos:** generarElectronica()
-* **Relaciones:** Pedido
-
----
-
-### GuiaDespacho
-Descripción: Documento de despacho que acompaña entregas.
-
-| Atributo | Tipo | Descripción |
-|---|---|---|
-| numero | string | Número de guía |
-| numeroBultos | int | Cantidad de bultos |
-| pesoTotal | float | Peso total de la guía |
-| rutaAsignada | string | Ruta usada para la entrega |
-
-* **Métodos:** generarGuia()
-* **Relaciones:** Pedido
-
----
-
-### Beneficio
-Descripción: Beneficio o incentivo aplicable a clientes o pedidos.
-
-| Atributo | Tipo | Descripción |
-|---|---|---|
-| id | string | Identificador del beneficio |
-| tipo | string | Tipo (descuento, bonificación) |
-| valor | float | Valor o porcentaje |
-| motivo | string | Razón por la cual se aplica el beneficio |
-
-* **Métodos:** aplicarBonificacion()
-* **Relaciones:** Cliente, Promocion
-
----
-
-### Promoción
-Descripción: Promoción comercial aplicada a productos o clientes.
-
-| Atributo | Tipo | Descripción |
-|---|---|---|
-| id | string | Identificador de la promoción |
-| descripcion | string | Texto descriptivo |
-| fechaInicio | date | Fecha inicio |
-| fechaFin | date | Fecha fin |
-| roi | float | Retorno de inversión (medido) |
-
-* **Métodos:** enviarInformacion(), medirPerformance()
-* **Relaciones:** Beneficio
-
----
-
-### Pago
-Descripción: Información sobre el pago asociado a un pedido.
-
-| Atributo | Tipo | Descripción |
-|---|---|---|
-| metodo | string | Método de pago (tarjeta, efectivo, etc.) |
-| estado | string | Estado del pago (pendiente, aprobado) |
-| monto | float | Monto pagado |
-| fechaPago | date | Fecha en que se realizó el pago |
-
-* **Métodos:** procesarPago(), emitirRecibo()
-* **Relaciones:** Pedido
-
----
+-----
 
 ### LineaCredito
-Descripción: Límite de crédito y condiciones asociadas a un cliente.
+
+**Descripción:** Definición de las condiciones financieras otorgadas a un cliente.
 
 | Atributo | Tipo | Descripción |
 |---|---|---|
-| limite | float | Límite total autorizado |
-| plazoDias | int | Plazo en días para pago |
-| scoreCumplimiento | float | Puntuación usada para calcular el límite |
-| disponible | float | Monto disponible actualmente |
+| cupoTotal | double | Monto máximo de crédito autorizado |
+| saldoUtilizado | double | Deuda actual |
+| saldoVencido | double | Monto en mora |
+| diasGracia | int | Días adicionales permitidos para pago |
 
-* **Métodos:** evaluarSolicitud(), actualizarLimite(), monitorearUso()
-* **Relaciones:** Cliente, SupervisorVentas
+  * **Métodos:** validarDisponibilidad(), bloquearPorMora()
+  * **Relaciones:** Cliente (1-1)
 
----
+-----
 
-### Inventario
-Descripción: Registro de stock y niveles críticos por producto.
+### Pedido
 
-| Atributo | Tipo | Descripción |
-|---|---|---|
-| producto | string | Referencia al `Producto` |
-| stockActual | int | Cantidad disponible |
-| umbralMin | int | Nivel mínimo de stock para alerta |
-| umbralMax | int | Nivel máximo seguro |
-| indiceRotacion | float | Métrica de rotación del producto en inventario |
-
-* **Métodos:** monitorearNivel(), generarAlerta(), analizarRotacion()
-* **Relaciones:** Producto, MovimientoInventario
-
----
-
-### MovimientoInventario
-Descripción: Registro de entradas/salidas del inventario.
+**Descripción:** Transacción de venta solicitada por un cliente.
 
 | Atributo | Tipo | Descripción |
 |---|---|---|
-| tipo | string | Tipo de movimiento (entrada/salida) |
-| cantidad | int | Cantidad afectada |
-| fecha | date | Fecha del movimiento |
-| producto | string | Producto afectado |
+| numeroPedido | String | Identificador único |
+| fechaCreacion | Date | Fecha y hora de la toma del pedido |
+| ubicacionVenta | GPS | Coordenadas donde se creó el pedido |
+| estado | String | Estado del flujo (aprobado, facturado, etc.) |
+| total | double | Valor monetario total |
+| pesoTotal | double | Peso total para logística |
 
-* **Métodos:** registrarMovimiento(), validarContraNegativo()
-* **Relaciones:** Inventario, Pedido
+  * **Métodos:** validarCupo()
+  * **Relaciones:** Cliente (Solicita), Vendedor (Gestiona), DetallePedido (1 contiene \*), Factura (1 genera 1), LoteDespacho (Transportado por), EntregaFinal (Resultado)
 
----
+-----
 
-### Incidencia
-Descripción: Evento que indica una anomalía o problema (entrega, calidad, etc.).
+### DetallePedido
 
-| Atributo | Tipo | Descripción |
-|---|---|---|
-| id | string | Identificador de la incidencia |
-| tipo | string | Tipo de incidencia |
-| descripcion | string | Descripción detallada |
-| evidencia | string/list | Referencia a archivos o notas |
-| estado | string | Estado del proceso de resolución |
-
-* **Métodos:** registrarIncidencia(), generarNotaCredito(), escalar()
-* **Relaciones:** Cliente, Pedido
-
----
-
-### Reclamo
-Descripción: Petición formal del cliente por un problema o devolución.
+**Descripción:** Línea individual de productos dentro de un pedido.
 
 | Atributo | Tipo | Descripción |
 |---|---|---|
-| id | string | Identificador del reclamo |
-| motivo | string | Motivo declarado por el cliente |
-| evidencia | string/list | Documentos adjuntos o pruebas |
-| estado | string | Estado de gestión del reclamo |
+| cantidad | int | Unidades solicitadas |
+| peso | double | Peso de la línea |
+| precioUnitario | double | Precio por unidad al momento de venta |
+| subtotal | double | Precio x Cantidad |
 
-* **Métodos:** aprobarDevolucion(), emitirNotaCredito(), coordinarReposicion()
-* **Relaciones:** Cliente, Pedido
+  * **Métodos:** —
+  * **Relaciones:** Pedido, Producto, Promocion
 
----
+-----
+
+### Promocion
+
+**Descripción:** Reglas de negocio para aplicar descuentos o bonificaciones.
+
+| Atributo | Tipo | Descripción |
+|---|---|---|
+| inicio | Date | Fecha de inicio de vigencia |
+| fin | Date | Fecha de fin de vigencia |
+| tipo | String | Mecánica de la promoción (descuento, 2x1, etc.) |
+
+  * **Métodos:** aplicarBonificacion(Pedido)
+  * **Relaciones:** DetallePedido (Modifica)
+
+-----
+
+### **MÓDULO DE INVENTARIO Y LOGÍSTICA**
+
+### Producto
+
+**Descripción:** Ítem comercializable con características físicas y de conservación.
+
+| Atributo | Tipo | Descripción |
+|---|---|---|
+| codigoUnico | String | SKU o código de barras |
+| nombre | String | Descripción comercial |
+| presentacion | String | Unidad de medida/empaque |
+| temperaturaRequerida | double | Grados para conservación |
+| condicionConservacion | String | Seco, congelado, refrigerado |
+| esPerecible | boolean | Indica si tiene caducidad crítica |
+
+  * **Métodos:** —
+  * **Relaciones:** DetallePedido, KardexInventario (1-1)
+
+-----
+
+### KardexInventario
+
+**Descripción:** Control de existencias y disponibilidad del producto.
+
+| Atributo | Tipo | Descripción |
+|---|---|---|
+| stockFisico | int | Cantidad total en bodega |
+| stockReservado | int | Cantidad comprometida en pedidos |
+| stockMermas | int | Cantidad no apta para venta |
+
+  * **Métodos:** generarAlertaStock()
+  * **Relaciones:** Producto, MovimientoInventario (Traza historial)
+
+-----
+
+### LoteDespacho
+
+**Descripción:** Agrupación logística de pedidos para ser transportados en un viaje.
+
+| Atributo | Tipo | Descripción |
+|---|---|---|
+| numeroManifiesto | String | Identificador del viaje |
+| numeroTanda | int | Secuencia de carga |
+| horaSalida | Date | Hora programada de salida |
+| pesoCargaActual | double | Peso acumulado de los pedidos |
+
+  * **Métodos:** validarCapacidad(), generarHojaRuta()
+  * **Relaciones:** RutaPlanificada, Vehiculo (1-1), Pedido (1-\*), Repartidor (Conductor)
+
+-----
+
+### Vehiculo
+
+**Descripción:** Unidad de transporte utilizada para el despacho.
+
+| Atributo | Tipo | Descripción |
+|---|---|---|
+| placa | String | Identificación del vehículo |
+| capacidadKg | double | Capacidad máxima de carga |
+| cadenaFrio | boolean | Si posee sistema de refrigeración |
+| estadoMantenimiento | String | Estado operativo |
+
+  * **Métodos:** —
+  * **Relaciones:** LoteDespacho
+
+-----
+
+### **MÓDULO DE FINANZAS Y SOPORTE**
+
+### Factura
+
+**Descripción:** Documento tributario generado a partir de un pedido.
+
+| Atributo | Tipo | Descripción |
+|---|---|---|
+| folioFiscal | String | Número autorizado por el SRI |
+| jsonIntegracionERP | String | Estructura de datos para contabilidad |
+| estadoSRI | String | Estado de autorización fiscal |
+| fechaVencimiento | Date | Fecha límite de pago |
+
+  * **Métodos:** sincronizarVisualFAC()
+  * **Relaciones:** Pedido (1-1), Pago (Liquida)
+
+-----
+
+### CierreCaja
+
+**Descripción:** Proceso diario de conciliación de valores recaudados por el vendedor.
+
+| Atributo | Tipo | Descripción |
+|---|---|---|
+| fecha | Date | Fecha del cierre |
+| totalCalculadoSistema | double | Lo que el sistema dice que debe tener |
+| totalDeclaradoVendedor | double | Lo que el vendedor entrega físicamente |
+| diferencia | double | Sobrante o faltante |
+
+  * **Métodos:** validarCuadre()
+  * **Relaciones:** Vendedor (Realiza), Pago (Consolida)
+
+-----
+
+### Pago
+
+**Descripción:** Registro de un cobro realizado a un cliente.
+
+| Atributo | Tipo | Descripción |
+|---|---|---|
+| monto | double | Cantidad abonada |
+| formaPago | String | Efectivo, Cheque, Transferencia |
+| fotoCheque | Imagen | Evidencia digital si aplica |
+
+  * **Métodos:** asignarAFactura()
+  * **Relaciones:** CierreCaja, Factura (1..\* Liquida)
+
+-----
+
+### TicketIncidencia
+
+**Descripción:** Reporte de problemas de servicio o soporte técnico.
+
+| Atributo | Tipo | Descripción |
+|---|---|---|
+| id | String | Identificador del ticket |
+| tipo | String | Categoría del problema |
+| descripcion | String | Detalle del incidente |
+| estado | String | Abierto, En proceso, Cerrado |
+
+  * **Métodos:** escalarAreaResolutora()
+  * **Relaciones:** ClienteUsuario (Reporta)
+
+-----
+
+### SolicitudDevolucion
+
+**Descripción:** Petición formal para retornar productos.
+
+| Atributo | Tipo | Descripción |
+|---|---|---|
+| id | String | Identificador de la solicitud |
+| motivo | String | Razón de la devolución |
+| evidenciaCliente | Imagen | Foto del producto dañado/erróneo |
+
+  * **Métodos:** validarVentanaTiempo()
+  * **Relaciones:** ClienteUsuario (Solicita), Vendedor (Verifica), InspeccionCalidad (Validación)
+
+-----
+
+### InspeccionCalidad
+
+**Descripción:** Proceso de validación física de una devolución en bodega.
+
+| Atributo | Tipo | Descripción |
+|---|---|---|
+| fisicoAprobado | boolean | Si el producto existe físicamente |
+| sellado | boolean | Si el empaque está íntegro |
+| decisionFinal | String | Aceptado/Rechazado |
+
+  * **Métodos:** autorizarNotaCredito()
+  * **Relaciones:** SolicitudDevolucion, MovimientoInventario (Genera ajuste)
