@@ -48,7 +48,7 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 <img width="636" height="1564" alt="image" src="https://github.com/user-attachments/assets/f0a7f6e1-8d1d-45b3-957d-43e0ed8534fe" />
 
 
-### 1. Planificación Comercial
+### 1. Módulo de Planificación Territorial y Asignación de Cartera
 
 **Objetivo:** Establecer la estrategia, reglas de negocio y objetivos que guiarán la operación comercial.
 
@@ -70,10 +70,11 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 ---
 
-<img width="595" height="863" alt="image" src="https://github.com/user-attachments/assets/a85a7f3b-0f0f-411e-b05d-1cfce73cd999" />
+
+<img width="516" height="895" alt="image" src="https://github.com/user-attachments/assets/1871e412-9278-4e5d-be9d-ed68923bd31f" />
 
 
-### 2. Gestión de Clientes
+### 2. Gestión de Catálogos Maestros
 
 **Objetivo:** Administrar el ciclo de vida completo del cliente, desde su captación hasta su retención.
 
@@ -90,10 +91,10 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 
 ---
+<img width="824" height="899" alt="image" src="https://github.com/user-attachments/assets/1789366e-deac-4012-9e7c-909864228936" />
 
-<img width="1068" height="1461" alt="productos" src="https://github.com/user-attachments/assets/fbeb1780-31bb-414c-8b97-5a87805c9e69" />
 
-### 3. Gestión de Productos
+### 3.  Toma y Registro de Pedidos y Validación y Preparación de Pedidos
 
 **Objetivo:** Administrar el catálogo de productos y asegurar la disponibilidad y trazabilidad del stock para satisfacer la demanda.
 
@@ -116,9 +117,10 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 ---
 
-<img width="909" height="776" alt="image" src="https://github.com/user-attachments/assets/1cd7046b-736b-417d-b6d1-8f0e7d854955" />
+<img width="561" height="900" alt="image" src="https://github.com/user-attachments/assets/ba5a1fd7-d4ae-4a57-ad09-e8bd76f61c77" />
 
-### 4. Gestión de Pedidos
+
+### 4. Integración Financiera y Facturación y Legalización
 
 **Objetivo:** Manejar el proceso de captura, validación y procesamiento de las órdenes de compra de manera eficiente.
 
@@ -139,9 +141,9 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 ---
 
-<img width="961" height="761" alt="image" src="https://github.com/user-attachments/assets/3646440e-c236-42b6-8a5f-41e424c34875" />
+<img width="749" height="898" alt="image" src="https://github.com/user-attachments/assets/720ee669-83d4-44dd-9d17-9c06bf13d70a" />
 
-### 5. Gestión de Entregas
+### 5. Entrega y Logística
 
 **Objetivo:** Asegurar que los pedidos preparados sean despachados y entregados al cliente de forma eficiente y puntual.
 
@@ -162,9 +164,10 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 ---
 
-<img width="1028" height="780" alt="image" src="https://github.com/user-attachments/assets/215945bd-8aa6-44bb-b70a-ce985095fae0" />
+<img width="1045" height="900" alt="image" src="https://github.com/user-attachments/assets/569b4d45-8c93-47fa-9d0f-09667be0bcbd" />
 
-### 6. Gestión de Cobros y Créditos
+
+### 6. Cobranzas y Recaudación
 
 **Objetivo:** Administrar la salud financiera de las transacciones, gestionando las líneas de crédito y asegurando el recaudo de la cartera.
 
@@ -184,10 +187,9 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 
 ---
+![WhatsApp Image 2025-12-18 at 8 18 08 AM](https://github.com/user-attachments/assets/e6e7f4d9-2bd4-4f48-90af-3942f5b5c2b2)
 
-<img width="1068" height="781" alt="image" src="https://github.com/user-attachments/assets/294cae3c-6024-4671-9b75-978ae6e8eef6" />
-
-### 7. Postventa y Servicio al Cliente
+### 7. Devoluciones y Garantías
 
 **Objetivo:** Brindar soporte al cliente después de la venta para resolver problemas y medir su nivel de satisfacción.
 
@@ -207,9 +209,10 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 ---
 
-<img width="1063" height="735" alt="image" src="https://github.com/user-attachments/assets/4e37c54c-8fd2-4641-a92f-9307b41fb598" />
+![WhatsApp Image 2025-12-18 at 8 20 05 AM](https://github.com/user-attachments/assets/8a881c4d-53ed-4c12-89ba-fbd17a4d7153)
 
-### 8. Control y Análisis Comercial
+
+### 8. Supervisión y Control de Gestión
 
 **Objetivo:** Proveer la inteligencia de negocio necesaria para la toma de decisiones estratégicas, midiendo el rendimiento de la operación.
 
@@ -224,3 +227,11 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 * **Reportes Gerenciales:**
     * **Elaborar Informes de Resultados** - Consolidar KPIs en dashboards visuales (ventas por zona, rentabilidad por cliente, etc.) para la gerencia.
     * **Tomar Decisiones Estratégicas** - Usar los informes para redefinir metas, ajustar precios, o enfocar esfuerzos en zonas/clientes de alto potencial.
+
+
+
+---
+<img width="798" height="902" alt="image" src="https://github.com/user-attachments/assets/6e97663f-c1fb-47cb-aa16-4de49e19a69d" />
+
+
+### 9. Autogestión del Cliente
