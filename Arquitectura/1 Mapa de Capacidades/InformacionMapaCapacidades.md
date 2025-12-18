@@ -43,7 +43,8 @@ Estos módulos suelen estar organizados de manera jerárquica y permiten a los d
 
 ## Descripción de los Módulos
 
-<img width="636" height="1564" alt="image" src="https://github.com/user-attachments/assets/9d615397-b21b-40b0-a03d-850a2bfea842" />
+<img width="636" height="1564" alt="image" src="https://github.com/user-attachments/assets/9d615397-b21b-40b0-a03d-850a2bfea842](https://github.com/user-attachments/assets/f25f6b0f-b8c6-4b1a-b6e0-9f7bc23aa90a" />
+
 
 ### 1. Planificación Comercial
 
