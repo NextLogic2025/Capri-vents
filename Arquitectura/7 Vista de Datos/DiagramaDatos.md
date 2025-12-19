@@ -21,4 +21,4 @@ Es un diseño conceptual que describe:
 
 El propósito principal de un modelo de datos es facilitar la comprensión y gestión de los datos en sistemas complejos, asegurando que estén organizados de manera lógica y eficiente.
 
-<img width="2052" height="1923" alt="DiagramaFlujo-Página-2 drawio" src="https://github.com/user-attachments/assets/c41ff097-208d-4e18-b6e2-1673455b5979" />
+<img width="2052" height="1923" alt="DiagramaFlujo-Página-2 drawio" src="https://github.com/user-attachments/assets/525ae02d-a8ca-455f-88d5-d34452d5d6da" />
