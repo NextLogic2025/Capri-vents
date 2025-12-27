@@ -1,4 +1,5 @@
 # Pipeline DevOps - Herramientas por Fase
+![alt text](<Blue Futuristic Business Presentation.jpg>)
 
 ## 1. FASE CODE (Desarrollo)
 
