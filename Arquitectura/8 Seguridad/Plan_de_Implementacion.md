@@ -15,14 +15,12 @@ El objetivo del plan es asegurar una transición controlada desde los entornos d
 
 ## 2. Alcance
 
-Este plan cubre la implementación de:
-
-* Backend basado en microservicios (Auth, Usuarios, Catálogo, Orders, Ventas, etc.)
-* Frontend Web (React + Vite)
-* Frontend Mobile (React Native + Expo)
-* Infraestructura en Google Cloud Platform (GCP)
-* Automatización CI/CD
+Este plan abarca la implementación de:
+* Infraestructura como Código (IaC): Despliegue de recursos GCP mediante módulos de Terraform (Networking, Database, Cloud Run, API Gateway, Automatización CI/CD).
 * Base de datos y migraciones iniciales
+* Backend: Despliegue de 6 microservicios NestJS (auth, usuarios, catalog, orders, ventas, warehouse).
+* Frontend: Despliegue de SPA Web (Firebase Hosting) y App Móvil (Expo/EAS).
+* Seguridad: Configuración de VPC, Cloud NAT, Secret Manager e IAM.
 
 Quedan fuera del alcance:
 
@@ -38,9 +36,10 @@ Quedan fuera del alcance:
 Arquitectura basada en **microservicios desacoplados**, expuestos mediante un API Gateway y protegidos por autenticación centralizada.
 
 * Clientes Web y Mobile
-* API Gateway / Endpoints
+* API Gateway / Endpoints: Único punto de acceso mediante API Gateway.
 * Microservicios independientes
-* Base de datos gestionada
+* Base de datos gestionada: DB Relacional centralizada con esquemas lógicos separados por servicio.
+* Comunicación: REST sobre HTTPS.
 
 ### 3.2 Vista Física
 
@@ -49,15 +48,19 @@ Arquitectura basada en **microservicios desacoplados**, expuestos mediante un AP
 * Cloud SQL con backups automáticos
 * Logging, Monitoring y Tracing centralizados
 
+La solución reside en la región us-east1 y consta de:
+* Cómputo: Google Cloud Run (Serverless) para cada microservicio.
+* Red: VPC Privada con Cloud NAT para salida segura a internet y VPC Access Connector para comunicación interna.
+* Seguridad: Secret Manager para gestión de credenciales y Service Accounts con principio de mínimo privilegio.
 ---
 
 La solución se implementa bajo una arquitectura distribuida:
 
-* **Backend**: Microservicios NestJS contenerizados con Docker y desplegados en Cloud Run.
+* **Backend**: Microservicios NestJS contenerizados con Docker y desplegados en Cloud Run, Secret Manager para gestión de credenciales y Service Accounts con principio de mínimo privilegio.
 * **Frontend Web**: Aplicación SPA desplegada como sitio estático.
 * **Frontend Mobile**: Aplicación móvil compilada y distribuida mediante Expo.
 * **Infraestructura**: Aprovisionada mediante Terraform.
-* **Base de datos**: Inicializada mediante scripts SQL versionados.
+* **Base de datos**: Inicializada mediante scripts SQL versionados / Cloud SQL (PostgreSQL 17) configurada con IP Privada exclusivamente..
 
 ---
 
@@ -104,6 +107,12 @@ Cada microservicio cuenta con:
 * Pipeline CI/CD
 * Configuración independiente de despliegue
 
+Pasos:
+1. Detecta cambios en la rama main.
+2. Construye la imagen Docker.
+3. Publica la imagen en Artifact Registry.
+4. Despliega la revisión en Cloud Run con la Service Account asignada.
+
 ### Servicios incluidos:
 
 * auth
@@ -111,13 +120,7 @@ Cada microservicio cuenta con:
 * catalog
 * orders
 * ventas
-
-Pasos:
-
-1. Build de imágenes Docker
-2. Push a Artifact Registry
-3. Despliegue en Cloud Run
-4. Validación de endpoints
+* warehouse
 
 ---
 
@@ -128,21 +131,25 @@ Pasos:
   * `01-init-dbs.sql`
   * `04-init-catalog.sql`
   * `05-init-orders.sql`
+  
 * Validación de:
 
   * Esquemas
   * Relaciones
   * Datos maestros
-
+  
+* Dada la naturaleza de la infraestructura (BD vacía):
+  * Esquema: Se delega al ORM (TypeORM) la sincronización inicial de tablas (synchronize: true para primer despliegue o ejecución de migraciones).
+  * Datos Semilla: Ejecución controlada de scripts SQL (local-init) mediante conexión segura (Bastion o SQL Proxy) si es necesario.
 ---
 
 ## 8. Despliegue del Frontend
 
 ### 8.1 Frontend Web
 
-* Build de la aplicación React
+* Build de producción con Vite
 * Configuración de variables de entorno
-* Publicación en hosting web
+* Despliegue a Firebase Hosting conectado al proyecto GCP
 
 ### 8.2 Frontend Mobile
 
@@ -163,6 +170,15 @@ Pasos:
   * Cliente
   * Bodeguero
   * Transportista
+
+
+### Matriz de Riesgos y Seguridad (Consolidada)
+Activo / Servicio,Amenaza / Riesgo,Nivel,Medida de Mitigación Implementada
+Base de Datos,Acceso público no autorizado,Alto,Configuración de Cloud SQL con ipv4_enabled = false (Solo IP Privada). Acceso exclusivo vía VPC Connector.
+Microservicios,Invocación directa desde internet,Alto,Eliminación de allUsers. Implementación de IAM roles/run.invoker restringido exclusivamente a la Service Account del API Gateway.
+Credenciales,Fuga de contraseñas en código,Alto,Uso de Secret Manager. Las contraseñas no existen en texto plano en el repositorio ni en tfvars.
+Red,Ataques a servidores backend,Medio,Uso de Cloud NAT para permitir actualizaciones del sistema sin exponer puertos de entrada a internet.
+Auth,Suplantación de identidad,Alto,Implementación de JWT firmados. API Gateway valida la existencia del servicio antes de enrutar.
 
 ---
 
