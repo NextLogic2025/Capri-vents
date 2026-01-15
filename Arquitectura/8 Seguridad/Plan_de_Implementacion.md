@@ -173,12 +173,14 @@ Pasos:
 
 
 ### Matriz de Riesgos y Seguridad (Consolidada)
-Activo / Servicio,Amenaza / Riesgo,Nivel,Medida de Mitigación Implementada
-Base de Datos,Acceso público no autorizado,Alto,Configuración de Cloud SQL con ipv4_enabled = false (Solo IP Privada). Acceso exclusivo vía VPC Connector.
-Microservicios,Invocación directa desde internet,Alto,Eliminación de allUsers. Implementación de IAM roles/run.invoker restringido exclusivamente a la Service Account del API Gateway.
-Credenciales,Fuga de contraseñas en código,Alto,Uso de Secret Manager. Las contraseñas no existen en texto plano en el repositorio ni en tfvars.
-Red,Ataques a servidores backend,Medio,Uso de Cloud NAT para permitir actualizaciones del sistema sin exponer puertos de entrada a internet.
-Auth,Suplantación de identidad,Alto,Implementación de JWT firmados. API Gateway valida la existencia del servicio antes de enrutar.
+
+| Activo / Servicio | Amenaza / Riesgo | Nivel | Medida de Mitigación Implementada |
+| :--- | :--- | :--- | :--- |
+| **Base de Datos** | Acceso público no autorizado | **Alto** | Configuración de Cloud SQL con `ipv4_enabled = false` (Solo IP Privada). Acceso exclusivo vía VPC Connector. |
+| **Microservicios** | Invocación directa desde internet | **Alto** | Eliminación de `allUsers`. Implementación de IAM `roles/run.invoker` restringido exclusivamente a la Service Account del API Gateway. |
+| **Credenciales** | Fuga de contraseñas en código | **Alto** | Uso de Secret Manager. Las contraseñas no existen en texto plano en el repositorio ni en `tfvars`. |
+| **Red** | Ataques a servidores backend | **Medio** | Uso de Cloud NAT para permitir actualizaciones del sistema sin exponer puertos de entrada a internet. |
+| **Auth** | Suplantación de identidad | **Alto** | Implementación de JWT firmados. API Gateway valida la existencia del servicio antes de enrutar. |
 
 ---
 
