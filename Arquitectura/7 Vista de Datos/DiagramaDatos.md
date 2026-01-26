@@ -62,8 +62,8 @@ Al separar los contextos (Microservicios), validar la calidad en la entrada (Con
 <img width="2052" height="1923" alt="Diagrama De Rutas" src="https://github.com/user-attachments/assets/05132808-bf5a-4c55-afcb-4a08ee249b74" />
 
 # Cafrilosa_Usuarios
-<img width="252" height="1923" alt="Diagrama De Usuarios" src="https://github.com/user-attachments/assets/3c6a0dd3-7638-40e2-aa13-7cda69c97d34" />
+<img width="2052" height="1923" alt="Diagrama De Usuarios" src="https://github.com/user-attachments/assets/3c6a0dd3-7638-40e2-aa13-7cda69c97d34" />
 
 # Cafrilosa_Zonas
-<img width="252" height="1923" alt="Diagrama De Zonas" src="https://github.com/user-attachments/assets/a988ec31-a2e9-4808-b13d-36894cc539e3" />
+<img width="2052" height="1923" alt="Diagrama De Zonas" src="https://github.com/user-attachments/assets/a988ec31-a2e9-4808-b13d-36894cc539e3" />
 
