@@ -4,21 +4,66 @@
 
 # Modelo de Datos
 
-# ¿Qué es un modelo de datos?
+1. Visión General del Modelo
+El sistema implementa una Arquitectura de Datos Distribuida basada en el patrón Database-per-Service (Base de Datos por Servicio). Se han definido 8 dominios de datos autónomos (Auth, User, Catalog, Zone, Order, Credit, Route, Billing), alojados en infraestructura Google Cloud SQL (PostgreSQL 17).
 
-El modelo de datos es un elemento fundamental dentro del diseño y gestión de sistemas de información, ya que establece la estructura lógica mediante la cual se almacenará y relacionará la información. Su importancia radica en que permite organizar los datos de forma coherente, evitar redundancias, garantizar la integridad referencial y facilitar la escalabilidad del sistema.
+Esta arquitectura rompe con el modelo monolítico tradicional para garantizar la escalabilidad horizontal, el desacoplamiento funcional y la resiliencia operativa, asegurando que la gestión de pedidos no se vea comprometida por procesos auxiliares.
 
-Un modelo bien diseñado mejora la eficiencia de las operaciones, optimiza las consultas, y asegura que los desarrolladores, analistas y administradores compartan una misma visión del entorno de datos.
+2. Alineación con DAMA-DMBOK (Data Management Body of Knowledge)
+El diseño propuesto cumple con las Áreas de Conocimiento clave del DMBOK:
 
-Además, en el marco de la ISO 8000 y del DAMA-DMBOK, el modelo de datos se considera un componente clave de la arquitectura de información, asegurando calidad, consistencia y trazabilidad durante todo el ciclo de vida de los datos.
-Es un diseño conceptual que describe:
+A. Arquitectura de Datos (Data Architecture)
+Diseño: Se utiliza un enfoque descentralizado donde cada microservicio es "propietario" de sus datos.
 
-**Entidades:** Objetos o conceptos del mundo real, como "Clientes", "Productos".
+Interoperabilidad: La integración no se realiza a nivel de base de datos (evitando el anti-patrón de base de datos compartida), sino mediante interfaces API y un modelo de consistencia eventual utilizando el patrón Transactional Outbox.
 
-**Atributos:** Propiedades o características de las entidades, como el "nombre" de un cliente o el "precio" de un producto.
+B. Gestión de Datos Maestros y de Referencia (MDM & Reference Data)
+Golden Records: Los servicios CATALOG-SERVICE y USER-SERVICE actúan como la "Fuente de Verdad" (Golden Source) para productos y actores respectivamente.
 
-**Relaciones:** Conexiones o asociaciones entre entidades, como la relación entre "Clientes" y "Productos".
+Datos de Referencia: Se estandarizan los estados y tipos mediante el uso de ENUMs en PostgreSQL (ej. estado_pedido, tipo_cliente), garantizando la integridad semántica en todo el ecosistema.
 
-El propósito principal de un modelo de datos es facilitar la comprensión y gestión de los datos en sistemas complejos, asegurando que estén organizados de manera lógica y eficiente.
+C. Seguridad de Datos (Data Security)
+Aislamiento: El uso de esquemas (schema app, schema audit) y roles de conexión específicos por servicio implementa el principio de "mínimo privilegio".
 
-<img width="2052" height="1923" alt="DiagramaFlujo-Página-2 drawio" src="https://github.com/user-attachments/assets/525ae02d-a8ca-455f-88d5-d34452d5d6da" />
+Protección: Las credenciales y tokens se almacenan utilizando algoritmos de hashing robustos (Argon2id), cumpliendo con estándares de privacidad modernos.
+
+3. Alineación con ISO 8000 (Calidad de Datos)
+El modelo de datos implementa controles técnicos nativos para satisfacer los principios de la norma ISO 8000-110 y siguientes:
+
+A. Calidad Sintáctica y Semántica (ISO 8000-61)
+Tipado Fuerte: Se hace uso estricto de tipos de datos PostgreSQL (UUID, TIMESTAMPTZ, NUMERIC) para evitar ambigüedades.
+
+Restricciones (Constraints): Se implementan reglas de negocio directamente en la base de datos (CHECK items_pedido > 0, UNIQUE SKU, NOT NULL) para prevenir la entrada de "datos sucios" desde el origen.
+
+B. Proveniencia y Trazabilidad (Data Provenance)
+Auditoría Nativa: Cada tabla transaccional incluye metadatos obligatorios (creado_en, actualizado_en, creado_por, version). Esto permite reconstruir el linaje del dato: quién lo creó, cuándo y qué versión es, cumpliendo con los requisitos de trazabilidad.
+
+C. Portabilidad de Datos
+Estándares Abiertos: Al utilizar PostgreSQL y formatos JSONB para el intercambio de mensajes, se garantiza que los datos son independientes de la plataforma tecnológica (Vendor Lock-in reducido), facilitando su intercambio y archivo a largo plazo.
+
+4. Conclusión Técnica
+La arquitectura de datos de CAFRILOSA no solo soporta las operaciones transaccionales de venta y distribución, sino que establece un Gobierno de Datos implícito en su diseño.
+
+Al separar los contextos (Microservicios), validar la calidad en la entrada (Constraints ISO 8000) y gestionar el ciclo de vida de la información mediante estándares (DMBOK), el sistema asegura una base sólida, auditable y escalable para la transformación digital de la empresa.
+## Diagrama Entidad-Relación
+# Cafrilosa_Auth
+<img width="2052" height="1923" alt="Diagrama De Auth" src="https://github.com/user-attachments/assets/7ad394ac-8251-4c8b-8125-2ff8d57bc85b" />
+
+# Cafrilosa_Catalogo
+<img width="2052" height="1923" alt="Diagrama De Catalogo" src="https://github.com/user-attachments/assets/99091320-d305-447e-880d-29d3ccc40960" />
+
+# Cafrilosa_Creditos
+<img width="2052" height="1923" alt="Diagrama De Creditos" src="https://github.com/user-attachments/assets/bb54b657-9e83-478e-a746-cfe2618df540" />
+
+# Cafrilosa_Pedidos
+<img width="2052" height="1923" alt="Diagrama De Pedidos" src="https://github.com/user-attachments/assets/70b8443f-f470-4768-a501-2e505673c558" />
+
+# Cafrilosa_Rutas
+<img width="2052" height="1923" alt="Diagrama De Rutas" src="https://github.com/user-attachments/assets/05132808-bf5a-4c55-afcb-4a08ee249b74" />
+
+# Cafrilosa_Usuarios
+<img width="252" height="1923" alt="Diagrama De Usuarios" src="https://github.com/user-attachments/assets/3c6a0dd3-7638-40e2-aa13-7cda69c97d34" />
+
+# Cafrilosa_Zonas
+<img width="252" height="1923" alt="Diagrama De Zonas" src="https://github.com/user-attachments/assets/a988ec31-a2e9-4808-b13d-36894cc539e3" />
+
