@@ -228,8 +228,44 @@ Secuencia de entrega.
 | **orden_entrega** | `INT` | NOT NULL | Número secuencial en la ruta (1, 2, 3...). |
 
 ---
+## 8. MICROSERVICIO: DELIVERY-SERVICE
 
-## 8. MICROSERVICIO: BILLING-SERVICE (cafrilosa_facturacion)
+### Tabla: app.entregas
+Ejecución de la entrega.
+
+| Campo | Tipo | Restricciones | Descripción |
+|-------|------|---------------|-------------|
+| id | UUID | PK | Identificador único. |
+| pedido_id | UUID | NOT NULL | Pedido a entregar. |
+| rutero_logistico_id | UUID | NOT NULL | Rutero asignado. |
+| estado | ENUM | NOT NULL | 'pendiente', 'en_ruta', 'entregado'. |
+| entregado_en | TIMESTAMPTZ | NULL | Fecha real de entrega. |
+| latitud | NUMERIC(9,6) | NULL | GPS Latitud. |
+| longitud | NUMERIC(9,6) | NULL | GPS Longitud. |
+
+### Tabla: app.evidencias_entrega
+Fotos y firmas.
+
+| Campo | Tipo | Restricciones | Descripción |
+|-------|------|---------------|-------------|
+| id | UUID | PK | Identificador de evidencia. |
+| entrega_id | UUID | FK -> entregas | Entrega asociada. |
+| tipo | ENUM | NOT NULL | 'foto', 'firma', 'documento'. |
+| url | TEXT | NOT NULL | URL del archivo (Storage). |
+
+### Tabla: app.incidencias_entrega
+Reporte de problemas.
+
+| Campo | Tipo | Restricciones | Descripción |
+|-------|------|---------------|-------------|
+| id | UUID | PK | Identificador de incidencia. |
+| entrega_id | UUID | FK -> entregas | Entrega afectada. |
+| severidad | ENUM | NOT NULL | 'baja', 'media', 'alta'. |
+| descripcion | TEXT | NOT NULL | Detalle del problema. |
+| resuelto_en | TIMESTAMPTZ | NULL | Fecha de resolución. |
+
+
+## . MICROSERVICIO: BILLING-SERVICE (cafrilosa_facturacion)
 
 ### Tabla: app.documentos_fiscales
 Facturación electrónica SRI.
