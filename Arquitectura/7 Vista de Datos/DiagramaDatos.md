@@ -66,4 +66,6 @@ Al separar los contextos (Microservicios), validar la calidad en la entrada (Con
 
 # Cafrilosa_Zonas
 <img width="2052" height="1923" alt="Diagrama De Zonas" src="https://github.com/user-attachments/assets/a988ec31-a2e9-4808-b13d-36894cc539e3" />
+# Cafrilosa_Entregas
+<img width="2052" height="1923" alt="Diagrama De Entregas" src="https://github.com/user-attachments/assets/6fc96f3d-986f-4478-8589-4d0649d7cdee" />
 
