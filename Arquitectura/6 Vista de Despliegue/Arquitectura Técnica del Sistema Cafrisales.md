@@ -116,3 +116,36 @@ La organización del código Terraform (`/infra/terraform`) refleja directamente
 * `networking/`: VPC, Subnets y Serverless Connector (Capa 3).
 * `cloud_build/` & `artifact_registry/`: Configuración del Pipeline CI/CD (Capa 4).
 * `firebase/`: Hosting web (Capa 1).
+
+
+---
+
+## 🔄 Pipeline de Automatización (CI/CD)
+El flujo de desarrollo está completamente automatizado utilizando **Google Cloud Build**, asegurando entregas rápidas y consistentes.
+
+### ⚙️ Flujo de Trabajo
+1.  **Source Code:** El código se aloja en repositorios de GitHub (`frontendCafrisales` y `backendCafrisales`).
+2.  **Triggers:** Al detectar un `Push` a la rama `main`, Cloud Build activa los disparadores correspondientes.
+3.  **Build:**
+    * Se compilan las imágenes Docker para cada microservicio modificado.
+    * Se ejecutan pruebas unitarias (si aplica).
+4.  **Registry:** Las imágenes construidas se almacenan en el **Container Registry** (o Artifact Registry).
+5.  **Deploy:**
+    * **Backend:** Cloud Build despliega las nuevas imágenes en **Cloud Run** (Actualización de revisión).
+    * **Frontend:** Se despliegan los activos estáticos optimizados en **Firebase Hosting**.
+
+---
+
+## 🛠️ Stack Tecnológico
+
+| Componente | Tecnología |
+| :--- | :--- |
+| **Infraestructura como Código** | Terraform |
+| **Nube Pública** | Google Cloud Platform (GCP) |
+| **Contenedores** | Docker |
+| **Orquestación Serverless** | Cloud Run (Knative managed) |
+| **Base de Datos** | PostgreSQL 17 (Cloud SQL) |
+| **Definición de API** | REST (OpenAPI 3.0) |
+| **Frontend Web** | React.js |
+| **Frontend Móvil** | React Native (Expo) |
+| **Lenguajes Backend** | Python / Node.js (según microservicio) |
