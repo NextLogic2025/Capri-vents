@@ -4,6 +4,8 @@ Este documento proporciona un desglose profundo de la arquitectura de despliegue
 
 El diseño prioriza el desacoplamiento estricto, la seguridad perimetral y la escalabilidad automática.
 
+https://drive.google.com/file/d/1Z7Gn6rGeCyA8bditPT4BQPkKVCqUwJNH/view?usp=sharing
+
 ---
 
 ## 1. Capa de Cliente y Entrada (Frontend & Gateway)
